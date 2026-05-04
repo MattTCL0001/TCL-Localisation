@@ -246,7 +246,15 @@
             // Extraction du nom de la ligne (ex: "ActIV:Line::C12:SYTRAL" -> "C12")
             const fullLineRef = journey.LineRef?.value || "";
             const lineName = fullLineRef.split(':').slice(-2, -1)[0] || "??";
-
+            const getModeIcon = (lineName) => {
+    if (lineName.startsWith('TB')) return 'Mode_TB.svg';
+    if (lineName.startsWith('T')) return 'Mode_T.svg';
+    if (lineName.startsWith('M') || ['A', 'B', 'C', 'D'].includes(lineName)) return 'Mode_M.svg';
+    if (lineName.startsWith('F')) return 'Mode_F.svg';
+    if (lineName.startsWith('C')) return 'Mode_C.svg';
+    if (lineName.startsWith('7601')) return 'Mode_NAVI.svg';
+    return 'Mode_Bus.svg'; // Par défaut pour tout le reste (C, S, Zi, chiffres)
+};
             const icon = L.divIcon({
                 html: `<div style="position:relative;width:32px;height:32px;">
                          <div style="position:absolute;left:9px;top:0px;transform:rotate(${bearing}deg);transform-origin:7px 14px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid #da291c;"></div>
