@@ -28,7 +28,7 @@ jobs:
         env:
           GRANDLYON_USER: ${{ secrets.GRANDLYON_USER }}
           GRANDLYON_PASS: ${{ secrets.GRANDLYON_PASS }}
-        run: python update_data.py # Remplace par le nom exact de ton fichier .py
+        run: python api/index.py # Remplace par le nom exact de ton fichier .py
 
       - name: Commit and Push changes
         run: |
