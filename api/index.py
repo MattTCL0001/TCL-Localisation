@@ -1,28 +1,17 @@
 import os
 import json
+import requests
 
-# Au lieu de faire un return jsonify(data) pour Flask, 
-# on enregistre le résultat dans un fichier que GitHub pourra lire
-def save_to_github(data, filename):
-    with open(f'data/{filename}.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
-        
-app = Flask(__name__)
-CORS(app)
-
-# Secrets Vercel
+# Secrets (à configurer dans les paramètres de ton dépôt GitHub)
 USER = os.environ.get('GRANDLYON_USER')
 PASS = os.environ.get('GRANDLYON_PASS')
 
-# --- Cache minimaliste ---
-# Note : Sur Vercel, ce cache se videra souvent, c'est normal (mode Serverless)
-cache = {
-    'parkings': None,
-    'traffic': None,
-    'accessibility': None,
-    'velov': None,
-    'stops': None
-}
+def save_to_github(data, filename):
+    """Enregistre les données dans le dossier data/ pour que le HTML les lise."""
+    if not os.path.exists('data'):
+        os.makedirs('data')
+    with open(f'data/{filename}.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
 
 # Ton dictionnaire LINE_COLORS (Garde-le tel quel dans ton code)
 LINE_COLORS = {
@@ -93,78 +82,63 @@ LINE_COLORS = {
 
 # --- Fonctions de récupération ---
 
-def fetch_parkings():
-    url_geo = "https://data.grandlyon.com/geoserver/sytral/ows?SERVICE=WFS&VERSION=2.0.0&request=GetFeature&typename=sytral:tcl_sytral.tclparcrelaisst&outputFormat=application/json&SRSNAME=EPSG:4171&sortBy=gid"
-    try:
-        r = requests.get(url_geo, auth=(USER, PASS), timeout=10)
-        if r.status_code == 200:
-            raw_geo = r.json()
-            parkings = []
-            for feature in raw_geo.get('features', []):
-                props = feature.get('properties', {})
-                coords = feature.get('geometry', {}).get('coordinates', [])
-                if coords:
-                    parkings.append({
-                        "nom": props.get('nom') or "P+R",
-                        "lat": coords[1], "lon": coords[0],
-                        "capacite": props.get('capacite', "?")
-                    })
-            cache['parkings'] = parkings
-            return parkings
-    except: return []
-
-def fetch_generic(key, url):
-    try:
-        r = requests.get(url, auth=(USER, PASS), timeout=10)
-        if r.status_code == 200:
-            cache[key] = r.json()
-            return cache[key]
-    except: return None
-
-# --- Routes API ---
-
-@app.route('/api/status')
-def get_status():
-    return jsonify({"status": "online", "auth": USER is not None})
-
-@app.route('/api/buses')
-def get_buses():
-    # Toujours en temps réel
+# --- 1. FONCTION BUS (SIRI-LITE) ---
+def fetch_buses():
     url = "https://data.grandlyon.com/siri-lite/2.0/vehicle-monitoring.json"
     try:
-        r = requests.get(url, auth=(USER, PASS), timeout=10)
-        # ... Ta logique de nettoyage des bus ici ...
-        return jsonify(r.json()) # Simplifié pour l'exemple
-    except: return jsonify([])
+        r = requests.get(url, auth=(USER, PASS), timeout=15)
+        if r.status_code == 200:
+            return r.json()
+    except Exception as e:
+        print(f"Erreur Bus: {e}")
+    return {"Siri": {"ServiceDelivery": {"VehicleMonitoringDelivery": []}}}
 
-@app.route('/api/parkings')
-def get_parkings_cached():
-    if cache['parkings'] is None: fetch_parkings()
-    return jsonify(cache['parkings'] or [])
+# --- 2. FONCTION PARKINGS (WFS) ---
+def fetch_parkings():
+    url = "https://data.grandlyon.com/geoserver/sytral/ows?SERVICE=WFS&VERSION=2.0.0&request=GetFeature&typename=sytral:tcl_sytral.tclparcrelaisst&outputFormat=application/json&SRSNAME=EPSG:4171"
+    try:
+        r = requests.get(url, auth=(USER, PASS), timeout=15)
+        if r.status_code == 200:
+            features = r.json().get('features', [])
+            parkings = []
+            for f in features:
+                p = f.get('properties', {})
+                c = f.get('geometry', {}).get('coordinates', [])
+                if c:
+                    parkings.append({
+                        "nom": p.get('nom', 'P+R'),
+                        "lat": c[1], "lon": c[0],
+                        "capacite": p.get('capacite', '?')
+                    })
+            return parkings
+    except Exception as e:
+        print(f"Erreur Parkings: {e}")
+    return []
 
-@app.route('/api/traffic')
-def get_traffic_cached():
-    if cache['traffic'] is None: 
-        fetch_generic('traffic', "https://data.grandlyon.com/fr/datapusher/ws/rdata/tcl_sytral.tclalertetrafic_2/all.json")
-    return jsonify(cache['traffic'] or {"values": []})
+# --- 3. FONCTION VELO'V (JSON) ---
+def fetch_velov():
+    # Note: On utilise ici l'API temps réel Velo'v du Grand Lyon
+    url = "https://data.grandlyon.com/fr/datapusher/ws/rdata/jcd_jcdecaux.jcdvelov/all.json"
+    try:
+        r = requests.get(url, auth=(USER, PASS), timeout=15)
+        if r.status_code == 200:
+            return r.json().get('values', [])
+    except Exception as e:
+        print(f"Erreur Velo'v: {e}")
+    return []
 
-# --- CONFIGURATION VERCEL ---
-# Pas de app.run(), pas de threads, pas de while True
-
-# L'objet app doit être accessible par Vercel
-expose_app = app
-return data
-
-def save_json(data, filename):
-    # Crée le dossier data s'il n'existe pas
-    if not os.path.exists('data'):
-        os.makedirs('data')
-    with open(f'data/{filename}.json', 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=4)
-
+# --- EXÉCUTION ---
 if __name__ == "__main__":
-    # On récupère et on enregistre tout
-    bus_data = fetch_sytral_data()
-    save_json(bus_data, 'bus_positions')
-    # Fais pareil pour les parkings et velov...
-    print("Données mises à jour !")
+    print("🚀 Lancement de la mise à jour des données...")
+    
+    # On récupère tout
+    buses = fetch_buses()
+    parkings = fetch_parkings()
+    velov = fetch_velov()
+    
+    # On sauvegarde tout dans des fichiers séparés
+    save_to_github(buses, 'bus_positions')
+    save_to_github(parkings, 'parkings')
+    save_to_github(velov, 'velov')
+    
+    print("✅ Terminé ! Les fichiers sont prêts dans le dossier data/.")
