@@ -247,13 +247,13 @@
             const fullLineRef = journey.LineRef?.value || "";
             const lineName = fullLineRef.split(':').slice(-2, -1)[0] || "??";
             const getModeIcon = (lineName) => {
-    if (lineName.startsWith('TB')) return 'Mode_TB.svg';
-    if (lineName.startsWith('T')) return 'Mode_T.svg';
-    if (lineName.startsWith('M') || ['A', 'B', 'C', 'D'].includes(lineName)) return 'Mode_M.svg';
-    if (lineName.startsWith('F')) return 'Mode_F.svg';
-    if (lineName.startsWith('C')) return 'Mode_C.svg';
-    if (lineName.startsWith('7601')) return 'Mode_NAVI.svg';
-    return 'Mode_Bus.svg'; // Par défaut pour tout le reste (C, S, Zi, chiffres)
+    if (lineName.startsWith('TB')) return '/Lignes/Mode_TB.svg';
+    if (lineName.startsWith('T')) return '/Lignes/Mode_T.svg';
+    if (lineName.startsWith('M') || ['A', 'B', 'C', 'D'].includes(lineName)) return '/Lignes/Mode_M.svg';
+    if (lineName.startsWith('F')) return '/Lignes/Mode_F.svg';
+    if (lineName.startsWith('C')) return '/Lignes/Mode_C.svg';
+    if (lineName.startsWith('7601')) return '/Lignes/Mode_NAVI.svg';
+    return '/Lignes/Mode_Bus.svg'; // Par défaut pour tout le reste (C, S, Zi, chiffres)
 };
             const icon = L.divIcon({
                 html: `<div style="position:relative;width:32px;height:32px;">
