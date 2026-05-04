@@ -7,10 +7,16 @@ USER = os.environ.get('GRANDLYON_USER')
 PASS = os.environ.get('GRANDLYON_PASS')
 
 def save_to_github(data, filename):
-    """Enregistre les données dans le dossier data/ pour que le HTML les lise."""
-    if not os.path.exists('data'):
-        os.makedirs('data')
-    with open(f'data/{filename}.json', 'w', encoding='utf-8') as f:
+    # On définit le chemin vers la racine (un dossier au-dessus de 'api')
+    # Si ton script n'est PAS dans un sous-dossier, utilise root_dir = "."
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_dir = os.path.join(root_dir, 'data')
+    
+    if not os.path.exists(target_dir):
+        os.makedirs(target_dir)
+        
+    file_path = os.path.join(target_dir, f'{filename}.json')
+    with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, ensure_ascii=False, indent=4)
 
 # Ton dictionnaire LINE_COLORS (Garde-le tel quel dans ton code)
