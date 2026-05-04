@@ -23,17 +23,17 @@ jobs:
 
       - name: Install Dependencies
         run: pip install requests
-
       - name: Run Update Script
         env:
           GRANDLYON_USER: ${{ secrets.GRANDLYON_USER }}
           GRANDLYON_PASS: ${{ secrets.GRANDLYON_PASS }}
-        run: python api/index.py 
+        run: python api/index.py  # Vérifie bien que ce nom est écrit !
 
       - name: Commit and Push changes
         run: |
           git config --global user.name 'github-actions[bot]'
           git config --global user.email 'github-actions[bot]@users.noreply.github.com'
-          git add data/*.json
+          # On ajoute tout le dossier data au cas où
+          git add data/*.json 
           git commit -m "Auto-update: $(date +'%Y-%m-%d %H:%M:%S')" || exit 0
           git push
