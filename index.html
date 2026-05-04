@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>TCL Localisation</title>
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="only light">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body, html { height: 100%; width: 100%; margin: 0; padding: 0; background-color: #1a1a1a; color: #eeeeee; overflow: hidden; position: fixed; top: 0; left: 0; right: 0; bottom: 0; }
+        .app-container { position: fixed; top: 0; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; }
+        .app-header { position: relative; height: 60px; background: #1a1a1a; border-bottom: 2px solid #00d2ff; display: flex; align-items: center; justify-content: space-between; padding: 0 20px; z-index: 1002; flex-shrink: 0; }
+        .map-container { flex: 1; position: relative; background: #242424; z-index: 1; }
+        #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; background: #242424; }
+        .logo-container { display: flex; align-items: center; gap: 10px; }
+        .logo-container img { height: 40px; width: auto; }
+        .logo-container h1 { font-size: 18px; margin: 0; color: #00d2ff; }
+        .header-tabs { display: flex; gap: 5px; background: #252525; padding: 5px; border-radius: 30px; }
+        .header-tab { padding: 8px 16px; border-radius: 25px; cursor: pointer; font-size: 13px; font-weight: 600; transition: all 0.2s; background: transparent; color: #aaa; border: none; }
+        .header-tab:hover { background: #333; color: #fff; }
+        .header-tab.active { background: #00d2ff; color: #000; }
+        .leaflet-tile-container { filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%); }
+        .leaflet-popup-content-wrapper { background: #2c2c2c !important; color: #ffffff !important; border: 1px solid #444; border-radius: 8px; padding: 5px; }
+        .leaflet-popup-tip { background: #444 !important; }
+        #info-panel { position: fixed; top: 70px; right: 0; bottom: 10px; width: 380px; z-index: 1000; font-family: 'Segoe UI', sans-serif; display: flex; flex-direction: column; pointer-events: none; transition: transform 0.3s ease; }
+        #info-panel.collapsed { transform: translateX(calc(100% - 45px)); }
+        #info-panel > * { pointer-events: all; }
+        .panel-toggle { position: absolute; left: -40px; top: 20px; background: #2c2c2c; border: 1px solid #444; border-right: none; color: #eee; width: 40px; height: 40px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; border-radius: 8px 0 0 8px; transition: background 0.15s; z-index: 1001; }
+        .panel-toggle:hover { background: #383838; }
+        #info-panel.collapsed .panel-toggle span { transform: rotate(180deg); display: inline-block; }
+        .tab-content { flex: 1; overflow-y: auto; background: #2c2c2c; border-left: 1px solid #444; border-bottom: 1px solid #444; border-radius: 10px 0 0 0; box-shadow: -4px 4px 24px rgba(0,0,0,0.5); display: flex; flex-direction: column; }
+        .tab-pane { display: none; flex-direction: column; flex: 1; overflow-y: auto; }
+        .tab-pane.active { display: flex; }
+        .tab-header { padding: 10px 16px; border-bottom: 1px solid #3a3a3a; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #666; flex-shrink: 0; background: #2c2c2c; position: sticky; top: 0; z-index: 10; }
+        .info-list { overflow-y: auto; flex: 1; scrollbar-width: thin; scrollbar-color: #555 #2c2c2c; }
+        .search-bar { background: #2c2c2c; border-left: 1px solid #444; border-bottom: 1px solid #444; padding: 10px; display: flex; gap: 8px; position: sticky; top: 0; z-index: 10; }
+        .search-bar input { flex: 1; background: #1a1a1a; border: 1px solid #444; color: #eee; padding: 8px 12px; border-radius: 6px; font-size: 12px; }
+        .search-bar input:focus { outline: none; border-color: #00d2ff; }
+        .search-bar input::placeholder { color: #666; }
+        .search-bar button { background: #00d2ff; border: none; color: #000; padding: 8px 12px; border-radius: 6px; cursor: pointer; font-weight: bold; }
+        .search-stats { font-size: 10px; color: #888; padding: 5px 12px; background: #252525; border-left: 1px solid #444; }
+        .filter-bar { padding: 8px 12px; background: #252525; border-bottom: 1px solid #3a3a3a; font-size: 10px; display: flex; flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 10; }
+        .filter-bar label { display: flex; align-items: center; gap: 3px; cursor: pointer; }
+        .filter-bar input { margin: 0; cursor: pointer; }
+        .info-item { border-bottom: 1px solid #333; overflow: hidden; }
+        .info-item:last-child { border-bottom: none; }
+        .info-summary { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; transition: background 0.12s; }
+        .info-summary:hover { background: #333; }
+        .info-line-icon { flex-shrink: 0; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; }
+        .info-line-badge { flex-shrink: 0; font-weight: 800; font-size: 10px; padding: 4px 6px; border-radius: 6px; min-width: 32px; text-align: center; color: #000; background: #333; display: flex; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 8px; font-size: 18px; }
+        .info-summary-text { flex: 1; overflow: hidden; }
+        .info-titre { font-size: 12px; font-weight: 700; color: #eee; }
+        .info-type { font-size: 10px; color: #777; }
+        .info-chevron { color: #555; font-size: 9px; flex-shrink: 0; transition: transform 0.2s; }
+        .info-item.expanded .info-chevron { transform: rotate(180deg); }
+        .info-detail { display: none; padding: 0 14px 12px 60px; font-size: 12px; color: #bbb; line-height: 1.6; }
+        .info-item.expanded .info-detail { display: block; }
+        .info-empty { padding: 32px 16px; text-align: center; color: #555; font-size: 13px; }
+        .stop-lines, .alert-lines { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
+        .stop-line-svg, .alert-line-svg { height: 20px; width: auto; max-width: 40px; background: #1a1a1a; border-radius: 4px; padding: 2px 4px; }
+        .search-highlight { background-color: #00d2ff; color: #000; border-radius: 3px; padding: 0 2px; }
+        .stop-commune { font-size: 10px; color: #ffb84d; }
+        .stop-pmr-badge { display: inline-block; background: #4dff88; color: #000; font-size: 9px; padding: 1px 4px; border-radius: 4px; margin-left: 6px; }
+        .bus-delay-ok { color: #4dff88; }
+        .bus-delay-ko { color: #ff4d4d; }
+        .line-group { margin-top: 10px; }
+        .line-group-header { padding: 6px 12px; font-weight: bold; font-size: 12px; position: sticky; top: 0; }
+        .line-items { display: flex; flex-wrap: wrap; padding: 8px; gap: 8px; }
+        .line-item { width: auto; padding: 5px 10px; cursor: pointer; background: #1a1a1a; border-radius: 6px; transition: transform 0.1s; }
+        .line-item:hover { transform: scale(1.05); background: #333; }
+        .line-item img { height: 24px; width: auto; }
+        .credits-content { padding: 20px; line-height: 1.8; }
+        .credits-content a { color: #00d2ff; text-decoration: none; }
+        .credits-content a:hover { text-decoration: underline; }
+        .credits-section { margin-bottom: 20px; }
+        .credits-section h3 { color: #00d2ff; margin-bottom: 10px; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #1a1a1a; }
+        ::-webkit-scrollbar-thumb { background: #555; border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: #777; }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-header">
+            <div class="logo-container">
+                <img src="Logo.svg" alt="TCL Localisation" onerror="this.style.display='none'">
+            </div>
+            <div class="header-tabs">
+                <button class="header-tab active" data-tab="traffic">🚧 Infos Trafic</button>
+                <button class="header-tab" data-tab="accessibility">♿ Accessibilité</button>
+                <button class="header-tab" data-tab="stops">🚏 Arrêts</button>
+                <button class="header-tab" data-tab="lines">📋 Lignes</button>
+                <button class="header-tab" data-tab="velov">🚲 Velo'v</button>
+                <button class="header-tab" data-tab="credits">ℹ️ Crédits</button>
+            </div>
+        </div>
+        <div class="map-container"><div id="map"></div></div>
+    </div>
+
+    <div id="info-panel">
+        <div class="panel-toggle" onclick="togglePanel()"><span>▶</span></div>
+        <div class="tab-content">
+            <div id="traffic-pane" class="tab-pane active"><div class="tab-header">Perturbations en cours</div><div id="traffic-list" class="info-list"><div class="info-empty">Chargement...</div></div></div>
+            <div id="accessibility-pane" class="tab-pane"><div class="tab-header">Alertes accessibilité</div><div id="accessibility-list" class="info-list"><div class="info-empty">Chargement...</div></div></div>
+            <div id="stops-pane" class="tab-pane">
+                <div class="search-bar"><input type="text" id="stop-search" placeholder="🔍 Rechercher..." onkeyup="filterStops()"><button onclick="filterStops()">Rechercher</button></div>
+                <div class="tab-header">Tous les arrêts <span id="search-stats" class="search-stats" style="display: inline-block; float: right; padding: 0;">0/0</span></div>
+                <div id="stops-list" class="info-list"><div class="info-empty">⚠️ Chargement...</div></div>
+            </div>
+            <div id="lines-pane" class="tab-pane">
+                <div class="filter-bar">
+                    <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> 🚇 Métro</label>
+                    <label><input type="checkbox" id="filter-tram" checked onchange="filterLines()"> 🚊 Tramway</label>
+                    <label><input type="checkbox" id="filter-tb" checked onchange="filterLines()"> 🚋 Trambus</label>
+                    <label><input type="checkbox" id="filter-funi" checked onchange="filterLines()"> 🚠 Funiculaire</label>
+                    <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> ⛴️ Navgône</label>
+                    <label><input type="checkbox" id="filter-chromo" checked onchange="filterLines()"> 🔵 Chrono</label>
+                    <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> 🚌 Bus</label>
+                    <label><input type="checkbox" id="filter-soyeuse" checked onchange="filterLines()"> 🟢 Soyeuse</label>
+                    <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> 🌙 Navette</label>
+                    <label><input type="checkbox" id="filter-gex" checked onchange="filterLines()"> 🚉 Gare Express</label>
+                    <label><input type="checkbox" id="filter-zi" checked onchange="filterLines()"> 🏭 Zone Ind.</label>
+                    <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> 🌕 Pleine Lune</label>
+                    <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> 📚 Junior Direct</label>
+                </div>
+                <div class="tab-header">Toutes les lignes</div>
+                <div id="lines-list" class="info-list"><div class="info-empty">⚠️ Chargement...</div></div>
+            </div>
+            <div id="credits-pane" class="tab-pane">
+                <div class="tab-header">À propos</div>
+                <div class="credits-content">
+                    <div class="credits-section"><h3>🚍 TCL Localisation</h3><p>Application de localisation en temps réel des transports en commun lyonnais.</p></div>
+                    <div class="credits-section"><h3>📡 Sources de données</h3><p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a></p></div>
+                    <div class="credits-section"><h3>🗺️ Cartographie</h3><p>© <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a></p></div>
+                    <div class="credits-section"><h3>👨‍💻 Développement</h3><p>Version BETA - Septembre 2026</p></div>
+                </div>
+            </div>
+            <div id="velov-pane" class="tab-pane">
+                <div class="search-bar">
+                    <input type="text" id="velov-search" placeholder="🔍 Rechercher par adresse, nom ou numéro..." onkeyup="filterVelovStations()">
+                    <button onclick="filterVelovStations()">Rechercher</button>
+                </div>
+                <div class="tab-header">
+                    Stations Velo'v
+                    <span id="velov-stats" class="search-stats" style="display: inline-block; float: right; padding: 0;">0/0</span>
+                </div>
+                <div id="velov-list" class="info-list">
+                    <div class="info-empty">⚠️ Chargement des stations...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <script>
+        // INITIALISATION RAPIDE
+        const map = L.map('map').setView([45.757, 4.832], 13);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(map);
+
+        // COUCHES
+        let busLayer = L.layerGroup().addTo(map);
+        let parkingLayer = L.layerGroup().addTo(map);
+        // FIX: velovLayer ajouté à la carte dès le départ
+        let velovLayer = L.layerGroup().addTo(map);
+
+        // VARIABLES
+        let allStops = [], stopsMapping = {}, allLines = [], filteredLines = [];
+        // FIX: une seule variable pour les stations Velo'v (suppression du doublon allStations)
+        let allVelovStations = [], currentVelovMarkers = [], currentStopMarker = null, currentVelovMarker = null;
+        const VELOV_MIN_ZOOM = 13;
+
+        // FONCTIONS UTILES RAPIDES
+        const togglePanel = () => { document.getElementById('info-panel').classList.toggle('collapsed'); setTimeout(() => map.invalidateSize(), 300); };
+        const toggleInfoItem = (el) => el.closest('.info-item').classList.toggle('expanded');
+
+        function switchToTab(tabName) {
+            document.querySelectorAll('.header-tab').forEach(btn => {
+                btn.classList.remove('active');
+                if (btn.getAttribute('data-tab') === tabName) btn.classList.add('active');
+            });
+            document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+            document.getElementById(`${tabName}-pane`).classList.add('active');
+
+            if (tabName === 'velov' && allVelovStations.length === 0) {
+                loadVelovStations();
+            }
+        }
+        document.querySelectorAll('.header-tab').forEach(btn => btn.addEventListener('click', () => switchToTab(btn.dataset.tab)));
+
+        // CORRESPONDANCES LIGNES
+        const lineMapping = { 'C3':'C3','C11':'C27','C7':'36','C15E':'32','C19':'41','C20E':'C20EX','C22E':'C22EX','2':'102','3':'103','5':'105','6':'106','6E':'106EX','7':'107','8':'108','9':'109','10':'110','10E':'110EX','11':'111','12':'112','14':'114','15':'115','15E':'99EX','16':'116','17':'117','18':'118','19':'119','20':'120','21':'121','22':'123','23':'123','24':'124','25':'125','26':'126','27':'127','30':'230','32':'232','47':'248','52E':'52EX','89D':'89EX','98E':'98EX','Zi1':'145','Zi2':'146','Zi3':'147','Zi4':'148','Zi5':'149','Zi8':'150','GE2':'130','GE4':'131','GE6':'132','N20':'N185','N80':'N180','N81':'N181','N82':'N182','N83':'N183','N84':'N184','N100':'N186','S1':'133','S2':'138','S3':'139','S4A':'104A','S4B':'104B','S5':'140','S6':'141','S7':'142','S8':'143','S9':'144','S10':'134','S11':'135','S14':'136','S15':'137' };
+        const getNewLineNumber = (line) => lineMapping[line] || line;
+        const getLinePrioritySimple = (line) => { const l = getNewLineNumber(line); if(l.match(/^[ABCD]$/)) return 1; if(l.match(/^T[1-7]$/i)) return 2; if(l.match(/^TB/i)) return 3; if(l.match(/^F[12]$/i)) return 4; if(l.match(/^(NAVI|7601)/i)) return 5; if(l.match(/^C/i)) return 6; if(l.match(/^\d+$/) && parseInt(l)>=32 && parseInt(l)<=248) return 7; if(l.match(/^(104A|104B|133|134|135|136|137|138|139|140|141|142|143|144)$/)) return 8; if(l.match(/^N/i)) return 9; if(l.match(/^(130|131|132)$/)) return 10; if(l.match(/^(145|146|147|148|149|150)$/)) return 11; if(l.match(/^PL/i)) return 12; if(l.match(/^JD/i)) return 13; return 14; };
+        const getLineType = (line) => { const l = getNewLineNumber(line); if(l.match(/^[ABCD]$/)) return 'metro'; if(l.match(/^T[1-7]$/i)) return 'tram'; if(l.match(/^TB/i)) return 'tb'; if(l.match(/^F[12]$/i)) return 'funiculaire'; if(l.match(/^(NAVI|7601)/i)) return 'navgone'; if(l.match(/^C/i)) return 'chromo'; if(l.match(/^\d+$/) && parseInt(l)>=32 && parseInt(l)<=248) return 'bus'; if(l.match(/^(104A|104B|133|134|135|136|137|138|139|140|141|142|143|144)$/)) return 'soyeuse'; if(l.match(/^N/i)) return 'navette'; if(l.match(/^(130|131|132)$/)) return 'gex'; if(l.match(/^(145|146|147|148|149|150)$/)) return 'zi'; if(l.match(/^PL/i)) return 'pl'; if(l.match(/^JD/i)) return 'jd'; return 'other'; };
+
+        function extractLines(desserte) {
+            if (!desserte) return [];
+            const lines = [...new Set(desserte.split(',').map(item => getNewLineNumber(item.trim().split(':')[0].trim())))];
+
+            function getNumericValue(line) {
+                const match = line.match(/\d+/);
+                return match ? parseInt(match[0]) : 999999;
+            }
+            function getPrefix(line) {
+                const match = line.match(/^[A-Za-z]+/);
+                return match ? match[0] : '';
+            }
+            function getSuffix(line) {
+                const match = line.match(/[A-Z]+$/);
+                return match ? match[0] : '';
+            }
+
+            const typeOrder = {
+                'A': 0, 'B': 0, 'C': 0, 'D': 0,
+                'T': 1, 'TB': 2, 'F': 3,
+                'NAVI': 4, '7601': 4,
+                '': 6, 'N': 7, 'S': 8,
+                'GE': 9, 'Zi': 10, 'PL': 11, 'JD': 12
+            };
+
+            lines.sort((a, b) => {
+                const prefixA = getPrefix(a), prefixB = getPrefix(b);
+                const numA = getNumericValue(a), numB = getNumericValue(b);
+                const suffixA = getSuffix(a), suffixB = getSuffix(b);
+                const orderA = typeOrder[prefixA] ?? 99;
+                const orderB = typeOrder[prefixB] ?? 99;
+                if (orderA !== orderB) return orderA - orderB;
+                if (numA !== numB) return numA - numB;
+                if (suffixA !== suffixB) {
+                    if (suffixA === 'EX') return 1;
+                    if (suffixB === 'EX') return -1;
+                    return suffixA.localeCompare(suffixB);
+                }
+                return a.localeCompare(b);
+            });
+
+            return lines;
+        }
+
+        function renderLineSvgs(lines) {
+            if(!lines?.length) return '<span style="color:#666;">Aucune ligne</span>';
+            return lines.map(line => `<img src="Lignes/${getNewLineNumber(line)}.svg" class="stop-line-svg" style="height:20px;width:auto;display:inline-block;margin:0 2px;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\'background:#555;padding:2px 6px;border-radius:4px;font-size:10px;margin:0 2px;\'>${getNewLineNumber(line)}</span>');">`).join('');
+        }
+
+        function highlightText(text, term) { if(!term||!text) return text||''; return text.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`,'gi'),'<span class="search-highlight">$1</span>'); }
+        function getStopType(desserte) { if(!desserte) return 'bus'; if(desserte.match(/T[1-7]/)) return 'tram'; if(desserte.match(/^[ABCD]$/)) return 'metro'; return 'bus'; }
+        function sortStopsAlphabetically(stops) { return [...stops].sort((a,b)=> ((a.nom||"").toLowerCase()).localeCompare((b.nom||"").toLowerCase())); }
+
+        function renderStopList(searchTerm='') {
+            let stops = sortStopsAlphabetically(allStops);
+            if(searchTerm) stops = stops.filter(s => (s.nom||"").toLowerCase().includes(searchTerm) || (s.commune||"").toLowerCase().includes(searchTerm) || (s.desserte||"").toLowerCase().includes(searchTerm));
+            document.getElementById('search-stats').textContent = `${stops.length}/${allStops.length}`;
+            if(!stops.length) { document.getElementById('stops-list').innerHTML = '<div class="info-empty">🔍 Aucun arrêt trouvé</div>'; return; }
+            const html = stops.slice(0,300).map(stop => {
+                const lines = extractLines(stop.desserte);
+                return `<div class="info-item" data-lat="${stop.lat}" data-lon="${stop.lon}" data-nom="${stop.nom||''}">
+                            <div class="info-summary" onclick="selectStopOnMap(this)">
+                                <div class="info-line-badge" style="font-size:18px;">${getStopType(stop.desserte)==='tram'?'🚊':(getStopType(stop.desserte)==='metro'?'🚇':'🚌')}</div>
+                                <div class="info-summary-text">
+                                    <div class="info-titre">${highlightText(stop.nom||"Arrêt",searchTerm)}${stop.pmr?'<span class="stop-pmr-badge">♿ PMR</span>':''}</div>
+                                    <div class="stop-commune">${highlightText(stop.commune||"",searchTerm)} • Zone ${stop.zone||'N/A'}</div>
+                                    <div class="stop-lines">${renderLineSvgs(lines)}</div>
+                                </div>
+                                <span class="info-chevron" onclick="event.stopPropagation();toggleInfoItem(this)">▼</span>
+                            </div>
+                            <div class="info-detail">
+                                <strong>📍 Adresse:</strong> ${stop.adresse||'Non renseignée'}<br>
+                                <strong>🚏 Lignes:</strong> ${stop.desserte||'Aucune'}<br>
+                                <strong>♿ PMR:</strong> ${stop.pmr?'✅ Accessible':'❌ Non accessible'}<br>
+                                <strong>🏙️ Commune:</strong> ${stop.commune||''}<br>
+                                <strong>🔢 Zone:</strong> ${stop.zone||'N/A'}
+                            </div>
+                        </div>`;
+            }).join('');
+            document.getElementById('stops-list').innerHTML = html + (stops.length>300 ? `<div class="info-empty">📌 +${stops.length-300} autres arrêts (affinez)</div>` : '');
+        }
+
+        window.selectStopOnMap = function(element) {
+            const item = element.closest('.info-item');
+            if(item) {
+                const lat = item.dataset.lat, lon = item.dataset.lon, nom = item.dataset.nom;
+                if(lat && lon) {
+                    if(currentStopMarker) map.removeLayer(currentStopMarker);
+                    currentStopMarker = L.marker([parseFloat(lat), parseFloat(lon)], { icon: L.divIcon({ html:'<div style="background:#ff0000;width:16px;height:16px;border-radius:50%;border:2px solid white;"></div>', iconSize:[16,16], iconAnchor:[8,8] }) }).bindPopup(`<b>📍 ${nom}</b>`).addTo(map);
+                    map.setView([parseFloat(lat), parseFloat(lon)], 16);
+                    currentStopMarker.openPopup();
+                    setTimeout(() => { if(currentStopMarker) { map.removeLayer(currentStopMarker); currentStopMarker=null; } }, 5000);
+                }
+            }
+        };
+
+        window.filterStops = () => renderStopList(document.getElementById('stop-search').value.toLowerCase().trim());
+
+        // LIGNES
+        function extractAllLinesFromStops() {
+            const linesSet = new Set();
+            allStops.forEach(stop => { if(stop.desserte) stop.desserte.split(',').forEach(item => linesSet.add(getNewLineNumber(item.trim().split(':')[0].trim()))); });
+            allLines = Array.from(linesSet).sort((a,b) => { const pa=getLinePrioritySimple(a), pb=getLinePrioritySimple(b); if(pa!==pb) return pa-pb; const na=parseInt(a), nb=parseInt(b); if(!isNaN(na)&&!isNaN(nb)) return na-nb; return a.localeCompare(b); });
+            filterLines();
+        }
+
+        window.filterLines = () => {
+            const filters = { metro:document.getElementById('filter-metro')?.checked, tram:document.getElementById('filter-tram')?.checked, tb:document.getElementById('filter-tb')?.checked, funiculaire:document.getElementById('filter-funi')?.checked, navgone:document.getElementById('filter-navgone')?.checked, chromo:document.getElementById('filter-chromo')?.checked, bus:document.getElementById('filter-bus')?.checked, soyeuse:document.getElementById('filter-soyeuse')?.checked, navette:document.getElementById('filter-navette')?.checked, gex:document.getElementById('filter-gex')?.checked, zi:document.getElementById('filter-zi')?.checked, pl:document.getElementById('filter-pl')?.checked, jd:document.getElementById('filter-jd')?.checked };
+            filteredLines = allLines.filter(line => filters[getLineType(line)] === true);
+            const typeNames = { metro:{icon:"🚇",name:"Métro",color:"#004f9f",text:"#fff"}, tram:{icon:"🚊",name:"Tramway",color:"#00d2ff",text:"#000"}, tb:{icon:"🚋",name:"Trambus",color:"#fdc300",text:"#000"}, funiculaire:{icon:"🚠",name:"Funiculaire",color:"#6da432",text:"#fff"}, navgone:{icon:"⛴️",name:"Navgône",color:"#00a3a6",text:"#fff"}, chromo:{icon:"🔵",name:"Chrono",color:"#359ed0",text:"#fff"}, bus:{icon:"🚌",name:"Bus",color:"#da291c",text:"#fff"}, soyeuse:{icon:"🟢",name:"Soyeuse",color:"#4dff88",text:"#000"}, navette:{icon:"🌙",name:"Navette",color:"#7b5ea7",text:"#fff"}, gex:{icon:"🚉",name:"Gare Express",color:"#e50069",text:"#fff"}, zi:{icon:"🏭",name:"Zone Ind.",color:"#8ec89a",text:"#000"}, pl:{icon:"🌕",name:"Pleine Lune",color:"#ffb84d",text:"#000"}, jd:{icon:"📚",name:"Junior Direct",color:"#f296aa",text:"#000"}, other:{icon:"📌",name:"Autres",color:"#888",text:"#fff"} };
+            let html = '';
+            for(let [type,lines] of Object.entries({ metro:[],tram:[],tb:[],funiculaire:[],navgone:[],chromo:[],bus:[],soyeuse:[],navette:[],gex:[],zi:[],pl:[],jd:[],other:[] })) {
+                const filtered = filteredLines.filter(l => getLineType(l)===type);
+                if(filtered.length) {
+                    const t = typeNames[type]||typeNames.other;
+                    html += `<div class="line-group"><div class="line-group-header" style="background:${t.color};color:${t.text};">${t.icon} ${t.name} (${filtered.length})</div><div class="line-items">`;
+                    filtered.forEach(l => html += `<div class="line-item" onclick="searchLineInStops('${l}')"><img src="Lignes/${l}.svg" style="height:24px;" onerror="this.style.display='none';this.insertAdjacentHTML('afterend','<span style=\'background:#555;padding:4px 8px;border-radius:4px;font-size:12px;\'>${l}</span>');"></div>`);
+                    html += `</div></div>`;
+                }
+            }
+            document.getElementById('lines-list').innerHTML = html || '<div class="info-empty">📋 Aucune ligne</div>';
+        };
+
+        window.searchLineInStops = (line) => { switchToTab('stops'); document.getElementById('stop-search').value = line; filterStops(); };
+
+        // API CALLS
+        async function loadStopsMapping() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/stops');
+                const stops = (await res.json()).values || [];
+                stops.forEach(stop => { if(stop.id && stop.nom) stopsMapping[stop.id] = stop.nom; if(stop.code_station && stop.nom) stopsMapping[stop.code_station] = stop.nom; });
+                console.log(`Mapping: ${Object.keys(stopsMapping).length} entrées`);
+            } catch(e) { console.error(e); }
+        }
+
+        const getStopNameFromCode = (code) => { if(!code) return null; const clean = code.includes(':') ? code.split(':').pop() : code; return stopsMapping[clean] || stopsMapping[code] || null; };
+
+        // ==================== BUS ====================
+        async function updateBus() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/buses');
+                const buses = await res.json();
+                busLayer.clearLayers();
+                for(const bus of buses) {
+                    const lat = parseFloat(bus.lat), lon = parseFloat(bus.lon);
+                    if(isNaN(lat)||isNaN(lon)) continue;
+                    const line = bus.line, rotation = bus.bearing || 0, isTram = line.startsWith('T')||line.startsWith('RX');
+                    const mainColor = bus.color || (isTram ? '#00d2ff' : '#da291c');
+                    let modeFile = 'mode_bus.svg';
+                    if(line.startsWith('C')) modeFile = 'Mode_C.svg';
+                    else if(line.startsWith('TB')) modeFile = 'Mode_TB.svg';
+                    else if(line.startsWith('RX')) modeFile = 'RX.svg';
+                    else if(line.startsWith('T')) modeFile = 'Mode_T.svg';
+                    else if(line.startsWith('7601')) modeFile = 'Mode_NAVI.svg';
+                    const dest = getStopNameFromCode(bus.dest_code) || bus.dest_name;
+
+                    // FIX: commentaires CSS invalides (// → supprimés, style inline uniquement)
+                    const directionIcon = L.divIcon({
+                        html: `<div style="position:relative;width:32px;height:32px;">
+                                    <div style="position:absolute;left:9px;top:0px;transform:rotate(${rotation}deg);transform-origin:7px 14px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid ${mainColor};filter:drop-shadow(0 1px 1px rgba(0,0,0,0.3));"></div>
+                                    <div style="position:absolute;left:2px;top:4px;width:28px;height:28px;background:${mainColor};border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #1a1a1a;box-shadow:0 0 4px rgba(0,0,0,0.3);">
+                                        <img src="Lignes/${modeFile}" style="width:18px;height:18px;" onerror="this.src='Lignes/mode_bus.svg'">
+                                    </div>
+                                </div>`,
+                        className: '',
+                        iconSize: [32, 32],
+                        iconAnchor: [16, 16]
+                    });
+
+                    L.marker([lat, lon], { icon: directionIcon })
+                        .bindPopup(`<div style="text-align:center;min-width:200px;">
+                            <img src="Lignes/${line}.svg" style="height:40px;" onerror="this.style.display='none'">
+                            <div style="background:${mainColor};color:${isTram?'#000':'#fff'};padding:4px;border-radius:5px;margin:10px;font-weight:bold;">Ligne ${line}</div>
+                            <b>🚏 ${dest}</b><br>
+                            <span class="${bus.delay === "0s" ? 'bus-delay-ok' : 'bus-delay-ko'}">${bus.delay === "0s" ? '✅ À l\'heure' : `⚠️ Retard: ${bus.delay}`}</span>
+                            <br><span style="font-size:10px;color:#888;">🆔 ${bus.id}</span>
+                        </div>`)
+                        .addTo(busLayer);
+                }
+            } catch(e) { console.error("Bus:", e); }
+        }
+
+        async function updateParkings() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/parkings');
+                const parkings = await res.json();
+                parkingLayer.clearLayers();
+                parkings.forEach(p => L.marker([p.lat, p.lon], { icon: L.divIcon({ html: '<img src="Lignes/P+R.svg" style="width:26px;height:26px;" onerror="this.src=\'Lignes/mode_bus.svg\'">', iconSize: [26,26], iconAnchor: [13,13] }) }).bindPopup(`<b>🅿️ P+R ${p.nom}</b><br>📊 ${p.capacite||'?'} places${p.place_handi?` ♿ ${p.place_handi} PMR`:''}<br>🕐 ${p.horaires||'Horaires non disponibles'}<br>🔒 ${p.p_surv?'surveillé ✓':'non surveillé'}`).addTo(parkingLayer));
+            } catch(e) { console.error("Parkings:", e); }
+        }
+
+        // ==================== VELO'V CARTE ====================
+        async function updateVelov() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/velov');
+                // FIX: on réutilise allVelovStations au lieu d'allStations
+                allVelovStations = (await res.json()).values || [];
+                console.log(`Velo'v: ${allVelovStations.length}`);
+                updateVisibleVelov();
+            } catch(e) { console.error("Velo'v:", e); }
+        }
+
+        function updateVisibleVelov() {
+            const zoom = map.getZoom();
+            if(zoom < VELOV_MIN_ZOOM) { currentVelovMarkers.forEach(m => velovLayer.removeLayer(m)); currentVelovMarkers = []; return; }
+            const bounds = map.getBounds();
+            // FIX: utilise allVelovStations au lieu d'allStations
+            const visible = allVelovStations.filter(s => { const lat=parseFloat(s.lat), lng=parseFloat(s.lng); return !isNaN(lat)&&!isNaN(lng)&&bounds.contains([lat,lng]); }).slice(0,300);
+            currentVelovMarkers.forEach(m => velovLayer.removeLayer(m));
+            currentVelovMarkers = [];
+            visible.forEach(s => {
+                const bikes = s.available_bikes||0;
+                const color = bikes===0?'#ff4d4d':(bikes<3?'#ffb84d':(bikes<7?'#00d2ff':'#4dff88'));
+                const m = L.marker([parseFloat(s.lat), parseFloat(s.lng)], { icon: L.divIcon({ html: `<div style="background:${color};width:10px;height:10px;border-radius:50%;border:1px solid #1a1a1a;"></div>`, iconSize: [10,10], iconAnchor: [5,5] }) }).bindPopup(`<b>🚲 ${s.name}</b><br>🚲 ${bikes} vélos<br>🅿️ ${s.available_bike_stands||0} places`).addTo(velovLayer);
+                currentVelovMarkers.push(m);
+            });
+        }
+
+        async function updateTraffic() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/traffic');
+                const items = (await res.json()).values || [];
+                const list = document.getElementById('traffic-list');
+                if(!items.length) { list.innerHTML = '<div class="info-empty">✅ Aucune perturbation</div>'; return; }
+                list.innerHTML = items.map(a => `<div class="info-item"><div class="info-summary" onclick="toggleInfoItem(this)"><div class="info-line-badge" style="background:${a.type?.includes('Perturbation')?'#ff4d4d':(a.type?.includes('travaux')?'#ffb84d':'#00d2ff')};font-size:18px;">${a.type?.includes('Perturbation')?'⚠️':(a.type?.includes('travaux')?'🛠️':'🚧')}</div><div class="info-summary-text"><div class="info-titre">${a.titre||'Info'}</div><div class="info-type">${a.type||''}</div></div><span class="info-chevron">▼</span></div><div class="info-detail">${a.message||'Aucun détail'}</div></div>`).join('');
+            } catch(e) { console.error("Traffic:", e); }
+        }
+
+        async function updateAccessibility() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/accessibility');
+                const items = (await res.json()).values || [];
+                const list = document.getElementById('accessibility-list');
+                if(!items.length) { list.innerHTML = '<div class="info-empty">♿ Aucune alerte</div>'; return; }
+                list.innerHTML = items.map(a => `<div class="info-item"><div class="info-summary" onclick="toggleInfoItem(this)"><div class="info-line-badge" style="background:${a.cause==='Panne'?'#ff4d4d':(a.type_equipement==='ASCENSEUR'?'#ffb84d':'#00d2ff')};font-size:18px;">${a.type_equipement==='ASCENSEUR'?'🛗':(a.type_equipement==='ESCALIER'?'🪜':'♿')}</div><div class="info-summary-text"><div class="info-titre">${a.type_equipement||'Équipement'} - ${a.nom_station||''}</div><div class="info-type">${a.cause||''}</div></div><span class="info-chevron">▼</span></div><div class="info-detail">${a.equipement||''}<br>📅 ${a.debut_indispo?new Date(a.debut_indispo).toLocaleDateString('fr-FR'):''} → ${a.fin_indispo?new Date(a.fin_indispo).toLocaleDateString('fr-FR'):''}</div></div>`).join('');
+            } catch(e) { console.error("Accessibilité:", e); }
+        }
+
+        async function updateStopsData() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/stops');
+                allStops = (await res.json()).values || [];
+                console.log(`Arrêts: ${allStops.length}`);
+                extractAllLinesFromStops();
+                renderStopList('');
+            } catch(e) { console.error("Arrêts:", e); document.getElementById('stops-list').innerHTML = '<div class="info-empty">❌ Erreur</div>'; }
+        }
+
+        // ==================== VELO'V LISTE ET RECHERCHE ====================
+        async function loadVelovStations() {
+            try {
+                const res = await fetch('http://127.0.0.1:5000/api/velov');
+                allVelovStations = (await res.json()).values || [];
+                console.log(`Stations Velo'v chargées: ${allVelovStations.length}`);
+                renderVelovList('');
+            } catch(e) { console.error("Erreur chargement Velo'v:", e); }
+        }
+
+        function filterVelovStations() {
+            const searchTerm = document.getElementById('velov-search').value.toLowerCase().trim();
+            renderVelovList(searchTerm);
+        }
+
+        function renderVelovList(searchTerm) {
+            let stations = [...allVelovStations];
+
+            if (searchTerm) {
+                stations = stations.filter(s =>
+                    (s.name || "").toLowerCase().includes(searchTerm) ||
+                    (s.address || "").toLowerCase().includes(searchTerm) ||
+                    (s.number || "").toString().includes(searchTerm) ||
+                    (s.commune || "").toLowerCase().includes(searchTerm)
+                );
+            }
+
+            stations.sort((a, b) => ((a.name || "").localeCompare(b.name || "")));
+
+            const statsSpan = document.getElementById('velov-stats');
+            statsSpan.textContent = `${stations.length}/${allVelovStations.length}`;
+
+            if (stations.length === 0) {
+                document.getElementById('velov-list').innerHTML = '<div class="info-empty">🔍 Aucune station trouvée</div>';
+                return;
+            }
+
+            const stationsToShow = stations.slice(0, 300);
+            let itemsHtml = stationsToShow.map(station => {
+                const availableBikes = station.available_bikes || 0;
+                const availableStands = station.available_bike_stands || 0;
+                const totalStands = station.bike_stands || 0;
+                const banking = station.banking ? "✅ CB acceptée" : "❌ Sans CB";
+                const status = station.status === 'OPEN' ? '🟢 Ouverte' : '🔴 Fermée';
+
+                let colorClass = "";
+                let statusText = "";
+                if (availableBikes === 0) { colorClass = "#ff4d4d"; statusText = "❌ Plus de vélos"; }
+                else if (availableBikes < 3) { colorClass = "#ffb84d"; statusText = "⚠️ Derniers vélos"; }
+                else if (availableBikes < 7) { colorClass = "#00d2ff"; statusText = "✅ Quelques vélos"; }
+                else { colorClass = "#4dff88"; statusText = "✅ Beaucoup de vélos"; }
+
+                return `<div class="info-item" data-lat="${station.lat}" data-lon="${station.lng}" data-name="${(station.name || '').replace(/['"]/g, '\\"')}">
+                            <div class="info-summary" onclick="selectVelovOnMap(this)">
+                                <div class="info-line-icon">
+                                    <div class="info-line-badge" style="background:${colorClass};display:flex;align-items:center;justify-content:center;width:36px;height:36px;border-radius:8px;font-size:18px;">
+                                        🚲
+                                    </div>
+                                </div>
+                                <div class="info-summary-text">
+                                    <div class="info-titre">
+                                        ${highlightText(station.name || 'Station', searchTerm)}
+                                        <span style="font-size:9px;color:${colorClass};"> ${statusText}</span>
+                                    </div>
+                                    <div class="stop-commune">${highlightText(station.address || 'Adresse non disponible', searchTerm)}</div>
+                                    <div style="display:flex;gap:15px;margin-top:5px;">
+                                        <span style="color:#4dff88;">🚲 ${availableBikes}</span>
+                                        <span style="color:#ffb84d;">🅿️ ${availableStands}</span>
+                                        <span style="color:#888;">📊 ${totalStands}</span>
+                                    </div>
+                                </div>
+                                <span class="info-chevron" onclick="event.stopPropagation();toggleInfoItem(this)">▼</span>
+                            </div>
+                            <div class="info-detail">
+                                <strong>📍 Adresse:</strong> ${station.address || 'Non renseignée'}<br>
+                                <strong>🏙️ Commune:</strong> ${station.commune || 'Non renseignée'}<br>
+                                <strong>🔢 Numéro:</strong> ${station.number || 'N/A'}<br>
+                                <strong>💳 Paiement:</strong> ${banking}<br>
+                                <strong>🟢 Statut:</strong> ${status}<br>
+                                <strong>📅 Dernière mise à jour:</strong> ${station.last_update ? new Date(station.last_update).toLocaleString('fr-FR') : 'N/A'}
+                            </div>
+                        </div>`;
+            }).join('');
+
+            if (stations.length > 300) {
+                itemsHtml += `<div class="info-empty">📌 +${stations.length - 300} autres stations (affinez votre recherche)</div>`;
+            }
+            document.getElementById('velov-list').innerHTML = itemsHtml;
+        }
+
+        function selectVelovOnMap(element) {
+            const item = element.closest('.info-item');
+            if(item) {
+                const lat = item.getAttribute('data-lat');
+                const lon = item.getAttribute('data-lon');
+                const name = item.getAttribute('data-name');
+
+                if(lat && lon) {
+                    if (currentVelovMarker) {
+                        map.removeLayer(currentVelovMarker);
+                    }
+
+                    const velovMarkerIcon = L.divIcon({
+                        html: `<div style="background-color:#4dff88;width:20px;height:20px;border-radius:50%;border:2px solid white;box-shadow:0 0 10px rgba(77,255,136,0.8);display:flex;align-items:center;justify-content:center;">
+                                    <span style="font-size:12px;">🚲</span>
+                               </div>`,
+                        className: '',
+                        iconSize: [20, 20],
+                        iconAnchor: [10, 10]
+                    });
+
+                    currentVelovMarker = L.marker([parseFloat(lat), parseFloat(lon)], { icon: velovMarkerIcon })
+                        .bindPopup(`<b>🚲 ${name}</b><br>Cliquez pour centrer`)
+                        .addTo(map);
+
+                    map.setView([parseFloat(lat), parseFloat(lon)], 16);
+                    currentVelovMarker.openPopup();
+
+                    setTimeout(() => {
+                        if (currentVelovMarker) {
+                            map.removeLayer(currentVelovMarker);
+                            currentVelovMarker = null;
+                        }
+                    }, 6000);
+                }
+            }
+        }
+
+        // INIT
+        map.on('zoomend moveend', () => updateVisibleVelov());
+        // FIX: updateVelovStations → loadVelovStations (nom correct)
+        loadStopsMapping().then(() => {
+            updateBus();
+            updateParkings();
+            updateVelov();
+            updateTraffic();
+            updateAccessibility();
+            updateStopsData();
+            loadVelovStations();
+        });
+        setInterval(updateBus, 10000);
+        setInterval(updateParkings, 300000);
+        setInterval(updateVelov, 60000);
+        setInterval(updateTraffic, 60000);
+        setInterval(updateAccessibility, 60000);
+        setInterval(updateStopsData, 300000);
+        setInterval(() => loadStopsMapping(), 3600000);
+        setTimeout(() => map.invalidateSize(), 200);
+    </script>
+</body>
+</html>
