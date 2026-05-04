@@ -1,8 +1,4 @@
-from flask import Flask, jsonify
-from flask_cors import CORS
-import requests
 import os
-import time
 import json
 
 # Au lieu de faire un return jsonify(data) pour Flask, 
@@ -157,3 +153,18 @@ def get_traffic_cached():
 
 # L'objet app doit être accessible par Vercel
 expose_app = app
+return data
+
+def save_json(data, filename):
+    # Crée le dossier data s'il n'existe pas
+    if not os.path.exists('data'):
+        os.makedirs('data')
+    with open(f'data/{filename}.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+
+if __name__ == "__main__":
+    # On récupère et on enregistre tout
+    bus_data = fetch_sytral_data()
+    save_json(bus_data, 'bus_positions')
+    # Fais pareil pour les parkings et velov...
+    print("Données mises à jour !")
