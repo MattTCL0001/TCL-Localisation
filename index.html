@@ -224,39 +224,35 @@
 
     // ==================== BUS & TEMPS RÉEL ====================
     async function updateBus() {
-        try {
-            const buses = await fetchJSON('bus_positions.json');
-            busLayer.clearLayers();
+    try {
+        const buses = await fetchJSON('bus_positions.json');
+        busLayer.clearLayers();
 
-            buses.forEach(bus => {
-                const lineName = bus.ligne || '??';
-                const rotation = bus.bearing || 0;
-                
-                const icon = L.divIcon({
-                    html: `<div style="position:relative;width:32px;height:32px;">
-                             <div style="position:absolute;left:9px;top:0px;transform:rotate(${rotation}deg);transform-origin:7px 14px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid #da291c;filter:drop-shadow(0 1px 1px rgba(0,0,0,0.3));"></div>
-                             <div style="position:absolute;left:2px;top:4px;width:28px;height:28px;background:#da291c;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #1a1a1a;">
-                                <img src="Lignes/${lineName}.svg" style="width:18px;height:18px;" onerror="this.src='Lignes/mode_bus.svg'">
-                             </div>
-                           </div>`,
-                    className: '',
-                    iconSize: [32, 32],
-                    iconAnchor: [16, 16]
-                });
+        // On vérifie que buses est bien un tableau avant de boucler
+        const busData = Array.isArray(buses) ? buses : (buses.values || []);
 
-                L.marker([bus.lat, bus.lon], { icon: icon })
-                    .bindPopup(`
-                        <div style="font-family:sans-serif;">
-                            <b style="font-size:14px;">Direction: ${bus.direction || 'Inconnue'}</b><br>
-                            <hr style="margin:5px 0;border:0;border-top:1px solid #eee;">
-                            🚌 Ligne: <b>${lineName}</b><br>
-                            📍 Vers: ${bus.arret_nom || 'En route'}<br>
-                            🆔 Véhicule: ${bus.id || 'N/A'}
-                        </div>
-                    `).addTo(busLayer);
+        busData.forEach(bus => {
+            const lineName = bus.ligne || '??';
+            const rotation = bus.bearing || 0;
+            
+            const icon = L.divIcon({
+                html: `<div style="position:relative;width:32px;height:32px;">
+                         <div style="position:absolute;left:9px;top:0px;transform:rotate(${rotation}deg);transform-origin:7px 14px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid #da291c;"></div>
+                         <div style="position:absolute;left:2px;top:4px;width:28px;height:28px;background:#da291c;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #1a1a1a;">
+                            <img src="Lignes/${lineName}.svg" style="width:18px;height:18px;" onerror="this.src='Lignes/mode_bus.svg'">
+                         </div>
+                       </div>`,
+                className: '',
+                iconSize: [32, 32],
+                iconAnchor: [16, 16]
             });
-        } catch(e) { console.error("Bus:", e); }
-    }
+
+            L.marker([bus.lat, bus.lon], { icon: icon })
+                .bindPopup(`<b>Ligne ${lineName}</b><br>Direction: ${bus.direction || 'Inconnue'}`)
+                .addTo(busLayer);
+        });
+    } catch(e) { console.error("Erreur Bus:", e); }
+}
 
     // ==================== PARKINGS P+R ====================
     async function updateParkings() {
@@ -299,26 +295,29 @@
         });
     }
 
-    function renderVelovList(searchTerm) {
-        let stations = allVelovStations.filter(s => 
-            (s.name||"").toLowerCase().includes(searchTerm) || (s.address||"").toLowerCase().includes(searchTerm)
-        ).sort((a,b) => (a.name||"").localeCompare(b.name||""));
+function renderVelovList(searchTerm) {
+    // Sécurité : si allVelovStations n'est pas un tableau, on le transforme
+    const stationsArray = Array.isArray(allVelovStations) ? allVelovStations : [];
+    
+    let stations = stationsArray.filter(s => 
+        (s.name||"").toLowerCase().includes(searchTerm) || (s.address||"").toLowerCase().includes(searchTerm)
+    ).sort((a,b) => (a.name||"").localeCompare(b.name||""));
 
-        document.getElementById('velov-stats').textContent = `${stations.length}/${allVelovStations.length}`;
-        
-        const html = stations.slice(0, 100).map(s => `
-            <div class="info-item" onclick="map.setView([${s.lat}, ${s.lng}], 17)">
-                <div class="info-summary">
-                    <div class="info-line-badge" style="background:${s.available_bikes > 0 ? '#4dff88' : '#ff4d4d'}">🚲</div>
-                    <div class="info-summary-text">
-                        <div class="info-titre">${highlightText(s.name, searchTerm)}</div>
-                        <div class="stop-commune">🚲 ${s.available_bikes} - 🅿️ ${s.available_bike_stands}</div>
-                    </div>
+    document.getElementById('velov-stats').textContent = `${stations.length}/${stationsArray.length}`;
+    
+    const html = stations.slice(0, 100).map(s => `
+        <div class="info-item" onclick="map.setView([${s.lat}, ${s.lng}], 17)">
+            <div class="info-summary">
+                <div class="info-line-badge" style="background:${s.available_bikes > 0 ? '#4dff88' : '#ff4d4d'}">🚲</div>
+                <div class="info-summary-text">
+                    <div class="info-titre">${highlightText(s.name, searchTerm)}</div>
+                    <div class="stop-commune">Vélos: ${s.available_bikes}</div>
                 </div>
             </div>
-        `).join('');
-        document.getElementById('velov-list').innerHTML = html || '<div class="info-empty">Aucune station</div>';
-    }
+        </div>
+    `).join('');
+    document.getElementById('velov-list').innerHTML = html || '<div class="info-empty">Aucune station</div>';
+}
 
     // ==================== INFOS TRAFIC & ACCESSIBILITÉ ====================
     async function updateTraffic() {
