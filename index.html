@@ -251,7 +251,7 @@
                 html: `<div style="position:relative;width:32px;height:32px;">
                          <div style="position:absolute;left:9px;top:0px;transform:rotate(${bearing}deg);transform-origin:7px 14px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid #da291c;"></div>
                          <div style="position:absolute;left:2px;top:4px;width:28px;height:28px;background:#da291c;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #1a1a1a;">
-                            <img src="Lignes/${lineName}.svg" style="width:18px;height:18px;" onerror="this.src='Lignes/mode_bus.svg'">
+                            <img src="Lignes/${lineName}.svg" style="width:18px;height:18px;" onerror="this.src='Lignes/Mode_Bus.svg'">
                          </div>
                        </div>`,
                 className: '',
@@ -276,7 +276,7 @@
             parkings.forEach(p => {
                 L.marker([p.lat, p.lon], { 
                     icon: L.divIcon({ 
-                        html: '<img src="Lignes/P+R.svg" style="width:26px;height:26px;" onerror="this.src=\'Lignes/mode_bus.svg\'">', 
+                        html: '<img src="Lignes/P+R.svg" style="width:26px;height:26px;" onerror="this.src=\'Lignes/Mode_Bus.svg\'">', 
                         iconSize: [26,26], iconAnchor: [13,13] 
                     }) 
                 }).bindPopup(`<b>🅿️ P+R ${p.nom}</b><br>📊 ${p.capacite||'?'} places<br>🕐 ${p.horaires||'N/A'}`).addTo(parkingLayer);
