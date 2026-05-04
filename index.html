@@ -225,19 +225,31 @@
     // ==================== BUS & TEMPS RÉEL ====================
     async function updateBus() {
     try {
-        const buses = await fetchJSON('bus_positions.json');
+        const data = await fetchJSON('bus_positions.json');
         busLayer.clearLayers();
 
-        // On vérifie que buses est bien un tableau avant de boucler
-        const busData = Array.isArray(buses) ? buses : (buses.values || []);
+        // On descend dans l'arborescence du format SIRI pour atteindre les véhicules
+        const delivery = data?.Siri?.ServiceDelivery?.VehicleMonitoringDelivery;
+        if (!delivery || delivery.length === 0) return;
 
-        busData.forEach(bus => {
-            const lineName = bus.ligne || '??';
-            const rotation = bus.bearing || 0;
+        const activities = delivery[0].VehicleActivity || [];
+
+        activities.forEach(activity => {
+            const journey = activity.MonitoredVehicleJourney;
+            if (!journey) return;
+
+            // Extraction des données spécifiques à ton JSON
+            const lat = journey.VehicleLocation.Latitude;
+            const lon = journey.VehicleLocation.Longitude;
+            const bearing = journey.Bearing || 0;
             
+            // Extraction du nom de la ligne (ex: "ActIV:Line::C12:SYTRAL" -> "C12")
+            const fullLineRef = journey.LineRef?.value || "";
+            const lineName = fullLineRef.split(':').slice(-2, -1)[0] || "??";
+
             const icon = L.divIcon({
                 html: `<div style="position:relative;width:32px;height:32px;">
-                         <div style="position:absolute;left:9px;top:0px;transform:rotate(${rotation}deg);transform-origin:7px 14px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid #da291c;"></div>
+                         <div style="position:absolute;left:9px;top:0px;transform:rotate(${bearing}deg);transform-origin:7px 14px;width:0;height:0;border-left:10px solid transparent;border-right:10px solid transparent;border-bottom:18px solid #da291c;"></div>
                          <div style="position:absolute;left:2px;top:4px;width:28px;height:28px;background:#da291c;border-radius:50%;display:flex;align-items:center;justify-content:center;border:2px solid #1a1a1a;">
                             <img src="Lignes/${lineName}.svg" style="width:18px;height:18px;" onerror="this.src='Lignes/mode_bus.svg'">
                          </div>
@@ -247,11 +259,13 @@
                 iconAnchor: [16, 16]
             });
 
-            L.marker([bus.lat, bus.lon], { icon: icon })
-                .bindPopup(`<b>Ligne ${lineName}</b><br>Direction: ${bus.direction || 'Inconnue'}`)
+            L.marker([lat, lon], { icon: icon })
+                .bindPopup(`<b>Ligne ${lineName}</b><br>Status: ${journey.VehicleStatus}`)
                 .addTo(busLayer);
         });
-    } catch(e) { console.error("Erreur Bus:", e); }
+    } catch(e) { 
+        console.error("Erreur parsing SIRI:", e); 
+    }
 }
 
     // ==================== PARKINGS P+R ====================
