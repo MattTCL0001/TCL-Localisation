@@ -3,7 +3,14 @@ from flask_cors import CORS
 import requests
 import os
 import time
+import json
 
+# Au lieu de faire un return jsonify(data) pour Flask, 
+# on enregistre le résultat dans un fichier que GitHub pourra lire
+def save_to_github(data, filename):
+    with open(f'data/{filename}.json', 'w', encoding='utf-8') as f:
+        json.dump(data, f, ensure_ascii=False, indent=4)
+        
 app = Flask(__name__)
 CORS(app)
 
