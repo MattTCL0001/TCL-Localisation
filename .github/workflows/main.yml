@@ -1,0 +1,32 @@
+name: Mise à jour des données Sytral
+
+on:
+  schedule:
+    - cron: '*/5 * * * *' # S'exécute toutes les 5 minutes
+  workflow_dispatch:      # Permet de le lancer à la main pour tester
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Récupérer le code du dépôt
+        uses: actions/checkout@v3
+
+      - name: Installer Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9'
+
+      - name: Installer les dépendances
+        run: pip install requests # Ajoute tes autres bibliothèques ici
+
+      - name: Lancer le script de mise à jour
+        run: python update_data.py
+
+      - name: Sauvegarder les changements sur GitHub
+        run: |
+          git config --global user.name 'GitHub Action'
+          git config --global user.email 'action@github.com'
+          git add data/*.json
+          git commit -m "Mise à jour automatique des données" || exit 0
+          git push
