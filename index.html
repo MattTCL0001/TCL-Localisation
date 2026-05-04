@@ -156,7 +156,8 @@
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
    <script>
     // ==================== CONFIGURATION & INIT ====================
-    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/MattTCL0001/TCL-Localisation/main/data';
+    // On s'arrête juste avant le nom du fichier JSON
+    const GITHUB_RAW_URL = 'https://raw.githubusercontent.com/MattTCL0001/TCL-Localisation/refs/heads/main/data';
     
     const map = L.map('map').setView([45.757, 4.832], 13);
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { 
