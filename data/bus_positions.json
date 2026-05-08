@@ -1,950 +1,21 @@
 {
     "Siri": {
         "ServiceDelivery": {
-            "ResponseTimestamp": "2026-05-08T19:47:40.261411685Z",
+            "ResponseTimestamp": "2026-05-08T20:42:21.789766144Z",
             "ProducerRef": {
                 "value": "MDL"
             },
             "ResponseMessageIdentifier": {
-                "value": "915a9b9d-f5de-4cf5-ac09-aec20d845e90"
+                "value": "eb736b3f-536d-4570-8bba-0d19663530a3"
             },
             "MoreData": false,
             "VehicleMonitoringDelivery": [
                 {
                     "VehicleActivity": [
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8010929Z",
+                            "ValidUntilTime": "2026-05-08T20:42:37.8618979Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2404:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C17:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::917_C17A-0777_x00A3__00401038:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:1507:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.905734,
-                                    "Latitude": 45.76035
-                                },
-                                "Bearing": 332,
-                                "Delay": "PT6M53S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2404:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:38:13Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:38:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:32303:SYTRAL"
-                                    },
-                                    "Order": 19
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8010929Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8007812Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2229:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C8:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::908_C8A-0467P_00501015:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:1087:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.908625,
-                                    "Latitude": 45.75094
-                                },
-                                "Bearing": 286,
-                                "Delay": "PT2M50S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2229:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:43:08Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:43:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:42545:SYTRAL"
-                                    },
-                                    "Order": 21
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8007812Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:45:07.8434538Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2802:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::TB11:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00201038:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:30000:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.82886,
-                                    "Latitude": 45.76611
-                                },
-                                "Bearing": 338,
-                                "Delay": "PT3M30S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2802:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:39:28Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:39:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:50213:SYTRAL"
-                                    },
-                                    "Order": 16
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:44:07.8434538Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.7980156Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1302:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C6:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::906_C6C-0167R_00701030:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:35834:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.800476,
-                                    "Latitude": 45.78852
-                                },
-                                "Bearing": 17,
-                                "Delay": "PT1M54S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1302:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:44:08Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:44:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:778:SYTRAL"
-                                    },
-                                    "Order": 9
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.7980156Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.7995311Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1528:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C3:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::903_C3A-1227_x0040__00201043:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:1513:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.910019,
-                                    "Latitude": 45.77994
-                                },
-                                "Bearing": 120,
-                                "Delay": "PT32S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1528:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:42:50Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:43:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:1938:SYTRAL"
-                                    },
-                                    "Order": 3
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.7995311Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8024515Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:3017:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C9:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::909_C9A-0647O_00401026:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:50210:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.849801,
-                                    "Latitude": 45.76055
-                                },
-                                "Bearing": 263,
-                                "Delay": "PT6M25S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:3017:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:39:01Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:39:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:46175:SYTRAL"
-                                    },
-                                    "Order": 17
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8024515Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:47:49.2209121Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:853:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::T2:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::570_T5-0537N_00101073:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:32583:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.91511,
-                                    "Latitude": 45.72227
-                                },
-                                "Bearing": 149,
-                                "Delay": "PT3S",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:853:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:44:43Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:44:43Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:32170:SYTRAL"
-                                    },
-                                    "Order": 8
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:46:49.2209121Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.7998639Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1533:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::37:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::37_37A-0987_x00A3__00101050:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:10484:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.892329,
-                                    "Latitude": 45.78379
-                                },
-                                "Bearing": 103,
-                                "Delay": "PT4M11S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1533:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:40:59Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:41:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:36035:SYTRAL"
-                                    },
-                                    "Order": 9
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.7998639Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8035152Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2818:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::TB11:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00901020:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:30000:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.84562,
-                                    "Latitude": 45.76362
-                                },
-                                "Bearing": 269,
-                                "Delay": "PT1M27S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2818:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:43:29Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:43:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:47003:SYTRAL"
-                                    },
-                                    "Order": 12
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8035152Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8014713Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2513:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::17:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::17_17C-0537_x00A3__00301027:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:46120:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.820956,
-                                    "Latitude": 45.69761
-                                },
-                                "Bearing": 74,
-                                "Delay": "PT8S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2513:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:46:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:46:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:411:SYTRAL"
-                                    },
-                                    "Order": 21
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8014713Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8038451Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:4205:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::52:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::52_52B-0667O_00501015:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:36014:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.929092,
-                                    "Latitude": 45.75362
-                                },
-                                "Bearing": 263,
-                                "Delay": "PT8M33S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:4205:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:37:48Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:38:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:10501:SYTRAL"
-                                    },
-                                    "Order": 4
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8038451Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8033633Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2748:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::93:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::93_93A-0617_x0024__00301028:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:39919:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.864826,
-                                    "Latitude": 45.71083
-                                },
-                                "Bearing": 315,
-                                "Delay": "PT21M25S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2748:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:21:59Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:22:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:37825:SYTRAL"
-                                    },
-                                    "Order": 15
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8033633Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:47:49.220429Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:104:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::RX:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::560_RX-010KM_01101031:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:41194:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.939855,
-                                    "Latitude": 45.76553
-                                },
-                                "Bearing": 248,
-                                "Delay": "PT11S",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:104:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:36:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:36:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:41198:SYTRAL"
-                                    },
-                                    "Order": 2
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:46:49.220429Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8032109Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1604:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::TB11:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00801022:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:1508:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.857855,
-                                    "Latitude": 45.76371
-                                },
-                                "Bearing": 85,
-                                "Delay": "PT2M2S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1604:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:44:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:44:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:46191:SYTRAL"
-                                    },
-                                    "Order": 7
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8032109Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:47:07.8401919Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1029:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C20:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::920_C20B-1317R_00101023:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:47029:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.830114,
-                                    "Latitude": 45.75746
-                                },
-                                "Bearing": 17,
-                                "Delay": "PT0S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1029:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:50:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:50:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:48375:SYTRAL"
-                                    },
-                                    "Order": 1
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:46:07.8401919Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8029034Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:4408:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C25:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::925_C25B-0427R_00201021:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:2882:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.883036,
-                                    "Latitude": 45.72425
-                                },
-                                "Bearing": 131,
-                                "Delay": "PT4M47S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:4408:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:41:28Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:41:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:45980:SYTRAL"
-                                    },
-                                    "Order": 17
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8029034Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8000185Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1606:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C3:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::903_C3A-1227_x0040__00401038:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:36014:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.91131,
-                                    "Latitude": 45.77921
-                                },
-                                "Bearing": 303,
-                                "Delay": "PT2M3S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1606:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:42:49Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:43:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:48256:SYTRAL"
-                                    },
-                                    "Order": 6
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8000185Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:45:07.8392428Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1210:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::89:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::89_89B-0407R_00101039:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:12045:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.805259,
-                                    "Latitude": 45.78099
-                                },
-                                "Bearing": 217,
-                                "Delay": "PT6M23S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1210:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:35:46Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:36:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:30017:SYTRAL"
-                                    },
-                                    "Order": 21
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:44:07.8392428Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8026028Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:3203:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C19:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::919_C19A-1117R_00301021:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:41778:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.805057,
-                                    "Latitude": 45.73694
-                                },
-                                "Bearing": 194,
-                                "Delay": "PT6M14S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:3203:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:40:12Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:40:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:2925:SYTRAL"
-                                    },
-                                    "Order": 10
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8026028Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8004355Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2212:LOC"
+                                "value": "ActIV:Vehicle:Bus:2220:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
@@ -957,77 +28,28 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::908_C8A-0467P_00401015:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::908_C8A-0467P_00301019:LOC"
                                 },
                                 "DestinationRef": {
                                     "value": "ActIV:StopArea:SP:42563:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.911612,
-                                    "Latitude": 45.76367
+                                    "Longitude": 4.899486,
+                                    "Latitude": 45.74965
                                 },
-                                "Bearing": 280,
-                                "Delay": "PT20M47S",
+                                "Bearing": 292,
+                                "Delay": "-PT2M1S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2212:LOC"
+                                    "value": "ActIV:Vehicle:Bus:2220:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:23:35Z",
+                                    "AimedArrivalTime": "2026-05-08T20:42:12Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:24:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:42540:SYTRAL"
-                                    },
-                                    "Order": 23
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8004355Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8009372Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2273:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C8:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::908_C8A-0467P_00201018:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:42563:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.905325,
-                                    "Latitude": 45.75765
-                                },
-                                "Bearing": 74,
-                                "Delay": "PT45S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2273:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:42:12Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:42:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:42:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
@@ -1037,114 +59,16 @@
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8009372Z"
+                            "RecordedAtTime": "2026-05-08T20:41:37.8618979Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8023007Z",
+                            "ValidUntilTime": "2026-05-08T20:42:49.2524679Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:3016:LOC"
+                                "value": "ActIV:Vehicle:Bus:816:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
-                                    "value": "ActIV:Line::C9:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::909_C9A-0647O_00101032:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:42030:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.842308,
-                                    "Latitude": 45.7595
-                                },
-                                "Bearing": 349,
-                                "Delay": "PT2M19S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:3016:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:43:57Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:44:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:3297:SYTRAL"
-                                    },
-                                    "Order": 3
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8023007Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.7991302Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1402:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C20:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::920_C20B-1317R_00201019:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:47029:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.743468,
-                                    "Latitude": 45.73037
-                                },
-                                "Bearing": 326,
-                                "Delay": "PT5M11S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1402:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:40:39Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:41:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:1343:SYTRAL"
-                                    },
-                                    "Order": 33
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.7991302Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.7997069Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1532:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C3:SYTRAL"
+                                    "value": "ActIV:Line::T5:SYTRAL"
                                 },
                                 "DirectionRef": {
                                     "value": "inbound"
@@ -1153,96 +77,46 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::903_C3A-1227_x0040__00301041:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::570_T5-0537N_00201074:LOC"
                                 },
                                 "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:1513:SYTRAL"
+                                    "value": "ActIV:StopArea:SP:45271:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.911833,
-                                    "Latitude": 45.77884
+                                    "Longitude": 4.892755,
+                                    "Latitude": 45.73906
                                 },
-                                "Bearing": 131,
-                                "Delay": "PT11M57S",
-                                "VehicleStatus": "IN_PROGRESS",
+                                "Bearing": 280,
+                                "Delay": "PT32S",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1532:LOC"
+                                    "value": "ActIV:Vehicle:Bus:816:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:34:23Z",
+                                    "AimedArrivalTime": "2026-05-08T20:40:31Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:34:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:40:31Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:48405:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:32161:SYTRAL"
                                     },
-                                    "Order": 4
+                                    "Order": 10
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.7997069Z"
+                            "RecordedAtTime": "2026-05-08T20:41:49.2524679Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:46:37.7476792Z",
+                            "ValidUntilTime": "2026-05-08T20:43:07.7546406Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1029:LOC"
+                                "value": "ActIV:Vehicle:Bus:4205:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
-                                    "value": "ActIV:Line::C20:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::920_C20B-1317R_00101022:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:48375:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.829935,
-                                    "Latitude": 45.75718
-                                },
-                                "Bearing": 63,
-                                "Delay": "PT3M55S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1029:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:39:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:39:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:10386:SYTRAL"
-                                    },
-                                    "Order": 34
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:45:37.7476792Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8012599Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2507:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::55:SYTRAL"
+                                    "value": "ActIV:Line::52:SYTRAL"
                                 },
                                 "DirectionRef": {
                                     "value": "outbound"
@@ -1251,335 +125,90 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::55_55B-0527R_00201027:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::52_52B-0667O_00501016:LOC"
                                 },
                                 "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:43031:SYTRAL"
+                                    "value": "ActIV:StopArea:SP:50184:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.796931,
-                                    "Latitude": 45.76364
+                                    "Longitude": 4.923003,
+                                    "Latitude": 45.76141
                                 },
-                                "Bearing": 263,
-                                "Delay": "PT35M50S",
+                                "Bearing": 154,
+                                "Delay": "PT5M17S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2507:LOC"
+                                    "value": "ActIV:Vehicle:Bus:4205:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:09:51Z",
+                                    "AimedArrivalTime": "2026-05-08T20:35:00Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:10:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:35:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:46977:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:50131:SYTRAL"
                                     },
-                                    "Order": 9
+                                    "Order": 15
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8012599Z"
+                            "RecordedAtTime": "2026-05-08T20:42:07.7546406Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8019683Z",
+                            "ValidUntilTime": "2026-05-08T20:43:07.7562073Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2816:LOC"
+                                "value": "ActIV:Vehicle:Bus:2830:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
                                     "value": "ActIV:Line::TB11:SYTRAL"
                                 },
                                 "DirectionRef": {
-                                    "value": "inbound"
+                                    "value": "outbound"
                                 },
                                 "FramedVehicleJourneyRef": {
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00601035:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00301040:LOC"
                                 },
                                 "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:30000:SYTRAL"
+                                    "value": "ActIV:StopArea:SP:1508:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.882173,
-                                    "Latitude": 45.76173
+                                    "Longitude": 4.854651,
+                                    "Latitude": 45.76367
                                 },
-                                "Bearing": 286,
-                                "Delay": "PT1M38S",
+                                "Bearing": 85,
+                                "Delay": "PT1M17S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2816:LOC"
+                                    "value": "ActIV:Vehicle:Bus:2830:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:43:30Z",
+                                    "AimedArrivalTime": "2026-05-08T20:38:41Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:43:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:39:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:36999:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:47002:SYTRAL"
                                     },
                                     "Order": 6
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8019683Z"
+                            "RecordedAtTime": "2026-05-08T20:42:07.7562073Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:46:37.7657638Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:6104:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C25:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::925_C25B-0427R_00701015:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:2882:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.857436,
-                                    "Latitude": 45.76298
-                                },
-                                "Bearing": 171,
-                                "Delay": "PT0S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:6104:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:50:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:50:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:36375:SYTRAL"
-                                    },
-                                    "Order": 1
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:45:37.7657638Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.7982215Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1318:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C6:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::906_C6C-0167R_00401036:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:46093:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.782863,
-                                    "Latitude": 45.7865
-                                },
-                                "Bearing": 229,
-                                "Delay": "PT4M11S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1318:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:42:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:42:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:47585:SYTRAL"
-                                    },
-                                    "Order": 20
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.7982215Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:45:37.745268Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:3014:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C9:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::909_C9A-0647O_00301026:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:42030:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.904655,
-                                    "Latitude": 45.74606
-                                },
-                                "Bearing": 332,
-                                "Delay": "PT7M17S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:3014:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:35:37Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:36:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:35974:SYTRAL"
-                                    },
-                                    "Order": 21
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:44:37.745268Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8036787Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:3208:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C19:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::919_C19A-1117R_00101027:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:33767:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.797951,
-                                    "Latitude": 45.73412
-                                },
-                                "Bearing": 223,
-                                "Delay": "PT8M7S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:3208:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:38:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:38:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:42515:SYTRAL"
-                                    },
-                                    "Order": 10
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8036787Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.7983877Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1319:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C6:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "outbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::906_C6C-0167R_00101042:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:46093:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.857996,
-                                    "Latitude": 45.76342
-                                },
-                                "Bearing": 17,
-                                "Delay": "PT1M3S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1319:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:45:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:45:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:32502:SYTRAL"
-                                    },
-                                    "Order": 1
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.7983877Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:47:49.2206938Z",
+                            "ValidUntilTime": "2026-05-08T20:42:49.2523039Z",
                             "VehicleMonitoringRef": {
                                 "value": "ActIV:Vehicle:Bus:805:LOC"
                             },
@@ -1594,46 +223,95 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::570_T5-0537N_00301057:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::570_T5-0537N_00301061:LOC"
                                 },
                                 "DestinationRef": {
                                     "value": "ActIV:StopArea:SP:45268:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.934449,
-                                    "Latitude": 45.73943
+                                    "Longitude": 4.917367,
+                                    "Latitude": 45.73071
                                 },
-                                "Bearing": 118,
-                                "Delay": "PT25S",
+                                "Bearing": 45,
+                                "Delay": "PT1M59S",
                                 "VehicleRef": {
                                     "value": "ActIV:Vehicle:Bus:805:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:44:01Z",
+                                    "AimedArrivalTime": "2026-05-08T20:38:34Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:44:01Z",
+                                    "AimedDepartureTime": "2026-05-08T20:38:34Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:45262:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:32168:SYTRAL"
                                     },
-                                    "Order": 10
+                                    "Order": 7
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:46:49.2206938Z"
+                            "RecordedAtTime": "2026-05-08T20:41:49.2523039Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8030593Z",
+                            "ValidUntilTime": "2026-05-08T20:43:07.7544837Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:6905:LOC"
+                                "value": "ActIV:Vehicle:Bus:3208:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
-                                    "value": "ActIV:Line::52:SYTRAL"
+                                    "value": "ActIV:Line::C19:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::919_C19A-1117R_00101029:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:33767:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.779598,
+                                    "Latitude": 45.73214
+                                },
+                                "Bearing": 355,
+                                "Delay": "PT7M45S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:3208:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:32:14Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:32:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:2482:SYTRAL"
+                                    },
+                                    "Order": 4
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7544837Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:41:37.8212334Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1533:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::37:SYTRAL"
                                 },
                                 "DirectionRef": {
                                     "value": "outbound"
@@ -1642,47 +320,47 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::52_52B-0667O_00401020:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::37_37A-0987_x00A3__00101054:LOC"
                                 },
                                 "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:50184:SYTRAL"
+                                    "value": "ActIV:StopArea:SP:10484:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.934306,
-                                    "Latitude": 45.77281
+                                    "Longitude": 4.861702,
+                                    "Latitude": 45.77076
                                 },
-                                "Bearing": 217,
-                                "Delay": "-PT1M33S",
+                                "Bearing": 332,
+                                "Delay": "PT0S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:6905:LOC"
+                                    "value": "ActIV:Vehicle:Bus:1533:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:47:40Z",
+                                    "AimedArrivalTime": "2026-05-08T20:50:00Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:48:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:50:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:50019:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:46645:SYTRAL"
                                     },
-                                    "Order": 11
+                                    "Order": 1
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8030593Z"
+                            "RecordedAtTime": "2026-05-08T20:40:37.8212334Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.7993328Z",
+                            "ValidUntilTime": "2026-05-08T20:42:37.8640886Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:1502:LOC"
+                                "value": "ActIV:Vehicle:Bus:6908:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
-                                    "value": "ActIV:Line::37:SYTRAL"
+                                    "value": "ActIV:Line::C17:SYTRAL"
                                 },
                                 "DirectionRef": {
                                     "value": "inbound"
@@ -1691,92 +369,43 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::37_37A-0987_x00A3__00201050:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::917_C17A-0777_x00A3__00301039:LOC"
                                 },
                                 "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:46642:SYTRAL"
+                                    "value": "ActIV:StopArea:SP:46644:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.920263,
-                                    "Latitude": 45.78685
+                                    "Longitude": 4.883248,
+                                    "Latitude": 45.78049
                                 },
-                                "Bearing": 275,
-                                "Delay": "PT13M12S",
+                                "Bearing": 229,
+                                "Delay": "PT4M40S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:1502:LOC"
+                                    "value": "ActIV:Vehicle:Bus:6908:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:33:00Z",
+                                    "AimedArrivalTime": "2026-05-08T20:35:20Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:33:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:35:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:30545:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:1803:SYTRAL"
                                     },
-                                    "Order": 5
+                                    "Order": 9
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.7993328Z"
+                            "RecordedAtTime": "2026-05-08T20:41:37.8640886Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.800624Z",
+                            "ValidUntilTime": "2026-05-08T20:43:07.7541485Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2220:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C8:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::908_C8A-0467P_00301018:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:1087:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.924999,
-                                    "Latitude": 45.78632
-                                },
-                                "Bearing": 97,
-                                "Delay": "-PT29S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2220:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:45:36Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:46:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:43514:SYTRAL"
-                                    },
-                                    "Order": 2
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.800624Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8017939Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2807:LOC"
+                                "value": "ActIV:Vehicle:Bus:2816:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
@@ -1789,141 +418,43 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00501037:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00601037:LOC"
                                 },
                                 "DestinationRef": {
                                     "value": "ActIV:StopArea:SP:1508:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.828293,
-                                    "Latitude": 45.76608
+                                    "Longitude": 4.898172,
+                                    "Latitude": 45.76008
                                 },
-                                "Bearing": 63,
-                                "Delay": "PT2M18S",
+                                "Bearing": 80,
+                                "Delay": "PT1M3S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2807:LOC"
+                                    "value": "ActIV:Vehicle:Bus:2816:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:44:00Z",
+                                    "AimedArrivalTime": "2026-05-08T20:39:37Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:44:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:40:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:3305:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:47120:SYTRAL"
                                     },
-                                    "Order": 1
+                                    "Order": 14
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8017939Z"
+                            "RecordedAtTime": "2026-05-08T20:42:07.7541485Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8027531Z",
+                            "ValidUntilTime": "2026-05-08T20:43:07.755903Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:4402:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C25:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::925_C25B-0427R_00501019:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:36375:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.899176,
-                                    "Latitude": 45.7129
-                                },
-                                "Bearing": 309,
-                                "Delay": "PT5M5S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:4402:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:40:26Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:40:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:522:SYTRAL"
-                                    },
-                                    "Order": 22
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8027531Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:46:07.7474681Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:6104:LOC"
-                            },
-                            "MonitoredVehicleJourney": {
-                                "LineRef": {
-                                    "value": "ActIV:Line::C25:SYTRAL"
-                                },
-                                "DirectionRef": {
-                                    "value": "inbound"
-                                },
-                                "FramedVehicleJourneyRef": {
-                                    "DataFrameRef": {
-                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
-                                    },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::925_C25B-0427R_00701014:LOC"
-                                },
-                                "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:36375:SYTRAL"
-                                },
-                                "DataSource": "TCL",
-                                "VehicleLocation": {
-                                    "Longitude": 4.85726,
-                                    "Latitude": 45.76364
-                                },
-                                "Bearing": 97,
-                                "Delay": "PT1M43S",
-                                "VehicleStatus": "IN_PROGRESS",
-                                "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:6104:LOC"
-                                },
-                                "PreviousCalls": {},
-                                "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:40:00Z",
-                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
-                                    "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:40:00Z",
-                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
-                                    "DepartureStatus": "ON_TIME",
-                                    "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:46151:SYTRAL"
-                                    },
-                                    "Order": 41
-                                },
-                                "OnwardCalls": {}
-                            },
-                            "RecordedAtTime": "2026-05-08T19:45:07.7474681Z"
-                        },
-                        {
-                            "ValidUntilTime": "2026-05-08T19:48:07.80164Z",
-                            "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2718:LOC"
+                                "value": "ActIV:Vehicle:Bus:2513:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
@@ -1936,47 +467,96 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::17_17C-0537_x00A3__00101029:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::17_17C-0537_x00A3__00301029:LOC"
                                 },
                                 "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:48339:SYTRAL"
+                                    "value": "ActIV:StopArea:SP:36754:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.804892,
-                                    "Latitude": 45.69915
+                                    "Longitude": 4.789684,
+                                    "Latitude": 45.68476
                                 },
-                                "Bearing": 269,
-                                "Delay": "PT1M39S",
+                                "Bearing": 200,
+                                "Delay": "PT4M39S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2718:LOC"
+                                    "value": "ActIV:Vehicle:Bus:2513:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:44:00Z",
+                                    "AimedArrivalTime": "2026-05-08T20:36:50Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:44:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:37:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:2297:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:31906:SYTRAL"
                                     },
-                                    "Order": 14
+                                    "Order": 24
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.80164Z"
+                            "RecordedAtTime": "2026-05-08T20:42:07.755903Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8001725Z",
+                            "ValidUntilTime": "2026-05-08T20:40:37.8248127Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:2034:LOC"
+                                "value": "ActIV:Vehicle:Bus:3203:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
-                                    "value": "ActIV:Line::TB11:SYTRAL"
+                                    "value": "ActIV:Line::C19:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::919_C19A-1117R_00301022:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:33767:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.828332,
+                                    "Latitude": 45.74935
+                                },
+                                "Bearing": 189,
+                                "Delay": "PT16M58S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:3203:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:21:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:21:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:10520:SYTRAL"
+                                    },
+                                    "Order": 24
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:39:37.8248127Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7547979Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:4210:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C17:SYTRAL"
                                 },
                                 "DirectionRef": {
                                     "value": "outbound"
@@ -1985,43 +565,778 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00701034:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::917_C17A-0777_x00A3__00101041:LOC"
                                 },
                                 "DestinationRef": {
-                                    "value": "ActIV:StopArea:SP:1508:SYTRAL"
+                                    "value": "ActIV:StopArea:SP:48190:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.887799,
-                                    "Latitude": 45.76019
+                                    "Longitude": 4.896755,
+                                    "Latitude": 45.76916
                                 },
-                                "Bearing": 108,
-                                "Delay": "PT3M49S",
+                                "Bearing": 143,
+                                "Delay": "PT3M8S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:2034:LOC"
+                                    "value": "ActIV:Vehicle:Bus:4210:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:41:23Z",
+                                    "AimedArrivalTime": "2026-05-08T20:37:10Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:41:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:37:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:47005:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:1491:SYTRAL"
+                                    },
+                                    "Order": 16
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7547979Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7565301Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:4407:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C25:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::925_C25B-0427R_00601016:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:36375:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.855037,
+                                    "Latitude": 45.76367
+                                },
+                                "Bearing": 85,
+                                "Delay": "PT2M38S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:4407:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:37:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:37:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:46151:SYTRAL"
+                                    },
+                                    "Order": 41
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7565301Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:42:37.8637614Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:6904:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::7:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::7_7A-0777_x00A3__00101037:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:1509:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.907485,
+                                    "Latitude": 45.76563
+                                },
+                                "Bearing": 143,
+                                "Delay": "PT3M6S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:6904:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:35:13Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:35:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:2988:SYTRAL"
+                                    },
+                                    "Order": 16
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:41:37.8637614Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7554458Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1502:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::37:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::37_37A-0987_x00A3__00201052:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:10484:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.925498,
+                                    "Latitude": 45.78628
+                                },
+                                "Bearing": 91,
+                                "Delay": "PT11M35S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:1502:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:28:46Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:29:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:43514:SYTRAL"
+                                    },
+                                    "Order": 17
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7554458Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7526299Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1029:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C20:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::920_C20B-1317R_00101024:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:48375:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.780719,
+                                    "Latitude": 45.7432
+                                },
+                                "Bearing": 0,
+                                "Delay": "-PT17S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:1029:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:39:57Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:40:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:43355:SYTRAL"
+                                    },
+                                    "Order": 13
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7526299Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7543256Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:3017:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C9:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::909_C9A-0647O_00401028:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:42030:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.876241,
+                                    "Latitude": 45.75636
+                                },
+                                "Bearing": 183,
+                                "Delay": "PT7M14S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:3017:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:34:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:34:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:11215:SYTRAL"
+                                    },
+                                    "Order": 13
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7543256Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7539314Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:2802:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::TB11:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00201041:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:30000:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.896276,
+                                    "Latitude": 45.75997
+                                },
+                                "Bearing": 263,
+                                "Delay": "PT2M29S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:2802:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:38:36Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:39:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:47121:SYTRAL"
+                                    },
+                                    "Order": 4
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7539314Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:42:37.861572Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1606:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C3:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::903_C3A-1227_x0040__00401041:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:1513:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.910769,
+                                    "Latitude": 45.77204
+                                },
+                                "Bearing": 252,
+                                "Delay": "PT1M37S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:1606:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:37:49Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:38:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:664:SYTRAL"
+                                    },
+                                    "Order": 7
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:41:37.861572Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:42:37.8626911Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:2807:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::TB11:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::511_TB11-1337O_00501038:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:30000:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.848052,
+                                    "Latitude": 45.76365
+                                },
+                                "Bearing": 263,
+                                "Delay": "PT2M33S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:2807:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:37:29Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:37:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:47003:SYTRAL"
                                     },
                                     "Order": 12
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8001725Z"
+                            "RecordedAtTime": "2026-05-08T20:41:37.8626911Z"
                         },
                         {
-                            "ValidUntilTime": "2026-05-08T19:48:07.8021464Z",
+                            "ValidUntilTime": "2026-05-08T20:43:07.7568789Z",
                             "VehicleMonitoringRef": {
-                                "value": "ActIV:Vehicle:Bus:3014:LOC"
+                                "value": "ActIV:Vehicle:Bus:6904:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::7:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::7_7A-0777_x00A3__00101038:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:45889:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.908411,
+                                    "Latitude": 45.76508
+                                },
+                                "Bearing": 211,
+                                "Delay": "PT0S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:6904:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:50:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:50:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:1509:SYTRAL"
+                                    },
+                                    "Order": 1
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7568789Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7552893Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1302:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C6:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::906_C6C-0167R_00701032:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:46093:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.779735,
+                                    "Latitude": 45.78734
+                                },
+                                "Bearing": 297,
+                                "Delay": "-PT12S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:1302:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:41:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:41:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:47585:SYTRAL"
+                                    },
+                                    "Order": 20
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7552893Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7549517Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:6905:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::52:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::52_52B-0667O_00401021:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:36014:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.916798,
+                                    "Latitude": 45.78377
+                                },
+                                "Bearing": 5,
+                                "Delay": "PT3M33S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:6905:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:36:50Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:37:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:45885:SYTRAL"
+                                    },
+                                    "Order": 18
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7549517Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7557506Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:2212:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C8:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::908_C8A-0467P_00401016:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:1087:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.921194,
+                                    "Latitude": 45.75794
+                                },
+                                "Bearing": 160,
+                                "Delay": "PT6M41S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:2212:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:33:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:33:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:46961:SYTRAL"
+                                    },
+                                    "Order": 15
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7557506Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7567149Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:4408:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C25:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::925_C25B-0427R_00201023:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:36375:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.925188,
+                                    "Latitude": 45.69799
+                                },
+                                "Bearing": 269,
+                                "Delay": "PT7M39S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:4408:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:33:45Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:34:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:47059:SYTRAL"
+                                    },
+                                    "Order": 18
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7567149Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7551318Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1210:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::89:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::89_89B-0407R_00101042:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:12045:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.782764,
+                                    "Latitude": 45.78747
+                                },
+                                "Bearing": 154,
+                                "Delay": "PT3M51S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:1210:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:37:54Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:38:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:816:SYTRAL"
+                                    },
+                                    "Order": 15
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7551318Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:42:37.8601895Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1318:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C6:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::906_C6C-0167R_00401038:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:35834:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.855947,
+                                    "Latitude": 45.77091
+                                },
+                                "Bearing": 137,
+                                "Delay": "PT2M57S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:1318:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:36:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:36:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:2187:SYTRAL"
+                                    },
+                                    "Order": 20
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:41:37.8601895Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7563575Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:3016:LOC"
                             },
                             "MonitoredVehicleJourney": {
                                 "LineRef": {
@@ -2034,41 +1349,383 @@
                                     "DataFrameRef": {
                                         "value": "ActIV:DataFrame::2026.05.08:LOC"
                                     },
-                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::909_C9A-0647O_00301027:LOC"
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::909_C9A-0647O_00101033:LOC"
                                 },
                                 "DestinationRef": {
                                     "value": "ActIV:StopArea:SP:50210:SYTRAL"
                                 },
                                 "DataSource": "TCL",
                                 "VehicleLocation": {
-                                    "Longitude": 4.904556,
-                                    "Latitude": 45.74642
+                                    "Longitude": 4.853397,
+                                    "Latitude": 45.76071
                                 },
-                                "Bearing": 0,
-                                "Delay": "PT1M22S",
+                                "Bearing": 263,
+                                "Delay": "PT4M55S",
                                 "VehicleStatus": "IN_PROGRESS",
                                 "VehicleRef": {
-                                    "value": "ActIV:Vehicle:Bus:3014:LOC"
+                                    "value": "ActIV:Vehicle:Bus:3016:LOC"
                                 },
                                 "PreviousCalls": {},
                                 "MonitoredCall": {
-                                    "AimedArrivalTime": "2026-05-08T19:45:00Z",
+                                    "AimedArrivalTime": "2026-05-08T20:35:00Z",
                                     "ActualArrivalTime": "0001-01-01T00:00:00Z",
                                     "ArrivalStatus": "ON_TIME",
-                                    "AimedDepartureTime": "2026-05-08T19:45:00Z",
+                                    "AimedDepartureTime": "2026-05-08T20:35:00Z",
                                     "ActualDepartureTime": "0001-01-01T00:00:00Z",
                                     "DepartureStatus": "ON_TIME",
                                     "StopPointRef": {
-                                        "value": "ActIV:StopArea:SP:42030:SYTRAL"
+                                        "value": "ActIV:StopArea:SP:50141:SYTRAL"
                                     },
-                                    "Order": 1
+                                    "Order": 16
                                 },
                                 "OnwardCalls": {}
                             },
-                            "RecordedAtTime": "2026-05-08T19:47:07.8021464Z"
+                            "RecordedAtTime": "2026-05-08T20:42:07.7563575Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7528569Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1402:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C20:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::920_C20B-1317R_00201021:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:47029:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.813175,
+                                    "Latitude": 45.75823
+                                },
+                                "Bearing": 326,
+                                "Delay": "PT3M17S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:1402:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:37:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:37:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:2759:SYTRAL"
+                                    },
+                                    "Order": 8
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7528569Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7530278Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:2229:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C8:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::908_C8A-0467P_00501016:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:42563:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.92991,
+                                    "Latitude": 45.78133
+                                },
+                                "Bearing": 343,
+                                "Delay": "PT8M15S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:2229:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:32:06Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:32:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:48326:SYTRAL"
+                                    },
+                                    "Order": 30
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7530278Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7560548Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:2718:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::17:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::17_17C-0537_x00A3__00101030:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:46120:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.804658,
+                                    "Latitude": 45.70138
+                                },
+                                "Bearing": 160,
+                                "Delay": "PT46S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:2718:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:38:31Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:39:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:2297:SYTRAL"
+                                    },
+                                    "Order": 20
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7560548Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:42:49.2521Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:104:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::RX:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::560_RX-010KM_01101033:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:41194:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 5.006048,
+                                    "Latitude": 45.77082
+                                },
+                                "Bearing": 278,
+                                "Delay": "PT2M41S",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:104:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:36:00Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:36:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:41198:SYTRAL"
+                                    },
+                                    "Order": 2
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:41:49.2521Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:43:07.7555985Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:1532:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C3:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::903_C3A-1227_x0040__00301044:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:36014:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.907966,
+                                    "Latitude": 45.78171
+                                },
+                                "Bearing": 355,
+                                "Delay": "PT1M40S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:1532:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:38:24Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:38:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:48404:SYTRAL"
+                                    },
+                                    "Order": 7
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:42:07.7555985Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:42:37.8622063Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:2404:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C17:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::917_C17A-0777_x00A3__00401041:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:1507:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.903997,
+                                    "Latitude": 45.72644
+                                },
+                                "Bearing": 240,
+                                "Delay": "PT2M16S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:2404:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:38:21Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:38:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:11761:SYTRAL"
+                                    },
+                                    "Order": 5
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:41:37.8622063Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-05-08T20:42:37.8634498Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:4402:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::C25:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.05.08:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::925_C25B-0427R_00501020:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:2882:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.872285,
+                                    "Latitude": 45.73302
+                                },
+                                "Bearing": 143,
+                                "Delay": "PT4M31S",
+                                "VehicleStatus": "IN_PROGRESS",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:4402:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-05-08T20:35:33Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-05-08T20:36:00Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:3044:SYTRAL"
+                                    },
+                                    "Order": 12
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-05-08T20:41:37.8634498Z"
                         }
                     ],
-                    "ResponseTimestamp": "2026-05-08T19:47:40.261415072Z",
+                    "ResponseTimestamp": "2026-05-08T20:42:21.789768766Z",
                     "version": "2.0"
                 }
             ]
