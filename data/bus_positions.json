@@ -1,17 +1,17 @@
 {
     "Siri": {
         "ServiceDelivery": {
-            "ResponseTimestamp": "2026-05-30T04:29:03.95591407Z",
+            "ResponseTimestamp": "2026-05-30T07:25:59.828028725Z",
             "ProducerRef": {
                 "value": "MDL"
             },
             "ResponseMessageIdentifier": {
-                "value": "59801acc-788c-44e2-846e-3fa6c3a81e90"
+                "value": "4221d0cf-e235-4b63-bd60-2fd11047e18b"
             },
             "MoreData": false,
             "VehicleMonitoringDelivery": [
                 {
-                    "ResponseTimestamp": "2026-05-30T04:29:03.955916162Z",
+                    "ResponseTimestamp": "2026-05-30T07:25:59.828031019Z",
                     "version": "2.0"
                 }
             ]
