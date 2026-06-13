@@ -1,7 +1,119 @@
 {
     "Siri": {
         "ServiceDelivery": {
-            "VehicleMonitoringDelivery": []
-        }
+            "ResponseTimestamp": "2026-06-13T22:42:19.062282963Z",
+            "ProducerRef": {
+                "value": "MDL"
+            },
+            "ResponseMessageIdentifier": {
+                "value": "39947008-2d0e-4c62-858a-e0fb2fa3760e"
+            },
+            "MoreData": false,
+            "VehicleMonitoringDelivery": [
+                {
+                    "VehicleActivity": [
+                        {
+                            "ValidUntilTime": "2026-06-13T22:43:12.5625659Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:930:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::T1:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "inbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.06.13:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::520_T1A-0826V_00101065:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:46160:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.818776,
+                                    "Latitude": 45.73363
+                                },
+                                "Bearing": 98,
+                                "Delay": "PT4M35S",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:930:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-06-13T22:34:18Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-06-12T22:34:18Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:34874:SYTRAL"
+                                    },
+                                    "Order": 23
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-06-13T22:42:12.5625659Z"
+                        },
+                        {
+                            "ValidUntilTime": "2026-06-13T22:43:12.562334Z",
+                            "VehicleMonitoringRef": {
+                                "value": "ActIV:Vehicle:Bus:887:LOC"
+                            },
+                            "MonitoredVehicleJourney": {
+                                "LineRef": {
+                                    "value": "ActIV:Line::T4:SYTRAL"
+                                },
+                                "DirectionRef": {
+                                    "value": "outbound"
+                                },
+                                "FramedVehicleJourneyRef": {
+                                    "DataFrameRef": {
+                                        "value": "ActIV:DataFrame::2026.06.13:LOC"
+                                    },
+                                    "DatedVehicleJourneyRef": "ActIV:VehicleJourney::550_T4A-1306M_00601053:LOC"
+                                },
+                                "DestinationRef": {
+                                    "value": "ActIV:StopArea:SP:39413:SYTRAL"
+                                },
+                                "DataSource": "TCL",
+                                "VehicleLocation": {
+                                    "Longitude": 4.86518,
+                                    "Latitude": 45.69181
+                                },
+                                "Bearing": 157,
+                                "Delay": "PT1M2S",
+                                "VehicleRef": {
+                                    "value": "ActIV:Vehicle:Bus:887:LOC"
+                                },
+                                "PreviousCalls": {},
+                                "MonitoredCall": {
+                                    "AimedArrivalTime": "2026-06-13T22:40:10Z",
+                                    "ActualArrivalTime": "0001-01-01T00:00:00Z",
+                                    "ArrivalStatus": "ON_TIME",
+                                    "AimedDepartureTime": "2026-06-12T22:40:10Z",
+                                    "ActualDepartureTime": "0001-01-01T00:00:00Z",
+                                    "DepartureStatus": "ON_TIME",
+                                    "StopPointRef": {
+                                        "value": "ActIV:StopArea:SP:39410:SYTRAL"
+                                    },
+                                    "Order": 28
+                                },
+                                "OnwardCalls": {}
+                            },
+                            "RecordedAtTime": "2026-06-13T22:42:12.562334Z"
+                        }
+                    ],
+                    "ResponseTimestamp": "2026-06-13T22:42:19.062287184Z",
+                    "version": "2.0"
+                }
+            ]
+        },
+        "version": "2.0"
     }
 }
