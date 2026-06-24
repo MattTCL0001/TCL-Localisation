@@ -771,7 +771,12 @@ async function updateBus() {
             const isTram = line.startsWith('T') || line.startsWith('RX');
             const color = bus.color || (isTram ? '#00d2ff' : '#da291c');
             let modeFile = 'Mode_Bus.svg';
-            if (line.startsWith('C')) modeFile = 'Mode_C.svg';
+            
+            // Exception pour C7 et C19 qui doivent utiliser le logo Bus
+            if (line === 'C7' || line === 'C19') {
+                modeFile = 'Mode_Bus.svg';
+            } 
+            else if (line.startsWith('C')) modeFile = 'Mode_C.svg';
             else if (line.startsWith('TB')) modeFile = 'Mode_TB.svg';
             else if (line.startsWith('RX')) modeFile = 'RX.svg';
             else if (line.startsWith('T')) modeFile = 'Mode_T.svg';
