@@ -654,19 +654,19 @@
         }
 
         function lineImgHtml(lineNum, height = '20px') {
-            const src = `Lignes2/${lineNum}.svg`;
+            const src = `Lignes/${lineNum}.svg`;
             const fallback = `<span style='background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:2px 6px;border-radius:4px;font-size:10px;margin:0 2px;color:#eee;'>${lineNum}</span>`;
             return cachedImgHtml(src, `height:${height};width:auto;display:inline-block;margin:0 2px;`, fallback);
         }
 
         function modeImgHtml(modeFile, sizePx = 18) {
-            const src = `Lignes2/${modeFile}`;
+            const src = `Lignes/${modeFile}`;
             const fallback = `<span style='font-size:${sizePx}px;'>🚌</span>`;
             return cachedImgHtml(src, `width:${sizePx}px;height:${sizePx}px;`, fallback);
         }
 
         const KNOWN_MODE_FILES = ['mode_bus.svg','Mode_C.svg','Mode_TB.svg','RX.svg','Mode_T.svg','Mode_NAVI.svg'];
-        KNOWN_MODE_FILES.forEach(f => preloadImage(`Lignes2/${f}`));
+        KNOWN_MODE_FILES.forEach(f => preloadImage(`Lignes/${f}`));
 
         // ==================== INITIALISATION CARTE ====================
         const map = L.map('map', { preferCanvas: true }).setView([45.757, 4.832], 13);
@@ -1023,7 +1023,7 @@
                 const parkings = await res.json();
                 parkingLayer.clearLayers();
                 parkings.forEach(p => {
-                    const iconHtml = cachedImgHtml('Lignes2/P+R.svg','width:26px;height:26px;','<span style="font-size:18px;">🅿️</span>');
+                    const iconHtml = cachedImgHtml('P+R.svg','width:26px;height:26px;','<span style="font-size:18px;">🅿️</span>');
                     L.marker([p.lat, p.lon], {
                         icon: L.divIcon({ html: iconHtml, iconSize:[26,26], iconAnchor:[13,13] })
                     }).bindPopup(`
