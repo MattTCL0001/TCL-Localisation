@@ -455,6 +455,7 @@ function lineImgHtml(lineNum, height = '20px') {
     if (state === 'ok') return `<img src="${src}" style="height:${height};width:auto;display:inline-block;margin:0 2px;">`;
     if (state === 'error') return fallback;
     return `<img src="${src}" style="height:${height};width:auto;display:inline-block;margin:0 2px;" loading="lazy"
+        onload="imgCache.set('${src}','ok')" onerror="imgCache.set('${src}','error');this.outerHTML='${fallback.replace(/'/g, "\\'")}'">`;
 }
 
 function modeImgHtml(modeFile, sizePx = 18) {
