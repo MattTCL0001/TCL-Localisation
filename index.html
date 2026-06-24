@@ -520,28 +520,39 @@ const getNewLineNumber = l => lineMapping[l] || l;
 function getLineType(line) {
     const u = line.toUpperCase();
     
-    // 1. Cas spécifiques d'abord
+    // 1. Cas spécifiques absolus
     if (/^[ABCD]$/.test(u)) return 'metro';
     if (/^NAVI|^7601/.test(u)) return 'navgone';
     
     // Exception Chrono pour les lignes 203 et 204
     if (u === '203' || u === '204') return 'chrono'; 
     
-    if (u === 'T36') return 'bus';
+    // Cas spécifiques Bus (A32, A71, 104A, 104B, T36)
+    if (u === 'A32' || u === 'A71' || u === 'T36') return 'bus';
+    if (/^104[A-Z]$/.test(u)) return 'bus'; // Gère 104A, 104B, etc.
+    
+    // 2. Bus Relais (Tout ce qui commence par BR : BRT0, BRML, BR00...)
+    if (/^BR/.test(u)) return 'bus relais';
+    
+    // 3. Zones Industrielles (Tout ce qui commence par ZI)
+    if (/^ZI/.test(u)) return 'bus';
+    
+    // 4. Tramways (T..., TS..., RX...)
     if (/^T\d/.test(u)) return 'tram';
-    if (/^TS\d/.test(u)) return 'tram';
+    if (/^TS/.test(u)) return 'tram'; // Modifié pour intercepter tout ce qui commence par TS
+    if (/^RX/.test(u)) return 'tram'; // Ajout de RX
+    
+    // 5. Autres modes spécifiques
     if (/^TB/.test(u)) return 'tb';
     if (/^F[12]$/.test(u)) return 'funiculaire';
     
-    // 2. Gestion des Chrono (Y compris les formats C00EX, C00, etc.)
-    // On le place AVANT le test des bus Express pour que "C01EX" soit bien capturé ici
+    // 6. Gestion des Chrono (Y compris les formats C00EX, C00, etc.)
     if (/^C/.test(u)) return 'chrono'; 
     
-    // 3. Gestion des lignes Express (000EX ou 00EX)
-    // \d{2,3} cherche exactement 2 ou 3 chiffres, suivis de EX
+    // 7. Gestion des lignes Express (000EX ou 00EX)
     if (/^\d{2,3}EX$/.test(u)) return 'bus';
     
-    // 4. Autres types de lignes
+    // 8. Autres types de lignes standards
     if (/^\d+$/.test(u)) return 'bus';
     if (/^N\d*/.test(u)) return 'navette';
     if (/^BGS\d*/.test(u)) return 'navette';
