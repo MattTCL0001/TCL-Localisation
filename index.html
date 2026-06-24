@@ -734,7 +734,7 @@ async function updateBus() {
             const line = bus.line, rot = bus.bearing || 0;
             const isTram = line.startsWith('T') || line.startsWith('RX');
             const color = bus.color || (isTram ? '#00d2ff' : '#da291c');
-            let modeFile = 'Mode_Bus.svg';
+            let modeFile = 'mode_bus.svg';
             if (line.startsWith('C')) modeFile = 'Mode_C.svg';
             else if (line.startsWith('TB')) modeFile = 'Mode_TB.svg';
             else if (line.startsWith('RX')) modeFile = 'RX.svg';
@@ -753,8 +753,14 @@ async function updateBus() {
                 className:'', iconSize:[36,42], iconAnchor:[18,21]
             });
 
+            const vehicleImg = `Vehicule/${bus.id}.jpg`;
             const marker = L.marker([lat,lon], {icon}).bindPopup(`
-            <div style="width:230px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
+            <div style="width:240px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
+                <div style="position:relative;height:100px;background:#0a0b14;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.style.display='none'">
+                    <div style="position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,rgba(14,16,28,0.95));"></div>
+                    <div style="position:absolute;bottom:8px;left:12px;">${lineImgHtml(line, '30px')}</div>
+                </div>
                 <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                         <div style="display:flex;align-items:center;gap:8px;">
@@ -766,10 +772,16 @@ async function updateBus() {
                     <div style="font-size:14px;font-weight:600;color:#edf0f8;margin-bottom:4px;">${dest}</div>
                 </div>
                 <div style="padding:8px 14px;display:flex;flex-direction:column;gap:5px;">
-                    <div style="font-size:11px;color:#8a90a8;">${getVehicleType(bus)}</div>
-                    <div style="font-size:10px;color:#4a4f6a;font-family:monospace;">${bus.id}</div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a4f6a" stroke-width="2"><rect x="1" y="3" width="15" height="13" rx="2"/><path d="m16 8 5 0 3 5v3h-8V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/></svg>
+                        <span style="font-size:11px;color:#8a90a8;">${getVehicleType(bus)}</span>
+                    </div>
+                    <div style="display:flex;align-items:center;gap:8px;">
+                        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4a4f6a" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+                        <span style="font-size:10px;color:#4a4f6a;font-family:monospace;">${bus.id}</span>
+                    </div>
                 </div>
-            </div>`, {maxWidth:250, className:'tcl-popup'}).addTo(busLayer);
+            </div>`, {maxWidth:260, className:'tcl-popup'}).addTo(busLayer);
             busMarkers.set(bus.id, {marker, hash: h});
         }
         for (const [id, e] of busMarkers) { if (!seen.has(id)) { busLayer.removeLayer(e.marker); busMarkers.delete(id); } }
