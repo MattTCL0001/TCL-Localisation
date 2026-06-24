@@ -596,15 +596,40 @@ function highlightText(text, term) {
 // Debounce pour la recherche
 let stopSearchTimer = null;
 window.filterStops = () => {
+    currentLineFilter = null; // reset filtre ligne si l'user tape
     clearTimeout(stopSearchTimer);
     stopSearchTimer = setTimeout(() => renderStopList(document.getElementById('stop-search').value.toLowerCase().trim()), 200);
 };
 
 function renderStopList(term = '') {
     let stops = [...allStops].sort((a,b) => (a.nom||'').localeCompare(b.nom||''));
-    if (term) stops = stops.filter(s => (s.nom||'').toLowerCase().includes(term)||(s.commune||'').toLowerCase().includes(term)||(s.desserte||'').toLowerCase().includes(term));
-    document.getElementById('search-stats').textContent = `${stops.length}/${allStops.length}`;
-    if (!stops.length) { document.getElementById('stops-list').innerHTML = '<div class="info-empty">🔍 Aucun arrêt trouvé</div>'; return; }
+    
+    if (currentLineFilter) {
+        // Filtre par ligne : cherche dans la desserte ORIGINALE, match exact sur le code
+        const target = currentLineFilter; // ex: "127"
+        // On doit aussi chercher les codes originaux qui mappent vers cette ligne remappée
+        const originalCodes = new Set([target]);
+        // Cherche tous les codes qui donnent target après remapping
+        for (const [orig, mapped] of Object.entries(lineMapping)) {
+            if (mapped === target) originalCodes.add(orig);
+        }
+        // Si target n'est pas dans lineMapping values, le code original = target lui-même
+        stops = stops.filter(s => {
+            if (!s.desserte) return false;
+            return s.desserte.split(',').some(entry => {
+                const code = entry.trim().split(':')[0].trim();
+                return originalCodes.has(code) || originalCodes.has(getNewLineNumber(code));
+            });
+        });
+    } else if (term) {
+        stops = stops.filter(s =>
+            (s.nom||'').toLowerCase().includes(term) ||
+            (s.commune||'').toLowerCase().includes(term) ||
+            (s.desserte||'').toLowerCase().includes(term)
+        );
+    }
+    
+    // ... reste inchangé
     // Limiter le rendu initial pour les appareils lents
     const chunk = stops.slice(0, 300);
     const html = chunk.map(s => {
@@ -700,7 +725,18 @@ window.filterLines = () => {
     document.getElementById('lines-list').innerHTML = html || '<div class="info-empty">📋 Aucune ligne</div>';
 };
 
-window.searchLineInStops = line => { switchToTab('stops'); document.getElementById('stop-search').value = line; filterStops(); };
+// Remplace l'ancienne fonction
+window.searchLineInStops = line => {
+    switchToTab('stops');
+    // Stocker la ligne recherchée séparément du texte libre
+    currentLineFilter = line;
+    document.getElementById('stop-search').value = '';
+    document.getElementById('search-stats').textContent = '…';
+    renderStopList('');
+};
+
+// Ajoute cette variable en haut du STATE
+let currentLineFilter = null;
 
 // ===== API FETCH HELPER =====
 async function apiFetch(path) {
