@@ -33,6 +33,7 @@
             --radius-sm: 8px;
             --radius-md: 12px;
             --radius-lg: 16px;
+            --panel-height: 46vh;
         }
 
         .app-container {
@@ -99,8 +100,13 @@
             color: var(--accent);
         }
 
-        /* MAP */
-        .map-container { flex: 1; position: relative; background: #0d0f18; }
+        /* MAP — occupe tout l'espace restant */
+        .map-container {
+            flex: 1;
+            position: relative;
+            background: #0d0f18;
+            min-height: 0;
+        }
         #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; }
 
         .leaflet-tile-container {
@@ -168,7 +174,12 @@
         }
         #bus-filter-clear:hover { background: rgba(255,255,255,0.13); color: var(--text-primary); }
 
-        /* PANEL */
+        /* =====================================================
+           PANEL — MODE PAYSAGE : à droite (comportement original)
+                 — MODE PORTRAIT  : en bas (slide-up)
+           ===================================================== */
+
+        /* ---------- PAYSAGE (défaut) ---------- */
         #info-panel {
             position: fixed;
             top: 70px; right: 0; bottom: 10px;
@@ -211,6 +222,58 @@
             box-shadow: -4px 0 20px rgba(0,0,0,0.4);
             display: flex;
             flex-direction: column;
+        }
+
+        /* ---------- PORTRAIT ---------- */
+        @media (orientation: portrait) {
+            /* Le map-container reprend le flex normal, le panel se positionne en bas */
+            #info-panel {
+                top: auto;
+                right: 0;
+                left: 0;
+                bottom: 0;
+                width: 100%;
+                height: var(--panel-height);
+                flex-direction: column;
+                /* collapsed = réduit à la poignée en bas */
+            }
+            #info-panel.collapsed {
+                transform: translateY(calc(100% - 44px));
+            }
+            /* Toggle : en haut du panel, centré horizontalement */
+            .panel-toggle {
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                top: -40px;
+                border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+                border: 1px solid var(--glass-border-strong);
+                border-bottom: none;
+                width: 48px;
+                height: 40px;
+            }
+            /* Rotation de la flèche : portrait expanded = flèche vers le bas ▼, collapsed = ▲ */
+            #info-panel:not(.collapsed) .panel-toggle span { transform: rotate(90deg); display: inline-block; }
+            #info-panel.collapsed .panel-toggle span        { transform: rotate(-90deg); display: inline-block; }
+
+            .tab-content {
+                border-left: none;
+                border-top: 1px solid var(--glass-border-strong);
+                border-radius: var(--radius-md) var(--radius-md) 0 0;
+                box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
+                overflow: hidden; /* pour que le border-radius soit visible */
+                flex: 1;
+            }
+
+            /* Ajuster la carte pour laisser place au panel */
+            .map-container {
+                padding-bottom: 0; /* le panel est en fixed, pas besoin */
+            }
+
+            /* Le filtre bus ne doit pas être caché derrière le panel */
+            #bus-filter-banner {
+                top: 10px;
+            }
         }
 
         .tab-pane { display: none; flex-direction: column; flex: 1; overflow-y: auto; }
@@ -431,6 +494,21 @@
             font-style: normal;
         }
         .leaflet-popup-content { font-family: 'TCL', sans-serif; }
+
+        /* Icône mode cliquable dans le popup */
+        .mode-icon-btn {
+            cursor: pointer;
+            border-radius: 6px;
+            transition: background 0.15s, transform 0.1s;
+            padding: 2px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .mode-icon-btn:hover {
+            background: rgba(255,255,255,0.15);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
@@ -553,9 +631,9 @@ function lineImgHtml(lineNum, height = '20px') {
 function modeImgHtml(modeFile, sizePx = 18) {
     const src = `Lignes/${modeFile}`;
     const state = imgCache.get(src);
-    if (state === 'ok')    return `<img src="${src}" style="width:${sizePx}px;height:${sizePx}px;">`;
-    if (state === 'error') return `<span style="font-size:${sizePx}px;">🚌</span>`;
-    return `<img src="${src}" style="width:${sizePx}px;height:${sizePx}px;" loading="lazy"
+    if (state === 'ok')    return `<img src="${src}" style="width:${sizePx}px;height:${sizePx}px;display:block;">`;
+    if (state === 'error') return `<span style="font-size:${sizePx}px;line-height:1;">🚌</span>`;
+    return `<img src="${src}" style="width:${sizePx}px;height:${sizePx}px;display:block;" loading="lazy"
         onload="imgCache.set('${src}','ok')" onerror="imgCache.set('${src}','error');this.style.display='none'">`;
 }
 
@@ -578,15 +656,21 @@ const velovMarkerMap = new Map();
 const VELOV_MIN_ZOOM = 13;
 
 // Filtres par ligne
-let currentLineFilter = null;  // filtre panel arrêts
-let busLineFilter      = null;  // filtre marqueurs bus
+let currentLineFilter = null;
+let busLineFilter      = null;
 
-// ===== UI GÉNÉRAL =====
+// ===== ORIENTATION PANEL =====
 const togglePanel = () => {
     document.getElementById('info-panel').classList.toggle('collapsed');
     setTimeout(() => map.invalidateSize(), 250);
 };
 const toggleInfoItem = (el) => el.closest('.info-item').classList.toggle('expanded');
+
+// Surveille les changements d'orientation pour invalider la carte
+if (window.screen?.orientation) {
+    window.screen.orientation.addEventListener('change', () => setTimeout(() => map.invalidateSize(), 350));
+}
+window.addEventListener('resize', () => setTimeout(() => map.invalidateSize(), 250));
 
 function switchToTab(name) {
     document.querySelectorAll('.header-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
@@ -666,12 +750,7 @@ function highlightText(text, term) {
     return text.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<span class="search-highlight">$1</span>');
 }
 
-// ===== FILTRES PAR LIGNE — logique centrale =====
-
-/**
- * Calcule l'ensemble des codes desserte (originaux ET remappés)
- * correspondant à une ligne cible remappée.
- */
+// ===== FILTRES PAR LIGNE =====
 function getOriginalCodes(targetMapped) {
     const codes = new Set([targetMapped]);
     for (const [orig, mapped] of Object.entries(lineMapping)) {
@@ -680,9 +759,6 @@ function getOriginalCodes(targetMapped) {
     return codes;
 }
 
-/**
- * Vérifie si un champ desserte contient la ligne cible.
- */
 function desserteContainsLine(desserte, targetMapped) {
     if (!desserte) return false;
     const codes = getOriginalCodes(targetMapped);
@@ -692,54 +768,38 @@ function desserteContainsLine(desserte, targetMapped) {
     });
 }
 
-/**
- * Active le filtre ligne : met à jour les deux bandeaux + les bus.
- */
 function applyLineFilter(line) {
     currentLineFilter = line;
     busLineFilter     = line;
 
-    // Bandeau arrêts
     const stopBanner = document.getElementById('stop-filter-banner');
     document.getElementById('stop-filter-label').innerHTML =
         `Arrêts de la ligne &nbsp;${lineImgHtml(line, '18px')}`;
     stopBanner.classList.add('visible');
 
-    // Bandeau bus (sur la carte)
     const busBanner = document.getElementById('bus-filter-banner');
     document.getElementById('bus-filter-label').innerHTML =
         `Véhicules filtrés · &nbsp;${lineImgHtml(line, '18px')}`;
     busBanner.classList.add('visible');
 
-    // Applique immédiatement le filtre sur les marqueurs existants
     applyBusLineFilter();
 }
 
-/**
- * Retire tous les filtres et restaure l'état normal.
- */
 window.clearAllFilters = function() {
     currentLineFilter = null;
     busLineFilter     = null;
 
-    // Cache les bandeaux
     document.getElementById('stop-filter-banner').classList.remove('visible');
     document.getElementById('bus-filter-banner').classList.remove('visible');
 
-    // Réaffiche tous les marqueurs bus
     for (const [, e] of busMarkers) {
         if (!busLayer.hasLayer(e.marker)) busLayer.addLayer(e.marker);
     }
 
-    // Reset champ recherche + re-render liste arrêts
     document.getElementById('stop-search').value = '';
     renderStopList('');
 };
 
-/**
- * Applique busLineFilter sur les marqueurs bus existants.
- * Appelé après chaque update et lors du changement de filtre.
- */
 function applyBusLineFilter() {
     for (const [, e] of busMarkers) {
         const lineRemapped = getNewLineNumber(e.line);
@@ -757,7 +817,6 @@ function applyBusLineFilter() {
 // ===== ARRÊTS =====
 let stopSearchTimer = null;
 window.filterStops = () => {
-    // L'utilisateur tape → on lève le filtre ligne
     currentLineFilter = null;
     document.getElementById('stop-filter-banner').classList.remove('visible');
     clearTimeout(stopSearchTimer);
@@ -899,17 +958,25 @@ window.filterLines = () => {
     document.getElementById('lines-list').innerHTML = html || '<div class="info-empty">📋 Aucune ligne</div>';
 };
 
-/**
- * Clic sur une ligne dans le panneau Lignes :
- * - bascule sur l'onglet Arrêts
- * - filtre les arrêts
- * - filtre les marqueurs bus sur la carte
- */
 window.searchLineInStops = function(line) {
     switchToTab('stops');
     document.getElementById('stop-search').value = '';
     applyLineFilter(line);
     renderStopList('');
+};
+
+// ===== POPUP FILTER (appelé depuis le HTML du popup) =====
+window.filterLineFromPopup = function(line) {
+    switchToTab('stops');
+    document.getElementById('stop-search').value = '';
+    applyLineFilter(getNewLineNumber(line));
+    renderStopList('');
+    // Ouvrir le panel si collapsed
+    const panel = document.getElementById('info-panel');
+    if (panel.classList.contains('collapsed')) {
+        panel.classList.remove('collapsed');
+        setTimeout(() => map.invalidateSize(), 250);
+    }
 };
 
 // ===== API =====
@@ -978,7 +1045,8 @@ async function updateBus() {
             if (existing?.hash === h) continue;
             if (existing) { busLayer.removeLayer(existing.marker); busMarkers.delete(bus.id); }
 
-            const line = bus.line, rot = bus.bearing || 0;
+            const line = bus.line;
+            const rot  = (bus.bearing != null && bus.bearing !== undefined && bus.bearing !== '') ? (bus.bearing || 0) : null;
             const isTram = line.startsWith('T') || line.startsWith('RX');
             const color  = bus.color || (isTram ? '#00d2ff' : '#da291c');
 
@@ -992,24 +1060,51 @@ async function updateBus() {
 
             const dest    = getStopName(bus.dest_code) || bus.dest_name || '';
             const delayOk = bus.delay === '0s';
+            const lineRemapped = getNewLineNumber(line);
 
-            const icon = L.divIcon({
-                html: `<div style="position:relative;width:36px;height:42px;transform:rotate(${rot}deg);">
+            // ── MARQUEUR ──
+            // Si bearing disponible : triangle directionnel + carré (total 42px)
+            // Si absent            : juste le carré seul (36px)
+            let iconHtml;
+            if (rot !== null) {
+                iconHtml = `<div style="position:relative;width:36px;height:42px;transform:rotate(${rot}deg);">
                     <div style="position:absolute;top:0;left:50%;transform:translateX(-50%);width:0;height:0;border-left:6px solid transparent;border-right:6px solid transparent;border-bottom:8px solid ${color};"></div>
                     <div style="position:absolute;top:6px;left:0;width:36px;height:36px;background:rgba(15,17,28,0.9);border-radius:10px;border:2px solid ${color};display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                        <div style="transform:rotate(-${rot}deg)">${modeImgHtml(modeFile, 18)}</div>
+                        <div style="display:flex;align-items:center;justify-content:center;transform:rotate(-${rot}deg)">${modeImgHtml(modeFile, 18)}</div>
                     </div>
-                </div>`,
-                className:'', iconSize:[36,42], iconAnchor:[18,21]
-            });
+                </div>`;
+            } else {
+                iconHtml = `<div style="width:36px;height:36px;background:rgba(15,17,28,0.9);border-radius:10px;border:2px solid ${color};display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                    ${modeImgHtml(modeFile, 18)}
+                </div>`;
+            }
+
+            const iconSize   = rot !== null ? [36, 42] : [36, 36];
+            const iconAnchor = rot !== null ? [18, 21] : [18, 18];
+
+            const icon = L.divIcon({ html: iconHtml, className:'', iconSize, iconAnchor });
 
             const vehicleImg = `Vehicule/${bus.id}.jpg`;
+
+            // ── POPUP ──
+            // Gradient de la couleur de ligne sur l'image + icône mode cliquable
             const marker = L.marker([lat, lon], { icon }).bindPopup(`
             <div style="width:240px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
                 <div style="position:relative;height:100px;background:#0a0b14;display:flex;align-items:center;justify-content:center;overflow:hidden;">
                     <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.style.display='none'">
-                    <div style="position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,rgba(14,16,28,0.95));"></div>
+                    <!-- Gradient couleur de ligne -->
+                    <div style="position:absolute;inset:0;background:linear-gradient(135deg,${color}33 0%,transparent 55%,${color}22 100%);pointer-events:none;"></div>
+                    <!-- Fondu bas vers fond popup -->
+                    <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,rgba(14,16,28,0.98));pointer-events:none;"></div>
+                    <!-- Badge ligne en bas à gauche -->
                     <div style="position:absolute;bottom:8px;left:12px;">${lineImgHtml(line, '30px')}</div>
+                    <!-- Icône mode cliquable en haut à droite -->
+                    <div onclick="filterLineFromPopup('${line}')" title="Filtrer la ligne ${line}"
+                         style="position:absolute;top:8px;right:8px;width:32px;height:32px;background:rgba(14,16,28,0.75);border:1px solid ${color}55;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);transition:background 0.15s;"
+                         onmouseover="this.style.background='rgba(${color.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16)).join(',')},0.35)'"
+                         onmouseout="this.style.background='rgba(14,16,28,0.75)'">
+                        ${modeImgHtml(modeFile, 18)}
+                    </div>
                 </div>
                 <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
                     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
@@ -1033,21 +1128,16 @@ async function updateBus() {
                 </div>
             </div>`, { maxWidth:260, className:'tcl-popup' });
 
-            // On ajoute au layer seulement si pas filtré
-            const lineRemapped = getNewLineNumber(line);
             const showNow = !busLineFilter || lineRemapped === busLineFilter || line === busLineFilter;
             if (showNow) marker.addTo(busLayer);
 
-            // Stocke ligne originale pour le filtre
             busMarkers.set(bus.id, { marker, hash: h, line });
         }
 
-        // Supprime les bus disparus
         for (const [id, e] of busMarkers) {
             if (!seen.has(id)) { busLayer.removeLayer(e.marker); busMarkers.delete(id); }
         }
 
-        // Applique le filtre actif sur tous les marqueurs
         applyBusLineFilter();
 
     } catch(e) { console.error('Bus:', e); }
