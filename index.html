@@ -451,11 +451,12 @@ const imgCache = new Map();
 function lineImgHtml(lineNum, height = '20px') {
     const src = `Lignes/${lineNum}.svg`;
     const state = imgCache.get(src);
-    const fallback = `<span style="background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:2px 6px;border-radius:4px;font-size:10px;margin:0 2px;color:#eee;">${lineNum}</span>`;
+    const fallbackStyle = 'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:2px 6px;border-radius:4px;font-size:10px;margin:0 2px;color:#eee;display:inline-block;';
     if (state === 'ok') return `<img src="${src}" style="height:${height};width:auto;display:inline-block;margin:0 2px;">`;
-    if (state === 'error') return fallback;
-    return `<img src="${src}" style="height:${height};width:auto;display:inline-block;margin:0 2px;" loading="lazy"
-        onload="imgCache.set('${src}','ok')" onerror="imgCache.set('${src}','error');this.outerHTML='${fallback.replace(/'/g, "\\'")}'">`;
+    if (state === 'error') return `<span style="${fallbackStyle}">${lineNum}</span>`;
+    return `<img src="${src}" data-line="${lineNum}" style="height:${height};width:auto;display:inline-block;margin:0 2px;" loading="lazy"
+        onload="imgCache.set(this.src,'ok')"
+        onerror="imgCache.set(this.src,'error');var s=document.createElement('span');s.textContent=this.dataset.line;s.style.cssText='${fallbackStyle}';this.replaceWith(s)">`;
 }
 
 function modeImgHtml(modeFile, sizePx = 18) {
