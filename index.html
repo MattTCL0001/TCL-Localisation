@@ -735,7 +735,7 @@ async function updateBus() {
             const line = bus.line, rot = bus.bearing || 0;
             const isTram = line.startsWith('T') || line.startsWith('RX');
             const color = bus.color || (isTram ? '#00d2ff' : '#da291c');
-            let modeFile = 'mode_bus.svg';
+            let modeFile = 'Mode_Bus.svg';
             if (line.startsWith('C')) modeFile = 'Mode_C.svg';
             else if (line.startsWith('TB')) modeFile = 'Mode_TB.svg';
             else if (line.startsWith('RX')) modeFile = 'RX.svg';
