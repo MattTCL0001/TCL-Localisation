@@ -519,17 +519,35 @@ const getNewLineNumber = l => lineMapping[l] || l;
 
 function getLineType(line) {
     const u = line.toUpperCase();
+    
+    // 1. Cas spécifiques d'abord
     if (/^[ABCD]$/.test(u)) return 'metro';
     if (/^NAVI|^7601/.test(u)) return 'navgone';
+    
+    // Exception Chrono pour les lignes 203 et 204
+    if (u === '203' || u === '204') return 'chrono'; 
+    
     if (u === 'T36') return 'bus';
     if (/^T\d/.test(u)) return 'tram';
+    if (/^TS\d/.test(u)) return 'tram';
     if (/^TB/.test(u)) return 'tb';
     if (/^F[12]$/.test(u)) return 'funiculaire';
-    if (/^C/.test(u)) return 'chrono';
+    
+    // 2. Gestion des Chrono (Y compris les formats C00EX, C00, etc.)
+    // On le place AVANT le test des bus Express pour que "C01EX" soit bien capturé ici
+    if (/^C/.test(u)) return 'chrono'; 
+    
+    // 3. Gestion des lignes Express (000EX ou 00EX)
+    // \d{2,3} cherche exactement 2 ou 3 chiffres, suivis de EX
+    if (/^\d{2,3}EX$/.test(u)) return 'bus';
+    
+    // 4. Autres types de lignes
     if (/^\d+$/.test(u)) return 'bus';
     if (/^N\d*/.test(u)) return 'navette';
+    if (/^BGS\d*/.test(u)) return 'navette';
     if (/^PL/.test(u)) return 'pl';
     if (/^JD/.test(u)) return 'jd';
+    
     return 'other';
 }
 
