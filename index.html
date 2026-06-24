@@ -703,11 +703,17 @@ function getVehicleType(bus) {
     if (isNaN(id)) return 'Véhicule TCL';
     if (id===111) return 'Le Gône';
     if (id===112) return 'La Fenotte';
+    if (id===114) return 'La Soyeuse';
     if (id===120) return 'La Mouche';
     if ((id>=801&&id<873)) return 'Alstom Citadis 302';
     if ((id>=874&&id<937)) return 'Alstom Citadis 402';
     if ((id>=101&&id<106)) return 'Stadler Tango';
     if ((id>=1001&&id<1030)||(id>=1201&&id<1218)||(id>=1301&&id<1333)||(id>=1401&&id<1417)||(id>=2301&&id<2328)) return 'Iveco Urbanway 18';
+    if ((id>=1601&&id<1615)||(id>=4401&&id<4414)) return 'Iveco Urbanway 18 GNV';
+    if ((id>=6101&&id<6106)) return 'Iveco Urbanway 18 Hybrid';
+    if ((id>=2401&&id<2458)||(id>=2501&&id<2524)||(id>=2701&&id<2750)||(id>=3000&&id<3065)||(id>=3201&&id<3220)||(id>=3501&&id<3550)||(id>=3601&&id<3650)) return 'Iveco Urbanway 12';
+    if ((id>=4101&&id<4127)||(id>=6901&&id<6915)) return 'Iveco Urbanway 12 GNV';
+    if ((id>=4201&&id<4212)) return 'Iveco Urbanway 12 GNV Hybrid';
     if ((id>=2001&&id<2034)||(id>=2801&&id<2835)||(id>=4901&&id<4921)) return 'Hess LighTram 19 DC';
     if (id>=2901&&id<2928) return 'Iveco Cristalis ETB 18';
     if ((id>=1101&&id<1112)||(id>=2101&&id<2124)||(id>=2201&&id<2279)) return 'Iveco Citelis 18';
