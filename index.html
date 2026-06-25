@@ -43,7 +43,6 @@
             flex-direction: column;
         }
 
-        /* HEADER */
         .app-header {
             position: relative;
             height: 56px;
@@ -100,7 +99,6 @@
             color: var(--accent);
         }
 
-        /* MAP — occupe tout l'espace restant */
         .map-container {
             flex: 1;
             position: relative;
@@ -116,7 +114,6 @@
             .leaflet-tile-container { filter: none; }
         }
 
-        /* POPUPS */
         .leaflet-popup-content-wrapper {
             background: rgba(14,16,28,0.95) !important;
             color: var(--text-primary) !important;
@@ -130,7 +127,6 @@
         .tcl-popup .leaflet-popup-content-wrapper { background: transparent !important; border: none !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important; }
         .tcl-popup .leaflet-popup-tip { background: #1e1e2e !important; }
 
-        /* PANNEAU FILTRE BUS (flottant sur la carte) */
         #bus-filter-banner {
             display: none;
             position: absolute;
@@ -174,12 +170,6 @@
         }
         #bus-filter-clear:hover { background: rgba(255,255,255,0.13); color: var(--text-primary); }
 
-        /* =====================================================
-           PANEL — MODE PAYSAGE : à droite (comportement original)
-                 — MODE PORTRAIT  : en bas (slide-up)
-           ===================================================== */
-
-        /* ---------- PAYSAGE (défaut) ---------- */
         #info-panel {
             position: fixed;
             top: 70px; right: 0; bottom: 10px;
@@ -224,9 +214,7 @@
             flex-direction: column;
         }
 
-        /* ---------- PORTRAIT ---------- */
         @media (orientation: portrait) {
-            /* Le map-container reprend le flex normal, le panel se positionne en bas */
             #info-panel {
                 top: auto;
                 right: 0;
@@ -235,12 +223,10 @@
                 width: 100%;
                 height: var(--panel-height);
                 flex-direction: column;
-                /* collapsed = réduit à la poignée en bas */
             }
             #info-panel.collapsed {
                 transform: translateY(calc(100% - 44px));
             }
-            /* Toggle : en haut du panel, centré horizontalement */
             .panel-toggle {
                 position: absolute;
                 left: 50%;
@@ -252,7 +238,6 @@
                 width: 48px;
                 height: 40px;
             }
-            /* Rotation de la flèche : portrait expanded = flèche vers le bas ▼, collapsed = ▲ */
             #info-panel:not(.collapsed) .panel-toggle span { transform: rotate(90deg); display: inline-block; }
             #info-panel.collapsed .panel-toggle span        { transform: rotate(-90deg); display: inline-block; }
 
@@ -261,19 +246,10 @@
                 border-top: 1px solid var(--glass-border-strong);
                 border-radius: var(--radius-md) var(--radius-md) 0 0;
                 box-shadow: 0 -4px 20px rgba(0,0,0,0.4);
-                overflow: hidden; /* pour que le border-radius soit visible */
+                overflow: hidden;
                 flex: 1;
             }
-
-            /* Ajuster la carte pour laisser place au panel */
-            .map-container {
-                padding-bottom: 0; /* le panel est en fixed, pas besoin */
-            }
-
-            /* Le filtre bus ne doit pas être caché derrière le panel */
-            #bus-filter-banner {
-                top: 10px;
-            }
+            #bus-filter-banner { top: 10px; }
         }
 
         .tab-pane { display: none; flex-direction: column; flex: 1; overflow-y: auto; }
@@ -294,7 +270,6 @@
             z-index: 10;
         }
 
-        /* Bandeau filtre dans le panneau arrêts */
         #stop-filter-banner {
             display: none;
             align-items: center;
@@ -374,7 +349,6 @@
         .info-item.expanded .info-detail { display: block; }
         .info-empty { padding: 32px 16px; text-align: center; color: var(--text-muted); font-size: 13px; }
 
-        /* SEARCH */
         .search-bar {
             background: rgba(0,0,0,0.2);
             border-bottom: 1px solid var(--glass-border);
@@ -411,7 +385,6 @@
         }
         .search-stats { font-size: 10px; color: var(--text-muted); padding: 5px 12px; }
 
-        /* FILTERS */
         .filter-bar {
             padding: 8px 12px;
             background: rgba(0,0,0,0.2);
@@ -440,7 +413,6 @@
         .filter-bar label:hover { background: var(--surface-hover); color: var(--text-primary); }
         .filter-bar input { margin: 0; cursor: pointer; accent-color: var(--accent); }
 
-        /* LINES */
         .line-group { margin-top: 8px; }
         .line-group-header {
             padding: 6px 14px;
@@ -462,7 +434,6 @@
         .line-item:hover { transform: scale(1.06); background: rgba(255,255,255,0.08); }
         .line-item img { height: 24px; width: auto; }
 
-        /* STOP BADGES */
         .stop-lines { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 5px; }
         .search-highlight { background: var(--accent); color: #fff; border-radius: 3px; padding: 0 2px; }
         .stop-commune { font-size: 10px; color: rgba(255,184,77,0.8); }
@@ -477,7 +448,6 @@
             margin-left: 6px;
         }
 
-        /* CREDITS */
         .credits-content { padding: 20px; line-height: 1.8; color: var(--text-secondary); }
         .credits-content a { color: var(--accent); text-decoration: none; }
         .credits-section { margin-bottom: 20px; }
@@ -495,7 +465,6 @@
         }
         .leaflet-popup-content { font-family: 'TCL', sans-serif; }
 
-        /* Icône mode cliquable dans le popup */
         .mode-icon-btn {
             cursor: pointer;
             border-radius: 6px;
@@ -528,7 +497,6 @@
     </div>
     <div class="map-container">
         <div id="map"></div>
-        <!-- Bannière filtre bus flottante sur la carte -->
         <div id="bus-filter-banner">
             <span id="bus-filter-label">Véhicules filtrés · </span>
             <button id="bus-filter-clear" onclick="clearAllFilters()">✕ Retirer le filtre</button>
@@ -555,7 +523,6 @@
                 <input type="text" id="stop-search" placeholder="🔍 Rechercher..." oninput="filterStops()">
                 <button onclick="filterStops()">Rechercher</button>
             </div>
-            <!-- Bandeau filtre ligne actif -->
             <div id="stop-filter-banner">
                 <span id="stop-filter-label">Arrêts · </span>
                 <button id="stop-filter-clear" onclick="clearAllFilters()">✕ Retirer le filtre</button>
@@ -641,32 +608,36 @@ function modeImgHtml(modeFile, sizePx = 18) {
 const map = L.map('map', { preferCanvas: true }).setView([45.757, 4.832], 13);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM', maxZoom: 19 }).addTo(map);
 
-const busLayer     = L.layerGroup().addTo(map);
-const parkingLayer = L.layerGroup().addTo(map);
-const velovLayer   = L.layerGroup().addTo(map);
+const busLayer          = L.layerGroup().addTo(map);
+const parkingLayer      = L.layerGroup().addTo(map);  // P+R TCL
+const parkingMetroLayer = L.layerGroup().addTo(map);  // Parkings métropole
+const velovLayer        = L.layerGroup().addTo(map);
+const lineTraceLayer    = L.layerGroup().addTo(map);  // Tracé de ligne actif
 
 // ===== STATE =====
 let allStops = [], stopsMapping = {}, allLines = [];
 let allVelovStations = [];
+let allLinesData = [];         // données brutes tracés lignes
+let parkingsTrData = {};       // P+R temps réel (par id)
 let currentStopMarker = null, currentVelovMarker = null;
 let parkingsLoaded = false;
-let velovLoaded    = false;
-const busMarkers   = new Map();   // id → { marker, hash, line }
+let parkingsMetroLoaded = false;
+let velovLoaded = false;
+const busMarkers   = new Map();
 const velovMarkerMap = new Map();
 const VELOV_MIN_ZOOM = 13;
+const PARKING_METRO_MIN_ZOOM = 14;
 
-// Filtres par ligne
 let currentLineFilter = null;
-let busLineFilter      = null;
+let busLineFilter     = null;
 
-// ===== ORIENTATION PANEL =====
+// ===== PANEL =====
 const togglePanel = () => {
     document.getElementById('info-panel').classList.toggle('collapsed');
     setTimeout(() => map.invalidateSize(), 250);
 };
 const toggleInfoItem = (el) => el.closest('.info-item').classList.toggle('expanded');
 
-// Surveille les changements d'orientation pour invalider la carte
 if (window.screen?.orientation) {
     window.screen.orientation.addEventListener('change', () => setTimeout(() => map.invalidateSize(), 350));
 }
@@ -768,6 +739,86 @@ function desserteContainsLine(desserte, targetMapped) {
     });
 }
 
+// ===== TRACÉ DE LIGNE =====
+// Couleurs par ligne pour le tracé (fallback générique)
+const LINE_TRACE_COLORS = {
+    'metro': '#E2001A', 'tram': '#662483', 'tb': '#fdc300',
+    'funiculaire': '#6da432', 'navgone': '#00A3A6', 'chrono': '#2699d6',
+    'bus': '#6e8997', 'navette': '#EC6608', 'pl': '#992358', 'jd': '#17297B', 'other': '#888'
+};
+
+function getLineColor(lineCode) {
+    // Chercher dans les données de tracés
+    const found = allLinesData.find(l => l.code_ligne === lineCode || l.ligne === lineCode);
+    if (found && found.couleur_hex) return found.couleur_hex;
+    return LINE_TRACE_COLORS[getLineType(lineCode)] || '#00d2ff';
+}
+
+function showLineTrace(lineCode) {
+    // Effacer tracé précédent
+    lineTraceLayer.clearLayers();
+
+    // Chercher toutes les entrées pour cette ligne dans l'API lignes
+    // L'API retourne des tracés WKT ou des listes de coords
+    // On va filtrer par code_ligne
+    const traces = allLinesData.filter(l =>
+        l.code_ligne === lineCode ||
+        l.ligne === lineCode ||
+        l.code_ligne === lineCode + 'E' ||  // variante express
+        (lineMapping[l.code_ligne] === lineCode) ||
+        (lineMapping[l.ligne] === lineCode)
+    );
+
+    if (!traces.length) {
+        console.log('Aucun tracé trouvé pour la ligne', lineCode);
+        return;
+    }
+
+    const color = getLineColor(lineCode);
+    const bounds = [];
+
+    traces.forEach(trace => {
+        // Les données tcllignebus_3 ont des champs nom_trace, origine, destination
+        // mais pas de géométrie dans la version datapusher JSON
+        // On va afficher une polyligne symbolique via les arrêts filtrés
+        // → pas de coordonnées dans ce dataset, on skip le tracé géo
+        // → on utilise à la place les arrêts filtrés pour délimiter la zone
+    });
+
+    // Fallback : afficher les arrêts de la ligne reliés entre eux comme tracé approx
+    const lineStops = allStops.filter(s => desserteContainsLine(s.desserte, lineCode));
+    if (!lineStops.length) return;
+
+    // Marquer les arrêts avec un petit cercle coloré
+    lineStops.forEach(s => {
+        if (!s.lat || !s.lon) return;
+        const circle = L.circleMarker([parseFloat(s.lat), parseFloat(s.lon)], {
+            radius: 5,
+            fillColor: color,
+            color: '#fff',
+            weight: 1.5,
+            opacity: 1,
+            fillOpacity: 0.9
+        }).bindPopup(`<div style="font-family:'TCL',sans-serif;padding:8px 10px;background:rgba(14,16,28,0.95);border-radius:10px;min-width:160px;">
+            <div style="font-size:12px;font-weight:600;color:#edf0f8;margin-bottom:4px;">🚏 ${s.nom||'Arrêt'}</div>
+            <div style="font-size:10px;color:#8a90a8;">${s.commune||''}</div>
+        </div>`, { className:'tcl-popup', maxWidth:200 });
+        lineTraceLayer.addLayer(circle);
+        bounds.push([parseFloat(s.lat), parseFloat(s.lon)]);
+    });
+
+    // Ajuster la vue sur les arrêts de la ligne
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+    }
+
+    console.log(`Tracé ligne ${lineCode}: ${lineStops.length} arrêts affichés`);
+}
+
+function clearLineTrace() {
+    lineTraceLayer.clearLayers();
+}
+
 function applyLineFilter(line) {
     currentLineFilter = line;
     busLineFilter     = line;
@@ -783,6 +834,9 @@ function applyLineFilter(line) {
     busBanner.classList.add('visible');
 
     applyBusLineFilter();
+
+    // Afficher le tracé de la ligne sur la carte
+    showLineTrace(line);
 }
 
 window.clearAllFilters = function() {
@@ -798,6 +852,9 @@ window.clearAllFilters = function() {
 
     document.getElementById('stop-search').value = '';
     renderStopList('');
+
+    // Effacer le tracé
+    clearLineTrace();
 };
 
 function applyBusLineFilter() {
@@ -819,6 +876,7 @@ let stopSearchTimer = null;
 window.filterStops = () => {
     currentLineFilter = null;
     document.getElementById('stop-filter-banner').classList.remove('visible');
+    clearLineTrace();
     clearTimeout(stopSearchTimer);
     stopSearchTimer = setTimeout(
         () => renderStopList(document.getElementById('stop-search').value.toLowerCase().trim()),
@@ -963,15 +1021,19 @@ window.searchLineInStops = function(line) {
     document.getElementById('stop-search').value = '';
     applyLineFilter(line);
     renderStopList('');
+    // Ouvrir le panel si collapsed
+    const panel = document.getElementById('info-panel');
+    if (panel.classList.contains('collapsed')) {
+        panel.classList.remove('collapsed');
+        setTimeout(() => map.invalidateSize(), 250);
+    }
 };
 
-// ===== POPUP FILTER (appelé depuis le HTML du popup) =====
 window.filterLineFromPopup = function(line) {
     switchToTab('stops');
     document.getElementById('stop-search').value = '';
     applyLineFilter(getNewLineNumber(line));
     renderStopList('');
-    // Ouvrir le panel si collapsed
     const panel = document.getElementById('info-panel');
     if (panel.classList.contains('collapsed')) {
         panel.classList.remove('collapsed');
@@ -1062,9 +1124,6 @@ async function updateBus() {
             const delayOk = bus.delay === '0s';
             const lineRemapped = getNewLineNumber(line);
 
-            // ── MARQUEUR ──
-            // Si bearing disponible : triangle directionnel + carré (total 42px)
-            // Si absent            : juste le carré seul (36px)
             let iconHtml;
             if (rot !== null) {
                 iconHtml = `<div style="position:relative;width:36px;height:42px;transform:rotate(${rot}deg);">
@@ -1081,27 +1140,20 @@ async function updateBus() {
 
             const iconSize   = rot !== null ? [36, 42] : [36, 36];
             const iconAnchor = rot !== null ? [18, 21] : [18, 18];
-
             const icon = L.divIcon({ html: iconHtml, className:'', iconSize, iconAnchor });
 
             const vehicleImg = `Vehicule/${bus.id}.jpg`;
 
-            // ── POPUP ──
-            // Gradient de la couleur de ligne sur l'image + icône mode cliquable
             const marker = L.marker([lat, lon], { icon }).bindPopup(`
             <div style="width:240px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
                 <div style="position:relative;height:100px;background:#0a0b14;display:flex;align-items:center;justify-content:center;overflow:hidden;">
                     <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.style.display='none'">
-                    <!-- Gradient couleur de ligne -->
                     <div style="position:absolute;inset:0;background:linear-gradient(135deg,${color}33 0%,transparent 55%,${color}22 100%);pointer-events:none;"></div>
-                    <!-- Fondu bas vers fond popup -->
                     <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,rgba(14,16,28,0.98));pointer-events:none;"></div>
-                    <!-- Badge ligne en bas à gauche -->
                     <div style="position:absolute;bottom:8px;left:12px;">${lineImgHtml(line, '30px')}</div>
-                    <!-- Icône mode cliquable en haut à droite -->
                     <div onclick="filterLineFromPopup('${line}')" title="Filtrer la ligne ${line}"
                          style="position:absolute;top:8px;right:8px;width:32px;height:32px;background:rgba(14,16,28,0.75);border:1px solid ${color}55;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;backdrop-filter:blur(4px);transition:background 0.15s;"
-                         onmouseover="this.style.background='rgba(${color.replace('#','').match(/.{2}/g).map(h=>parseInt(h,16)).join(',')},0.35)'"
+                         onmouseover="this.style.background='rgba(14,16,28,0.9)'"
                          onmouseout="this.style.background='rgba(14,16,28,0.75)'">
                         ${modeImgHtml(modeFile, 18)}
                     </div>
@@ -1143,27 +1195,98 @@ async function updateBus() {
     } catch(e) { console.error('Bus:', e); }
 }
 
-// ===== PARKINGS =====
+// ===== P+R TCL (avec dispo temps réel) =====
 async function updateParkings() {
     if (parkingsLoaded) return;
     try {
-        const parkings = await apiFetch('api/parkings');
+        // Charger géoloc + dispo temps réel en parallèle
+        const [parkings, trData] = await Promise.all([
+            apiFetch('api/parkings'),
+            apiFetch('api/parkings-tr').catch(() => ({ values: [] }))
+        ]);
+
+        // Indexer dispo par id
+        const trById = {};
+        (trData.values || []).forEach(p => { if (p.id) trById[p.id] = p; });
+
         parkings.forEach(p => {
+            const tr = trById[p.id] || {};
+            const dispo = tr.nb_tot_place_dispo;
+            const pct = (p.capacite && dispo != null) ? Math.round(dispo / p.capacite * 100) : null;
+            const dispoBadge = dispo != null
+                ? `<div style="display:flex;align-items:center;gap:8px;margin-top:8px;">
+                    <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:8px;padding:6px;text-align:center;">
+                        <div style="font-size:20px;font-weight:700;color:${pct>50?'#4dff88':pct>20?'#ffb84d':'#ff4d4d'};">${dispo}</div>
+                        <div style="font-size:10px;color:#4a4f6a;">places libres</div>
+                    </div>
+                    <div style="flex:1;background:rgba(255,255,255,0.04);border-radius:8px;padding:6px;text-align:center;">
+                        <div style="font-size:20px;font-weight:700;color:#8a90a8;">${p.capacite}</div>
+                        <div style="font-size:10px;color:#4a4f6a;">capacité</div>
+                    </div>
+                    ${pct!=null?`<div style="flex:1;background:rgba(255,255,255,0.04);border-radius:8px;padding:6px;text-align:center;"><div style="font-size:20px;font-weight:700;color:#8a90a8;">${pct}%</div><div style="font-size:10px;color:#4a4f6a;">libre</div></div>`:''}
+                </div>`
+                : `<div style="margin-top:6px;font-size:12px;color:#edf0f8;">Capacité : <b>${p.capacite||'?'}</b> places${p.place_handi?` · PMR : <b>${p.place_handi}</b>`:''}</div>`;
+
             L.marker([p.lat, p.lon], {
                 icon: L.divIcon({
                     html: `<img src="P+R.svg" style="width:26px;height:26px;" onerror="this.outerHTML='<span style=font-size:18px>🅿️</span>'">`,
                     iconSize:[26,26], iconAnchor:[13,13]
                 })
-            }).bindPopup(`<div style="width:210px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
-                <div style="font-size:13px;font-weight:600;color:#edf0f8;margin-bottom:6px;">P+R ${p.nom}</div>
+            }).bindPopup(`<div style="width:220px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
+                <div style="font-size:13px;font-weight:600;color:#edf0f8;margin-bottom:4px;">🅿️ P+R ${p.nom}</div>
                 <div style="font-size:11px;color:#8a90a8;">${p.horaires||'Horaires non disponibles'}</div>
-                <div style="margin-top:8px;font-size:12px;color:#edf0f8;">Capacité : <b>${p.capacite||'?'}</b> places${p.place_handi?` · PMR : <b>${p.place_handi}</b>`:''}</div>
+                ${dispoBadge}
+                ${p.place_handi?`<div style="margin-top:6px;font-size:11px;color:#8a90a8;">♿ ${p.place_handi} places PMR</div>`:''}
                 <div style="margin-top:6px;font-size:10px;color:${p.p_surv?'#4dff88':'#4a4f6a'}">${p.p_surv?'✔ Surveillé':'Non surveillé'}</div>
-            </div>`, { maxWidth:230, className:'tcl-popup' }).addTo(parkingLayer);
+            </div>`, { maxWidth:240, className:'tcl-popup' }).addTo(parkingLayer);
         });
         parkingsLoaded = true;
     } catch(e) { console.error('Parkings:', e); }
 }
+
+// ===== PARKINGS MÉTROPOLE =====
+async function updateParkingsMetro() {
+    if (parkingsMetroLoaded) return;
+    try {
+        const data = await apiFetch('api/parkings-metro');
+        const parkings = (data.values || []).filter(p => p.lat && p.lon);
+        parkings.forEach(p => {
+            const lat = parseFloat(p.lat), lon = parseFloat(p.lon);
+            if (isNaN(lat) || isNaN(lon)) return;
+            L.marker([lat, lon], {
+                icon: L.divIcon({
+                    html: `<img src="Park.svg" style="width:22px;height:22px;" onerror="this.outerHTML='<span style=font-size:16px>🅿</span>'">`,
+                    iconSize:[22,22], iconAnchor:[11,11]
+                })
+            }).bindPopup(`<div style="width:220px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
+                <div style="font-size:13px;font-weight:600;color:#edf0f8;margin-bottom:4px;">🅿 ${p.nom||'Parking'}</div>
+                <div style="font-size:10px;color:#8a90a8;margin-bottom:6px;">${p.commune||''} · ${p.typeparking||'Parking'}</div>
+                <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
+                    ${p.capacite?`<span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:3px 8px;font-size:11px;color:#edf0f8;">🚗 ${p.capacite} places</span>`:''}
+                    ${p.capacitepmr?`<span style="background:rgba(77,255,136,0.08);border:1px solid rgba(77,255,136,0.2);border-radius:6px;padding:3px 8px;font-size:11px;color:#4dff88;">♿ ${p.capacitepmr}</span>`:''}
+                    ${p.capacitevelo?`<span style="background:rgba(0,210,255,0.08);border:1px solid rgba(0,210,255,0.2);border-radius:6px;padding:3px 8px;font-size:11px;color:#00d2ff;">🚲 ${p.capacitevelo}</span>`:''}
+                </div>
+                <div style="font-size:11px;color:#8a90a8;">${p.reglementation||''}</div>
+                <div style="font-size:11px;color:#8a90a8;">${p.fermeture||''}</div>
+                ${p.voieentree?`<div style="font-size:10px;color:#4a4f6a;margin-top:4px;">Entrée : ${p.voieentree}</div>`:''}
+            </div>`, { maxWidth:240, className:'tcl-popup' }).addTo(parkingMetroLayer);
+        });
+        parkingsMetroLoaded = true;
+        console.log(`✓ ${parkings.length} parkings métropole chargés`);
+    } catch(e) { console.error('ParkingsMetro:', e); }
+}
+
+// Afficher les parkings métropole seulement à partir d'un certain zoom
+function updateParkingMetroVisibility() {
+    if (map.getZoom() >= PARKING_METRO_MIN_ZOOM) {
+        if (!map.hasLayer(parkingMetroLayer)) parkingMetroLayer.addTo(map);
+        if (!parkingsMetroLoaded) updateParkingsMetro();
+    } else {
+        if (map.hasLayer(parkingMetroLayer)) map.removeLayer(parkingMetroLayer);
+    }
+}
+
+map.on('zoomend', updateParkingMetroVisibility);
 
 // ===== VELO'V CARTE =====
 function updateVisibleVelov() {
@@ -1183,11 +1306,26 @@ function updateVisibleVelov() {
         const key = `${s.lat},${s.lng}`;
         seen.add(key);
         if (velovMarkerMap.has(key)) return;
-        const bikes = s.available_bikes||0, stands = s.available_bike_stands||0, total = bikes+stands;
+
+        const bikes = s.available_bikes || 0;
+        const stands = s.available_bike_stands || 0;
+        const total = bikes + stands;
         const color = bikes===0?'#ff4d4d':bikes<2?'#ffb84d':bikes<6?'#00d2ff':'#4dff88';
+
+        // Extraire données vélos élec / méca depuis main_stands
+        const ms = s.main_stands?.availabilities || {};
+        const elec = ms.electricalBikes || 0;
+        const meca = ms.mechanicalBikes || 0;
+
+        const velovTypeBadges = (elec > 0 || meca > 0) ? `
+            <div style="display:flex;gap:6px;margin-top:6px;">
+                ${elec>0?`<span style="background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.25);border-radius:6px;padding:3px 8px;font-size:11px;color:#00d2ff;">⚡ ${elec} élec</span>`:''}
+                ${meca>0?`<span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:6px;padding:3px 8px;font-size:11px;color:#8a90a8;">🔧 ${meca} méca</span>`:''}
+            </div>` : '';
+
         const m = L.circleMarker([parseFloat(s.lat), parseFloat(s.lng)], {
             radius:7, fillColor:color, color:'rgba(15,17,28,0.8)', weight:2, opacity:1, fillOpacity:0.9
-        }).bindPopup(`<div style="width:200px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
+        }).bindPopup(`<div style="width:210px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
             <div style="font-size:12px;font-weight:600;color:#edf0f8;margin-bottom:8px;">${s.name}</div>
             <div style="display:flex;gap:8px;">
                 <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:8px;padding:6px;">
@@ -1200,7 +1338,8 @@ function updateVisibleVelov() {
                 </div>
                 ${total>0?`<div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:8px;padding:6px;"><div style="font-size:18px;font-weight:700;color:#4a4f6a;">${Math.round(bikes/total*100)}%</div><div style="font-size:10px;color:#4a4f6a;">dispo</div></div>`:''}
             </div>
-        </div>`, { maxWidth:220, className:'tcl-popup' }).addTo(velovLayer);
+            ${velovTypeBadges}
+        </div>`, { maxWidth:230, className:'tcl-popup' }).addTo(velovLayer);
         velovMarkerMap.set(key, m);
     });
     for (const [k, m] of velovMarkerMap) {
@@ -1307,6 +1446,15 @@ async function updateStopsData() {
     }
 }
 
+// ===== TRACÉS LIGNES DATA =====
+async function loadLinesData() {
+    try {
+        const data = await apiFetch('api/lines');
+        allLinesData = data.values || [];
+        console.log(`✓ ${allLinesData.length} tracés de lignes chargés`);
+    } catch(e) { console.error('LinesData:', e); }
+}
+
 // ===== VELO'V LISTE =====
 async function loadVelovList() {
     try {
@@ -1342,6 +1490,18 @@ function renderVelovList(term) {
         const bikes = s.available_bikes||0, stands = s.available_bike_stands||0, total = s.bike_stands||0;
         const color = bikes===0?'#ff4d4d':bikes<2?'#ffb84d':bikes<6?'#D3D800':'#4dff88';
         const statusText = bikes===0?'❌ Aucun vélo':bikes<2?'⚠️ Dernier(s)':bikes<6?'☑️ Quelques':'✅ Disponible';
+
+        const ms = s.main_stands?.availabilities || {};
+        const elec = ms.electricalBikes || 0;
+        const meca = ms.mechanicalBikes || 0;
+
+        const velovTypeLine = (elec > 0 || meca > 0)
+            ? `<div style="display:flex;gap:6px;margin-top:4px;">
+                ${elec>0?`<span style="font-size:10px;color:#00d2ff;">⚡ ${elec} élec</span>`:''}
+                ${meca>0?`<span style="font-size:10px;color:#8a90a8;">🔧 ${meca} méca</span>`:''}
+               </div>`
+            : '';
+
         return `<div class="info-item" data-lat="${s.lat||''}" data-lon="${s.lng||''}" data-name="${(s.name||'').replace(/"/g,'&quot;')}">
             <div class="info-summary" onclick="selectVelovOnMap(this)">
                 <div class="info-line-badge" style="background:rgba(${bikes===0?'255,77,77':bikes<2?'255,184,77':bikes<6?'211,216,0':'77,255,136'},0.12);border:1px solid rgba(${bikes===0?'255,77,77':bikes<2?'255,184,77':bikes<6?'211,216,0':'77,255,136'},0.25);font-size:18px;">🚲</div>
@@ -1353,12 +1513,14 @@ function renderVelovList(term) {
                         <span style="font-size:11px;color:#ffb84d;">🅿️ ${stands}</span>
                         <span style="font-size:11px;color:var(--text-muted);">📊 ${total}</span>
                     </div>
+                    ${velovTypeLine}
                 </div>
                 <span class="info-chevron" onclick="event.stopPropagation();toggleInfoItem(this)">▼</span>
             </div>
             <div class="info-detail">
                 <strong>📍</strong> ${s.address||'N/A'}<br>
                 <strong>🏙️</strong> ${s.commune||'N/A'}<br>
+                <strong>⚡ Élec :</strong> ${elec} · <strong>🔧 Méca :</strong> ${meca}<br>
                 <strong>💳</strong> ${s.banking?'CB acceptée':'Sans CB'}<br>
                 <strong>🟢</strong> ${s.status==='OPEN'?'Ouverte':'Fermée'}<br>
                 <strong>📅 Màj :</strong> ${s.last_update?new Date(s.last_update).toLocaleString('fr-FR'):'N/A'}
@@ -1397,8 +1559,11 @@ async function init() {
         updateVelov(),
         updateTraffic(),
         updateAccessibility(),
-        updateStopsData()
+        updateStopsData(),
+        loadLinesData(),
     ]);
+    // Lancer le chargement des parkings métropole en arrière-plan (pas urgent)
+    setTimeout(updateParkingsMetro, 2000);
 }
 init();
 
