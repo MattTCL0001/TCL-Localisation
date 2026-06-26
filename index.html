@@ -741,85 +741,125 @@ function desserteContainsLine(desserte, targetMapped) {
 
 // ===== TRACÉ DE LIGNE =====
 // Couleurs par ligne pour le tracé (fallback générique)
-const LINE_TRACE_COLORS = {
-    'metro': '#E2001A', 'tram': '#662483', 'tb': '#fdc300',
-    'funiculaire': '#6da432', 'navgone': '#00A3A6', 'chrono': '#2699d6',
-    'bus': '#6e8997', 'navette': '#EC6608', 'pl': '#992358', 'jd': '#17297B', 'other': '#888'
+// Couleurs de fallback par type (pour les lignes sans tracé GeoJSON = tram/métro)
+const LINE_COLORS_JS = {
+    'C6':'#83c491','C202':'#83c491','38':'#83c491','76':'#83c491','112':'#83c491','141':'#83c491','143':'#83c491','147':'#83c491','12':'#83c491','S6':'#83c491','S8':'#83c491','ZI3':'#83c491',
+    'T4':'#662483','C8':'#662483','31':'#662483','66':'#662483','69':'#662483','78':'#662483','115':'#662483','161':'#662483','236':'#662483','GE6':'#662483','15':'#662483',
+    'T5':'#ec6608','C5':'#ec6608','C205':'#ec6608','40':'#ec6608','7':'#ec6608','11':'#ec6608','23':'#ec6608','26':'#ec6608','GE4':'#ec6608','155':'#ec6608','211':'#ec6608','239':'#ec6608','N100':'#ec6608',
+    'T6':'#f191a3','C14':'#f191a3','82':'#f191a3','86':'#f191a3','104A':'#f191a3','109':'#f191a3','219':'#f191a3','241':'#f191a3','S4A':'#f191a3','9':'#f191a3',
+    'TB11':'#fdc300','C25':'#fdc300','C200':'#fdc300','45':'#fdc300','137':'#fdc300','S15':'#fdc300','144':'#fdc300','S9':'#fdc300','231':'#fdc300','232':'#fdc300','247':'#fdc300','32':'#fdc300',
+    'C2':'#e50069','57':'#e50069','72':'#e50069','125':'#e50069','25':'#e50069',
+    'C20':'#836c77','79':'#836c77','102':'#836c77','114':'#836c77','2':'#836c77','14':'#836c77',
+    'C16':'#c57e65','65':'#c57e65',
+    'T3':'#00a3a6','NAVI1':'#00a3a6','C18':'#00a3a6','54':'#00a3a6','90':'#00a3a6','124':'#00a3a6','134':'#00a3a6','159':'#00a3a6','N180':'#00a3a6','24':'#00a3a6','S10':'#00a3a6',
+    'T2':'#6ba230','C27':'#6ba230','34':'#6ba230','105':'#6ba230','5':'#6ba230','106EX':'#6ba230','6E':'#6ba230','135':'#6ba230','142':'#6ba230','156':'#6ba230','S7':'#6ba230','S11':'#6ba230','C3':'#6ba230','C11':'#6ba230','240':'#6ba230',
+    '33':'#31287d','106':'#31287d','136':'#31287d','6':'#31287d','S14':'#31287d',
+    'C15':'#d3d800','44':'#d3d800','61':'#d3d800','98':'#d3d800','129':'#d3d800','220':'#d3d800','N181':'#d3d800','N81':'#d3d800',
+    'F2':'#006f9e','49':'#006f9e','85':'#006f9e','118':'#006f9e','148':'#006f9e','243':'#006f9e','18':'#006f9e',
+    '36':'#6e8997','87':'#6e8997','110EX':'#6e8997','218':'#6e8997','222':'#6e8997','150':'#6e8997','164':'#6e8997','C7':'#6e8997','10E':'#6e8997','ZI8':'#6e8997',
+    'C9':'#c88817','50':'#c88817','119':'#c88817','88':'#c88817','149':'#c88817','151':'#c88817','19':'#c88817','ZI5':'#c88817',
+    'TB12':'#80682e','C22EX':'#80682e','46':'#80682e','84':'#80682e','117':'#80682e','128':'#80682e','N185':'#80682e','17':'#80682e','N20':'#80682e',
+    'C23':'#009e3d','52':'#009e3d','55':'#009e3d','89':'#009e3d','97':'#009e3d','104B':'#009e3d','122':'#009e3d','139':'#009e3d','140':'#009e3d','153':'#009e3d','157':'#009e3d','245':'#009e3d','S4B':'#009e3d','22':'#009e3d','S5':'#009e3d','S3':'#009e3d',
+    'C20EX':'#f59c00','C203':'#f59c00','60':'#f59c00','81':'#f59c00','116':'#f59c00','120':'#f59c00','146':'#f59c00','16':'#f59c00','20':'#f59c00','ZI2':'#f59c00',
+    'C22':'#bca3ce','35':'#bca3ce','70':'#bca3ce','108':'#bca3ce','138':'#bca3ce','154':'#bca3ce','8':'#bca3ce','S2':'#bca3ce',
+    '95':'#3f4e55','98EX':'#3f4e55','C17':'#3f4e55',
+    'C24':'#00336a','64':'#00336a','71':'#00336a','103':'#00336a','N183':'#00336a','3':'#00336a','N83':'#00336a',
+    'C10':'#cf7eae','43':'#cf7eae','80':'#cf7eae','145':'#cf7eae','ZI1':'#cf7eae',
+    'C12':'#0099bc','C21':'#0099bc','63':'#0099bc',
+    'T1':'#004f9f','C1':'#004f9f','39':'#004f9f','77':'#004f9f','133':'#004f9f','S1':'#004f9f',
+    'C26':'#2699d6','C204':'#2699d6','68':'#2699d6','99':'#2699d6','130':'#2699d6','212':'#2699d6','214':'#2699d6','237':'#2699d6','248':'#2699d6','249':'#2699d6','285':'#2699d6',
+    'C201':'#0075bf','37':'#0075bf','62':'#0075bf','110':'#0075bf','152':'#0075bf','10':'#0075bf',
+    'C19':'#e50069','21':'#e50069','41':'#e50069','93':'#e50069','121':'#e50069','165':'#e50069','265':'#e50069',
+    'T7':'#992358','59':'#992358','96':'#992358','127':'#992358','230':'#992358','27':'#992358',
+    '89EX':'#9f9825','52EX':'#9f9825','158':'#9f9825',
+    '67':'#c20344','216':'#c20344','C13':'#c20344','N195':'#c20344','BGS1':'#c20344',
+    'A':'#E2001A','B':'#E2001A','C':'#E2001A','D':'#E2001A',
 };
 
-function getLineColor(lineCode) {
-    // Chercher dans les données de tracés
-    const found = allLinesData.find(l => l.code_ligne === lineCode || l.ligne === lineCode);
-    if (found && found.couleur_hex) return found.couleur_hex;
-    return LINE_TRACE_COLORS[getLineType(lineCode)] || '#00d2ff';
+const LINE_TYPE_COLORS = {
+    'metro':'#E2001A','tram':'#662483','tb':'#fdc300','funiculaire':'#6da432',
+    'navgone':'#00A3A6','chrono':'#2699d6','bus':'#6e8997','navette':'#EC6608',
+    'pl':'#992358','jd':'#17297B','other':'#888'
+};
+
+function getLineColorFallback(lineCode) {
+    return LINE_COLORS_JS[lineCode] || LINE_TYPE_COLORS[getLineType(lineCode)] || '#00d2ff';
 }
 
-function showLineTrace(lineCode) {
-    // Effacer tracé précédent
+async function showLineTrace(lineCode) {
     lineTraceLayer.clearLayers();
 
-    // Chercher toutes les entrées pour cette ligne dans l'API lignes
-    // L'API retourne des tracés WKT ou des listes de coords
-    // On va filtrer par code_ligne
-    const traces = allLinesData.filter(l =>
-        l.code_ligne === lineCode ||
-        l.ligne === lineCode ||
-        l.code_ligne === lineCode + 'E' ||  // variante express
-        (lineMapping[l.code_ligne] === lineCode) ||
-        (lineMapping[l.ligne] === lineCode)
-    );
+    // Couleur de fallback immédiate (depuis le dico JS)
+    const fallbackColor = getLineColorFallback(lineCode);
 
-    if (!traces.length) {
-        console.log('Aucun tracé trouvé pour la ligne', lineCode);
-        return;
-    }
-
-    const color = getLineColor(lineCode);
+    // Arrêts de la ligne — affichés en premier avec la couleur dico
+    const lineStops = allStops.filter(s => desserteContainsLine(s.desserte, lineCode));
     const bounds = [];
 
-    traces.forEach(trace => {
-        // Les données tcllignebus_3 ont des champs nom_trace, origine, destination
-        // mais pas de géométrie dans la version datapusher JSON
-        // On va afficher une polyligne symbolique via les arrêts filtrés
-        // → pas de coordonnées dans ce dataset, on skip le tracé géo
-        // → on utilise à la place les arrêts filtrés pour délimiter la zone
-    });
+    // ── 1. Essayer de récupérer le tracé réel depuis le backend ──
+    let traceColor = fallbackColor;
+    try {
+        const resp = await fetch(API + 'api/line-trace/' + encodeURIComponent(lineCode));
+        if (resp.ok) {
+            const traceData = await resp.json();
+            traceColor = traceData.color || fallbackColor;
 
-    // Fallback : afficher les arrêts de la ligne reliés entre eux comme tracé approx
-    const lineStops = allStops.filter(s => desserteContainsLine(s.desserte, lineCode));
-    if (!lineStops.length) return;
-
-    // Marquer les arrêts avec un petit cercle coloré
-    lineStops.forEach(s => {
-        if (!s.lat || !s.lon) return;
-        const circle = L.circleMarker([parseFloat(s.lat), parseFloat(s.lon)], {
-            radius: 5,
-            fillColor: color,
-            color: '#fff',
-            weight: 1.5,
-            opacity: 1,
-            fillOpacity: 0.9
-        }).bindPopup(`<div style="font-family:'TCL',sans-serif;padding:8px 10px;background:rgba(14,16,28,0.95);border-radius:10px;min-width:160px;">
-            <div style="font-size:12px;font-weight:600;color:#edf0f8;margin-bottom:4px;">🚏 ${s.nom||'Arrêt'}</div>
-            <div style="font-size:10px;color:#8a90a8;">${s.commune||''}</div>
-        </div>`, { className:'tcl-popup', maxWidth:200 });
-        lineTraceLayer.addLayer(circle);
-        bounds.push([parseFloat(s.lat), parseFloat(s.lon)]);
-    });
-
-    // Ajuster la vue sur les arrêts de la ligne
-    if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [40, 40], maxZoom: 15 });
+            // Dessiner les polylignes du tracé réel
+            (traceData.segs || []).forEach(seg => {
+                if (seg.length < 2) return;
+                // seg = [[lon, lat], ...]  → Leaflet veut [lat, lon]
+                const latlngs = seg.map(([lon, lat]) => [lat, lon]);
+                L.polyline(latlngs, {
+                    color: traceColor,
+                    weight: 4,
+                    opacity: 0.85,
+                    lineJoin: 'round',
+                    lineCap: 'round'
+                }).addTo(lineTraceLayer);
+            });
+            console.log(`Tracé réel ligne ${lineCode} : ${traceData.segs?.length || 0} segments, couleur ${traceColor}`);
+        } else {
+            console.log(`Pas de tracé GeoJSON pour la ligne ${lineCode} (${resp.status}) – arrêts seuls`);
+        }
+    } catch(e) {
+        console.warn('Erreur récupération tracé ligne:', e);
     }
 
-    console.log(`Tracé ligne ${lineCode}: ${lineStops.length} arrêts affichés`);
+    // ── 2. Afficher les arrêts par-dessus le tracé ──
+    lineStops.forEach(s => {
+        if (!s.lat || !s.lon) return;
+        const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
+        if (isNaN(lat) || isNaN(lon)) return;
+        L.circleMarker([lat, lon], {
+            radius: 5,
+            fillColor: traceColor,
+            color: '#fff',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 1
+        }).bindPopup(`<div style="font-family:'TCL',sans-serif;padding:8px 10px;background:rgba(14,16,28,0.95);border-radius:10px;min-width:160px;">
+            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+                <div style="width:10px;height:10px;border-radius:50%;background:${traceColor};flex-shrink:0;"></div>
+                <div style="font-size:12px;font-weight:600;color:#edf0f8;">${s.nom||'Arrêt'}</div>
+            </div>
+            <div style="font-size:10px;color:#8a90a8;">${s.commune||''}</div>
+        </div>`, { className:'tcl-popup', maxWidth:200 }).addTo(lineTraceLayer);
+        bounds.push([lat, lon]);
+    });
+
+    // ── 3. Ajuster la vue ──
+    if (bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+
+    console.log(`Arrêts ligne ${lineCode} : ${lineStops.length} affichés (couleur: ${traceColor})`);
 }
 
 function clearLineTrace() {
     lineTraceLayer.clearLayers();
 }
 
-function applyLineFilter(line) {
+async function applyLineFilter(line) {
     currentLineFilter = line;
     busLineFilter     = line;
 
@@ -836,7 +876,7 @@ function applyLineFilter(line) {
     applyBusLineFilter();
 
     // Afficher le tracé de la ligne sur la carte
-    showLineTrace(line);
+    await showLineTrace(line);
 }
 
 window.clearAllFilters = function() {
@@ -1016,10 +1056,10 @@ window.filterLines = () => {
     document.getElementById('lines-list').innerHTML = html || '<div class="info-empty">📋 Aucune ligne</div>';
 };
 
-window.searchLineInStops = function(line) {
+window.searchLineInStops = async function(line) {
     switchToTab('stops');
     document.getElementById('stop-search').value = '';
-    applyLineFilter(line);
+    await applyLineFilter(line);
     renderStopList('');
     // Ouvrir le panel si collapsed
     const panel = document.getElementById('info-panel');
@@ -1029,10 +1069,10 @@ window.searchLineInStops = function(line) {
     }
 };
 
-window.filterLineFromPopup = function(line) {
+window.filterLineFromPopup = async function(line) {
     switchToTab('stops');
     document.getElementById('stop-search').value = '';
-    applyLineFilter(getNewLineNumber(line));
+    await applyLineFilter(getNewLineNumber(line));
     renderStopList('');
     const panel = document.getElementById('info-panel');
     if (panel.classList.contains('collapsed')) {
@@ -1560,7 +1600,6 @@ async function init() {
         updateTraffic(),
         updateAccessibility(),
         updateStopsData(),
-        loadLinesData(),
     ]);
     // Lancer le chargement des parkings métropole en arrière-plan (pas urgent)
     setTimeout(updateParkingsMetro, 2000);
