@@ -107,12 +107,7 @@
         }
         #map { position: absolute; top: 0; left: 0; right: 0; bottom: 0; width: 100%; height: 100%; }
 
-        .leaflet-tile-container {
-            filter: invert(100%) hue-rotate(180deg) brightness(90%) contrast(85%);
-        }
-        @media (max-width: 600px) {
-            .leaflet-tile-container { filter: none; }
-        }
+        /* dark tiles handled by CARTO tile layer — no CSS filter needed */
 
         .leaflet-popup-content-wrapper {
             background: rgba(14,16,28,0.95) !important;
@@ -126,9 +121,6 @@
         .leaflet-popup-content { margin: 0 !important; }
         .tcl-popup .leaflet-popup-content-wrapper { background: transparent !important; border: none !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important; }
         .tcl-popup .leaflet-popup-tip { background: #1e1e2e !important; }
-        .leaflet-tile-pane {
-          filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-        }
 
         #bus-filter-banner {
             display: none;
@@ -571,7 +563,7 @@
             <div class="credits-content">
                 <div class="credits-section"><h3>🚍 TCL Localisation</h3><p>Application de localisation en temps réel des transports en commun lyonnais.</p></div>
                 <div class="credits-section"><h3>📡 Sources de données</h3><p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a></p></div>
-                <div class="credits-section"><h3>🗺️ Cartographie</h3><p>© <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a></p></div>
+                <div class="credits-section"><h3>🗺️ Cartographie</h3><p>© <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors © <a href="https://carto.com/" target="_blank">CARTO</a></p></div>
                 <div class="credits-section"><h3>👨‍💻 Développeurs et Contributeurs</h3><p>Matt TCL, NDR, S1ba</p></div>
                 <div class="credits-section"><h3>👨‍💻 Développement</h3><p>Version BETA – v1 officielle prévue pour Septembre 2026</p></div>
             </div>
@@ -610,13 +602,20 @@ function modeImgHtml(modeFile, sizePx = 18) {
 
 // ===== CARTE =====
 const map = L.map('map', { preferCanvas: true }).setView([45.757, 4.832], 13);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OSM', maxZoom: 19 }).addTo(map);
 
-const busLayer          = L.layerGroup().addTo(map);
+// Tuiles sombres CARTO Dark Matter — natif, pas de filtre CSS
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd',
+    maxZoom: 20
+}).addTo(map);
+
+// Z-order (bottom → top): parkingMetro → parkingPR → lineTrace → velov → bus
+const parkingMetroLayer = L.layerGroup().addTo(map);  // Parkings métropole (bas)
 const parkingLayer      = L.layerGroup().addTo(map);  // P+R TCL
-const parkingMetroLayer = L.layerGroup().addTo(map);  // Parkings métropole
-const velovLayer        = L.layerGroup().addTo(map);
 const lineTraceLayer    = L.layerGroup().addTo(map);  // Tracé de ligne actif
+const velovLayer        = L.layerGroup().addTo(map);
+const busLayer          = L.layerGroup().addTo(map);  // Bus (haut)
 
 // ===== STATE =====
 let allStops = [], stopsMapping = {}, allLines = [];
@@ -744,8 +743,6 @@ function desserteContainsLine(desserte, targetMapped) {
 }
 
 // ===== TRACÉ DE LIGNE =====
-// Couleurs par ligne pour le tracé (fallback générique)
-// Couleurs de fallback par type (pour les lignes sans tracé GeoJSON = tram/métro)
 const LINE_COLORS_JS = {
     'C6':'#83c491','C202':'#83c491','38':'#83c491','76':'#83c491','112':'#83c491','141':'#83c491','143':'#83c491','147':'#83c491','12':'#83c491','S6':'#83c491','S8':'#83c491','ZI3':'#83c491',
     'T4':'#662483','C8':'#662483','31':'#662483','66':'#662483','69':'#662483','78':'#662483','115':'#662483','161':'#662483','236':'#662483','GE6':'#662483','15':'#662483',
@@ -793,14 +790,10 @@ function getLineColorFallback(lineCode) {
 async function showLineTrace(lineCode) {
     lineTraceLayer.clearLayers();
 
-    // Couleur de fallback immédiate (depuis le dico JS)
     const fallbackColor = getLineColorFallback(lineCode);
-
-    // Arrêts de la ligne — affichés en premier avec la couleur dico
     const lineStops = allStops.filter(s => desserteContainsLine(s.desserte, lineCode));
     const bounds = [];
 
-    // ── 1. Essayer de récupérer le tracé réel depuis le backend ──
     let traceColor = fallbackColor;
     try {
         const resp = await fetch(API + 'api/line-trace/' + encodeURIComponent(lineCode));
@@ -808,10 +801,8 @@ async function showLineTrace(lineCode) {
             const traceData = await resp.json();
             traceColor = traceData.color || fallbackColor;
 
-            // Dessiner les polylignes du tracé réel
             (traceData.segs || []).forEach(seg => {
                 if (seg.length < 2) return;
-                // seg = [[lon, lat], ...]  → Leaflet veut [lat, lon]
                 const latlngs = seg.map(([lon, lat]) => [lat, lon]);
                 L.polyline(latlngs, {
                     color: traceColor,
@@ -829,7 +820,6 @@ async function showLineTrace(lineCode) {
         console.warn('Erreur récupération tracé ligne:', e);
     }
 
-    // ── 2. Afficher les arrêts par-dessus le tracé ──
     lineStops.forEach(s => {
         if (!s.lat || !s.lon) return;
         const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
@@ -851,7 +841,6 @@ async function showLineTrace(lineCode) {
         bounds.push([lat, lon]);
     });
 
-    // ── 3. Ajuster la vue ──
     if (bounds.length > 0) {
         map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
     }
@@ -879,7 +868,6 @@ async function applyLineFilter(line) {
 
     applyBusLineFilter();
 
-    // Afficher le tracé de la ligne sur la carte
     await showLineTrace(line);
 }
 
@@ -897,7 +885,6 @@ window.clearAllFilters = function() {
     document.getElementById('stop-search').value = '';
     renderStopList('');
 
-    // Effacer le tracé
     clearLineTrace();
 };
 
@@ -1000,7 +987,8 @@ window.selectStopOnMap = function(el) {
         const c = document.getElementById(`mm-${id}`);
         if (!c) return;
         const mm = L.map(c, { zoomControl:false, attributionControl:false, interactive:false }).setView([lat,lon], 17);
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom:19 }).addTo(mm);
+        // Mini-map aussi en dark
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(mm);
         L.marker([lat, lon]).addTo(mm);
     }, 80);
 };
@@ -1065,7 +1053,6 @@ window.searchLineInStops = async function(line) {
     document.getElementById('stop-search').value = '';
     await applyLineFilter(line);
     renderStopList('');
-    // Ouvrir le panel si collapsed
     const panel = document.getElementById('info-panel');
     if (panel.classList.contains('collapsed')) {
         panel.classList.remove('collapsed');
@@ -1243,13 +1230,11 @@ async function updateBus() {
 async function updateParkings() {
     if (parkingsLoaded) return;
     try {
-        // Charger géoloc + dispo temps réel en parallèle
         const [parkings, trData] = await Promise.all([
             apiFetch('api/parkings'),
             apiFetch('api/parkings-tr').catch(() => ({ values: [] }))
         ]);
 
-        // Indexer dispo par id
         const trById = {};
         (trData.values || []).forEach(p => { if (p.id) trById[p.id] = p; });
 
@@ -1273,8 +1258,10 @@ async function updateParkings() {
 
             L.marker([p.lat, p.lon], {
                 icon: L.divIcon({
-                    html: `<img src="P+R.svg" style="width:26px;height:26px;" onerror="this.outerHTML='<span style=font-size:18px>🅿️</span>'">`,
-                    iconSize:[26,26], iconAnchor:[13,13]
+                    // SVG brut, sans fond ni bordure Leaflet
+                    html: `<img src="P+R.svg" style="width:28px;height:28px;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.8));" onerror="this.outerHTML='<span style=font-size:18px>🅿️</span>'">`,
+                    className: '',
+                    iconSize:[28,28], iconAnchor:[14,14]
                 })
             }).bindPopup(`<div style="width:220px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
                 <div style="font-size:13px;font-weight:600;color:#edf0f8;margin-bottom:4px;">🅿️ P+R ${p.nom}</div>
@@ -1299,8 +1286,10 @@ async function updateParkingsMetro() {
             if (isNaN(lat) || isNaN(lon)) return;
             L.marker([lat, lon], {
                 icon: L.divIcon({
-                    html: `<img src="Park.svg" style="width:22px;height:22px;" onerror="this.outerHTML='<span style=font-size:16px>🅿</span>'">`,
-                    iconSize:[22,22], iconAnchor:[11,11]
+                    // SVG brut, sans fond ni bordure Leaflet
+                    html: `<img src="Park.svg" style="width:24px;height:24px;filter:drop-shadow(0 1px 4px rgba(0,0,0,0.8));" onerror="this.outerHTML='<span style=font-size:16px>🅿</span>'">`,
+                    className: '',
+                    iconSize:[24,24], iconAnchor:[12,12]
                 })
             }).bindPopup(`<div style="width:220px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
                 <div style="font-size:13px;font-weight:600;color:#edf0f8;margin-bottom:4px;">🅿 ${p.nom||'Parking'}</div>
@@ -1320,7 +1309,6 @@ async function updateParkingsMetro() {
     } catch(e) { console.error('ParkingsMetro:', e); }
 }
 
-// Afficher les parkings métropole seulement à partir d'un certain zoom
 function updateParkingMetroVisibility() {
     if (map.getZoom() >= PARKING_METRO_MIN_ZOOM) {
         if (!map.hasLayer(parkingMetroLayer)) parkingMetroLayer.addTo(map);
@@ -1356,7 +1344,6 @@ function updateVisibleVelov() {
         const total = bikes + stands;
         const color = bikes===0?'#ff4d4d':bikes<2?'#ffb84d':bikes<6?'#00d2ff':'#4dff88';
 
-        // Extraire données vélos élec / méca depuis main_stands
         const ms = s.main_stands?.availabilities || {};
         const elec = ms.electricalBikes || 0;
         const meca = ms.mechanicalBikes || 0;
@@ -1605,7 +1592,6 @@ async function init() {
         updateAccessibility(),
         updateStopsData(),
     ]);
-    // Lancer le chargement des parkings métropole en arrière-plan (pas urgent)
     setTimeout(updateParkingsMetro, 2000);
 }
 init();
