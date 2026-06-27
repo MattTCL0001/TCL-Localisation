@@ -1159,34 +1159,33 @@ async function updateBus() {
 
             // Icône SVG inline minimal — 1 seul nœud DOM au lieu de 4+ divs imbriqués
             // La flèche de direction est dessinée directement dans le SVG, sans rotation CSS
-const svgSize = 48;
+const svgSize = 38;
 const cx = svgSize / 2;
-const cy = 18;          // Centre du carré
+const cy = svgSize / 2;
 const r = 14;
 
 // Flèche directionnelle
 const arrowPath = (() => {
     if (rot == null) return "";
 
-    // Angle du véhicule (corrige le sens si besoin)
+    // +180° pour corriger le sens
     const angle = (rot + 180) * Math.PI / 180;
 
-    // Distance entre le centre du carré et la flèche
-    const radius = r + 10;
+    // Distance du centre du carré au centre de la flèche
+    const radius = r + 3;
 
-    // Centre de la flèche
     const ax = cx + Math.sin(angle) * radius;
     const ay = cy - Math.cos(angle) * radius;
 
     return `
         <polygon
             points="
-                ${ax},${ay-6}
+                ${ax},${ay-5}
                 ${ax-5},${ay+4}
                 ${ax+5},${ay+4}
             "
             fill="${color}"
-            transform="rotate(${rot+180} ${ax} ${ay})"
+            transform="rotate(${rot + 180} ${ax} ${ay})"
         />
     `;
 })();
@@ -1198,22 +1197,24 @@ const iconHtml = `
      viewBox="0 0 ${svgSize} ${svgSize}"
      style="overflow:visible;">
 
-    <rect x="${cx-r}"
-          y="${cy-r}"
-          width="${r*2}"
-          height="${r*2}"
-          rx="7"
-          fill="rgba(15,17,28,0.92)"
-          stroke="${color}"
-          stroke-width="2"/>
-
-    <image href="Lignes/${modeFile}"
-           x="${cx-9}"
-           y="${cy-9}"
-           width="18"
-           height="18"/>
-
     ${arrowPath}
+
+    <rect
+        x="${cx-r}"
+        y="${cy-r}"
+        width="${r*2}"
+        height="${r*2}"
+        rx="7"
+        fill="rgba(15,17,28,0.92)"
+        stroke="${color}"
+        stroke-width="2"/>
+
+    <image
+        href="Lignes/${modeFile}"
+        x="${cx-9}"
+        y="${cy-9}"
+        width="18"
+        height="18"/>
 
 </svg>`;
 
@@ -1225,7 +1226,6 @@ const icon = L.divIcon({
     iconSize,
     iconAnchor
 });
-
             // Popup lazy : le HTML lourd n'est construit qu'au clic
             const busSnap = { ...bus, line, color, dest, delayOk, modeFile, lineRemapped };
             const marker = L.marker([lat, lon], { icon }).bindPopup(() => {
