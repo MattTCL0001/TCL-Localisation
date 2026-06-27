@@ -1169,7 +1169,7 @@ const arrowPath = (() => {
     if (rot == null) return "";
 
     // +180° pour corriger le sens
-    const angle = (rot + 180) * Math.PI / 180;
+    const angle = rot * Math.PI / 180;
 
     // Distance du centre du carré au centre de la flèche
     const radius = r + 3;
