@@ -1395,10 +1395,18 @@ function updateVisibleVelov() {
         const stands = s.available_bike_stands || 0;
         const total = bikes + stands;
         
-        // On vérifie d'abord si la station est fermée
+        // Calcul du pourcentage (on évite la division par zéro si la station est vide de tout)
+        const percentage = total > 0 ? (bikes / total) * 100 : 0;
+        
+        // Logique des couleurs
         const color = (bikes === 0 && stands === 0) 
-            ? 'repeating-linear-gradient(45deg, #ff9900, #ff9900 10px, #000000 10px, #000000 20px)' 
-            : (bikes === 0 ? '#ff4d4d' : bikes < 2 ? '#ffb84d' : bikes < 6 ? '#00d2ff' : '#4dff88');
+            ? '#4B0082' // Violet sombre pour station fermée
+            : (bikes === 0) 
+                ? '#ff4d4d' // Rouge si 0 vélo mais des places dispos
+                : (percentage <= 25) ? '#ffb84d' // Jaune/Orangé
+                : (percentage <= 50) ? '#00d2ff' // Bleu
+                : (percentage <= 75) ? '#4dff88' // Vert clair
+                : '#2ecc71'; // Vert plus soutenu pour > 75%
 
         const ms = s.main_stands?.availabilities || {};
         const elec = ms.electricalBikes || 0;
