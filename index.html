@@ -1166,20 +1166,16 @@ const r = 14;
 
 // Flèche directionnelle
 const arrowPath = (() => {
-    if (rot == null) return "";
+    if (rot == null || rot === "" || Number.isNaN(rot)) return "";
 
     const angle = rot * Math.PI / 180;
 
-    // Longueur de la flèche
     const L = 26;
-    // Largeur de la base
     const W = 12;
 
-    // Pointe
     const tipX = cx + Math.sin(angle) * L;
     const tipY = cy - Math.cos(angle) * L;
 
-    // Base (au centre du carré)
     const leftX  = cx + Math.sin(angle + Math.PI / 2) * W;
     const leftY  = cy - Math.cos(angle + Math.PI / 2) * W;
 
