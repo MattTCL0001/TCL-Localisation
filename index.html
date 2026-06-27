@@ -1141,6 +1141,7 @@ async function updateBus() {
             if (existing) { busLayer.removeLayer(existing.marker); busMarkers.delete(bus.id); }
 
             const line = bus.line;
+            console.log(bus.id, bus.bearing);
             const rot  = (bus.bearing != null && bus.bearing !== undefined && bus.bearing !== '') ? (bus.bearing || 0) : null;
             const isTram = line.startsWith('T') || line.startsWith('RX');
             const color  = bus.color || (isTram ? '#00d2ff' : '#da291c');
@@ -1171,7 +1172,7 @@ const arrowPath = (() => {
     if (
         lat == null || lon == null ||
         lat === 0 || lon === 0 ||
-        lat === "0.000000" || lon === "0.000000"
+        Math.abs(lat) < 1e-6 || Math.abs(lon) < 1e-6
     ) {
         return "";
     }
