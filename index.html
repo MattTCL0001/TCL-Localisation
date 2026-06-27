@@ -1206,13 +1206,6 @@ const iconHtml = `
      style="overflow:visible;">
 
     ${arrowPath}
-
-    <image
-        href="Lignes/${modeFile}"
-        x="${cx-9}"
-        y="${cy-9}"
-        width="18"
-        height="18"/>
     <rect
         x="${cx-r}"F
         y="${cy-r}"
@@ -1221,7 +1214,12 @@ const iconHtml = `
         rx="7"
         fill="rgba(15,17,28,0.92)"
         stroke="${color}"
-        stroke-width="2"/>
+        stroke-width="2"/> 
+        <image href="Lignes/${modeFile}"
+        x="${cx-9}"
+        y="${cy-9}"
+        width="18"
+        height="18"/>
 
 </svg>`;
 
