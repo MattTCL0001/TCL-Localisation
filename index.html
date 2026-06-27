@@ -1163,9 +1163,9 @@ async function updateBus() {
             const cx = svgSize / 2, cy = svgSize / 2, r = 14;
             // Flèche directionnelle : triangle pointant vers le haut, tourné via transform SVG
             const arrowPath = rot !== null
-                ? `<polygon points="${cx},${cy - r - 6} ${cx - 5},${cy - r + 2} ${cx + 5},${cy - r + 2}"
-                     fill="${color}" transform="rotate(${rot} ${cx} ${cy})"/>`
-                : '';
+            ? `<polygon points="${cx},${cy + r + 6} ${cx - 5},${cy + r - 2} ${cx + 5},${cy + r - 2}"
+                 fill="${color}" transform="rotate(${rot} ${cx} ${cy})"/>`
+            : '';
             const iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}" style="overflow:visible;">
                 <rect x="${cx - r}" y="${cy - r}" width="${r*2}" height="${r*2}" rx="7"
                       fill="rgba(15,17,28,0.92)" stroke="${color}" stroke-width="2"/>
