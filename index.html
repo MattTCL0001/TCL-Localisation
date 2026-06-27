@@ -126,9 +126,11 @@
         .leaflet-popup-content { margin: 0 !important; }
         .tcl-popup .leaflet-popup-content-wrapper { background: transparent !important; border: none !important; box-shadow: 0 8px 24px rgba(0,0,0,0.6) !important; }
         .tcl-popup .leaflet-popup-tip { background: #1e1e2e !important; }
-        .leaflet-tile-pane {
-          filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
-        }
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+          attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/">CARTO</a>',
+          subdomains: 'abcd',
+          maxZoom: 20
+        }).addTo(map);
 
         #bus-filter-banner {
             display: none;
