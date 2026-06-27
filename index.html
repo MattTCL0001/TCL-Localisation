@@ -1168,24 +1168,34 @@ const r = 14;
 const arrowPath = (() => {
     if (rot == null) return "";
 
-    // +180° pour corriger le sens
     const angle = rot * Math.PI / 180;
 
-    // Distance du centre du carré au centre de la flèche
-    const radius = r + 3;
+    // Longueur de la flèche
+    const L = 20;
 
-    const ax = cx + Math.sin(angle) * radius;
-    const ay = cy - Math.cos(angle) * radius;
+    // Largeur de la base
+    const W = 7;
+
+    // Pointe
+    const tipX = cx + Math.sin(angle) * L;
+    const tipY = cy - Math.cos(angle) * L;
+
+    // Base (au centre du carré)
+    const leftX  = cx + Math.sin(angle + Math.PI / 2) * W;
+    const leftY  = cy - Math.cos(angle + Math.PI / 2) * W;
+
+    const rightX = cx + Math.sin(angle - Math.PI / 2) * W;
+    const rightY = cy - Math.cos(angle - Math.PI / 2) * W;
 
     return `
         <polygon
             points="
-                ${ax},${ay-5}
-                ${ax-5},${ay+4}
-                ${ax+5},${ay+4}
+                ${tipX},${tipY}
+                ${leftX},${leftY}
+                ${rightX},${rightY}
             "
             fill="${color}"
-            transform="rotate(${rot + 180} ${ax} ${ay})"
+            opacity="0.95"
         />
     `;
 })();
