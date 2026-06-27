@@ -1166,7 +1166,17 @@ const r = 14;
 
 // Flèche directionnelle
 const arrowPath = (() => {
-    if (rot == null || rot === "" || Number.isNaN(rot)) return "";
+
+    // Pas de coordonnées ou coordonnées nulles
+    if (
+        lat == null || lon == null ||
+        lat === 0 || lon === 0 ||
+        lat === "0.000000" || lon === "0.000000"
+    ) {
+        return "";
+    }
+
+    if (!Number.isFinite(rot)) return "";
 
     const angle = rot * Math.PI / 180;
 
