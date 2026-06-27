@@ -1582,9 +1582,40 @@ function renderVelovList(term) {
 
     const shown = stations.slice(0, 300);
     const html = shown.map(s => {
-        const bikes = s.available_bikes||0, stands = s.available_bike_stands||0, total = s.bike_stands||0;
-        const color = bikes===0?'#ff4d4d':bikes<2?'#ffb84d':bikes<6?'#D3D800':'#4dff88';
-        const statusText = bikes===0?'❌ Aucun vélo':bikes<2?'⚠️ Dernier(s)':bikes<6?'☑️ Quelques':'✅ Disponible';
+        const bikes = s.available_bikes || 0;
+        const stands = s.available_bike_stands || 0;
+        const total = s.bike_stands || 0;
+        
+        // Calcul du pourcentage et logique de couleur
+        const percentage = total > 0 ? (bikes / total) * 100 : 0;
+        
+        let color, statusText, rgb;
+        
+        if (bikes === 0 && stands === 0) {
+            color = '#4B0082'; // Violet sombre
+            statusText = '🟣 Fermée';
+            rgb = '75,0,130';
+        } else if (bikes === 0) {
+            color = '#ff4d4d'; // Rouge
+            statusText = '❌ Aucun vélo';
+            rgb = '255,77,77';
+        } else if (percentage <= 25) {
+            color = '#ffb84d'; // Jaune/Orangé
+            statusText = '⚠️ Faible';
+            rgb = '255,184,77';
+        } else if (percentage <= 50) {
+            color = '#00d2ff'; // Bleu
+            statusText = 'ℹ️ Moyen';
+            rgb = '0,210,255';
+        } else if (percentage <= 75) {
+            color = '#4dff88'; // Vert clair
+            statusText = '☑️ Correct';
+            rgb = '77,255,136';
+        } else {
+            color = '#2ecc71'; // Vert plus soutenu
+            statusText = '✅ Disponible';
+            rgb = '46,204,113';
+        }
 
         const ms = s.main_stands?.availabilities || {};
         const elec = ms.electricalBikes || 0;
@@ -1599,7 +1630,7 @@ function renderVelovList(term) {
 
         return `<div class="info-item" data-lat="${s.lat||''}" data-lon="${s.lng||''}" data-name="${(s.name||'').replace(/"/g,'&quot;')}">
             <div class="info-summary" onclick="selectVelovOnMap(this)">
-                <div class="info-line-badge" style="background:rgba(${bikes===0?'255,77,77':bikes<2?'255,184,77':bikes<6?'211,216,0':'77,255,136'},0.12);border:1px solid rgba(${bikes===0?'255,77,77':bikes<2?'255,184,77':bikes<6?'211,216,0':'77,255,136'},0.25);font-size:18px;">🚲</div>
+                <div class="info-line-badge" style="background:rgba(${rgb},0.12);border:1px solid rgba(${rgb},0.25);font-size:18px;">🚲</div>
                 <div class="info-summary-text">
                     <div class="info-titre">${highlightText(s.name||'Station', term)} <span style="font-size:9px;color:${color};">${statusText}</span></div>
                     <div class="stop-commune">${highlightText(s.address||'', term)}</div>
@@ -1622,6 +1653,7 @@ function renderVelovList(term) {
             </div>
         </div>`;
     }).join('');
+    
     document.getElementById('velov-list').innerHTML =
         html + (stations.length > 300 ? `<div class="info-empty">+${stations.length-300} stations (affinez)</div>` : '');
 }
