@@ -1165,16 +1165,31 @@ const cy = 18;          // Centre du carré
 const r = 14;
 
 // Flèche directionnelle
-const arrowPath = rot !== null ? `
-<g transform="translate(0,14)">
-    <polygon
-        points="${cx},${cy-r-6}
-                ${cx-5},${cy-r+2}
-                ${cx+5},${cy-r+2}"
-        fill="${color}"
-        transform="rotate(${rot + 180} ${cx} ${cy})"/>
-</g>
-` : '';
+const arrowPath = (() => {
+    if (rot == null) return "";
+
+    // Angle du véhicule (corrige le sens si besoin)
+    const angle = (rot + 180) * Math.PI / 180;
+
+    // Distance entre le centre du carré et la flèche
+    const radius = r + 10;
+
+    // Centre de la flèche
+    const ax = cx + Math.sin(angle) * radius;
+    const ay = cy - Math.cos(angle) * radius;
+
+    return `
+        <polygon
+            points="
+                ${ax},${ay-6}
+                ${ax-5},${ay+4}
+                ${ax+5},${ay+4}
+            "
+            fill="${color}"
+            transform="rotate(${rot+180} ${ax} ${ay})"
+        />
+    `;
+})();
 
 const iconHtml = `
 <svg xmlns="http://www.w3.org/2000/svg"
