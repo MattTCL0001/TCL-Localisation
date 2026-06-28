@@ -1187,12 +1187,13 @@ window.selectStopOnMap = async function(el) {
     const popupEl = await buildStopPopupContent(nom, id, lat, lon, commune, zone);
     const mmId = popupEl.querySelector('[id^="mm-"]')?.id;
 
-    currentStopMarker = L.marker([lat, lon], {
         icon: L.divIcon({
+            className: 'my-custom-marker',
             html: '<div style="background:#e2001a;width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(226,0,26,0.5);"></div>',
-            iconSize: [16,16], iconAnchor: [8,8]
+            iconSize: [16,16],
+            iconAnchor: [8,8]
         })
-    }).bindPopup(popupEl, { maxWidth: 260, className: 'tcl-popup' }).addTo(map);
+    }.bindPopup(popupEl, { maxWidth: 260, className: 'tcl-popup' }).addTo(map);
     currentStopMarker.on('popupclose', _stopDepInterval);
     map.setView([lat, lon], 16);
     currentStopMarker.openPopup();
@@ -1207,9 +1208,7 @@ window.selectStopOnMap = async function(el) {
     }, 80);
 
     // Prochains passages (async, après ouverture popup)
-    const safeId = id || ('loc_' + lat + '_' + lon);
-    loadNextDepartures(id, `deps-${safeId}`);
-};
+    if (id) {loadNextDepartures(id, `deps-${safeId}`);}
 
 // ===== LIGNES =====
 function extractAllLines() {
