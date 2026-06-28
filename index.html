@@ -2,7 +2,7 @@
 <html>
 <head>
     <title>TCL Localisation</title>
-    <link rel="icon" href="logo.svg" type="image/svg+xml">
+    <link rel="icon" href="icon.svg" type="image/svg+xml">
     <meta charset="utf-8" />
     <meta name="color-scheme" content="only light">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -859,7 +859,7 @@ async function showLineTrace(lineCode) {
         }
     } catch(e) {
         console.warn('Erreur récupération tracé ligne:', e);
-    }}
+    }
 
     lineStops.forEach(s => {
         if (!s.lat || !s.lon) return;
@@ -897,7 +897,7 @@ async function showLineTrace(lineCode) {
 
 if (Array.isArray(bounds) && bounds.length > 0) {
     map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-}
+}}
 
 function clearLineTrace() {
     lineTraceLayer.clearLayers();
