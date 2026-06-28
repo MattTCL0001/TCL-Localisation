@@ -578,13 +578,22 @@ const API = 'https://matttcl-tcl-localisation.hf.space/';
 // ===== IMAGE CACHE =====
 const imgCache = new Map();
 
+// Lignes sans SVG connu → fallback direct sans requête HTTP
+const NO_SVG_PREFIXES = ['JD'];
+
 function lineImgHtml(lineNum, height = '20px') {
     const src = `Lignes/${lineNum}.svg`;
     const state = imgCache.get(src);
-    const fallbackStyle = 'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:2px 6px;border-radius:4px;font-size:10px;margin:0 2px;color:#eee;display:inline-block;';
-    if (state === 'ok')    return `<img src="${src}" style="height:${height};width:auto;display:inline-block;margin:0 2px;">`;
+    const fallbackStyle = 'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:2px 6px;border-radius:4px;font-size:10px;margin:0 2px;color:#eee;display:inline-block;vertical-align:middle;';
+
+    // Pré-marquer les lignes connues sans SVG pour éviter les 404
+    if (state === undefined && NO_SVG_PREFIXES.some(p => lineNum.toString().startsWith(p))) {
+        imgCache.set(src, 'error');
+    }
+
+    if (state === 'ok')    return `<img src="${src}" style="height:${height};width:auto;display:inline-block;margin:0 2px;vertical-align:middle;">`;
     if (state === 'error') return `<span style="${fallbackStyle}">${lineNum}</span>`;
-    return `<img src="${src}" data-line="${lineNum}" style="height:${height};width:auto;display:inline-block;margin:0 2px;" loading="lazy"
+    return `<img src="${src}" data-line="${lineNum}" style="height:${height};width:auto;display:inline-block;margin:0 2px;vertical-align:middle;" loading="lazy"
         onload="imgCache.set(this.src,'ok')"
         onerror="imgCache.set(this.src,'error');var s=document.createElement('span');s.textContent=this.dataset.line;s.style.cssText='${fallbackStyle}';this.replaceWith(s)">`;
 }
@@ -1414,7 +1423,7 @@ marker.bindPopup(() => {
     const journeyId  = `journey-${busSnap.id}`;
     return `<div style="width:260px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
         <div style="position:relative;height:100px;background:#0a0b14;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.style.display='none'">
+            <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.closest('div[style*=height]').style.background='linear-gradient(135deg,${busSnap.color}22,#0a0b14)';this.remove()">
             <div style="position:absolute;inset:0;background:linear-gradient(135deg,${busSnap.color}33 0%,transparent 55%,${busSnap.color}22 100%);pointer-events:none;"></div>
             <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,rgba(14,16,28,0.98));pointer-events:none;"></div>
             <div style="position:absolute;bottom:8px;left:12px;">${lineImgHtml(busSnap.line, '30px')}</div>
