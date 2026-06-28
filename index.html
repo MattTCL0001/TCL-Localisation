@@ -583,15 +583,12 @@ const NO_SVG_PREFIXES = ['JD'];
 
 function lineImgHtml(lineNum, height = '20px') {
     const src = `Lignes/${lineNum}.svg`;
-    const state = imgCache.get(src);
-    const fallbackStyle = 'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:2px 6px;border-radius:4px;font-size:10px;margin:0 2px;color:#eee;display:inline-block;vertical-align:middle;';
-
-    // Pré-marquer les lignes connues sans SVG pour éviter les 404
-    if (state === undefined && NO_SVG_PREFIXES.some(p => lineNum.toString().startsWith(p))) {
-        imgCache.set(src, 'error');
+    // Pré-marquer AVANT de vérifier le cache
+    if (!imgCache.has(src) && NO_SVG_PREFIXES.some(p => String(lineNum).startsWith(p))) {imgCache.set(src, 'error');
     }
-
-    if (state === 'ok')    return `<img src="${src}" style="height:${height};width:auto;display:inline-block;margin:0 2px;vertical-align:middle;">`;
+    const state = imgCache.get(src);
+    const fallbackStyle = '...'; // inchangé
+    if (state === 'ok')    return `<img ...>`;
     if (state === 'error') return `<span style="${fallbackStyle}">${lineNum}</span>`;
     return `<img src="${src}" data-line="${lineNum}" style="height:${height};width:auto;display:inline-block;margin:0 2px;vertical-align:middle;" loading="lazy"
         onload="imgCache.set(this.src,'ok')"
