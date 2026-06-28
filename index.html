@@ -2,6 +2,7 @@
 <html>
 <head>
     <title>TCL Localisation</title>
+    <link rel="icon" href="logo.svg" type="image/svg+xml">
     <meta charset="utf-8" />
     <meta name="color-scheme" content="only light">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -1156,33 +1157,6 @@ async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
             </div>
         </div>`;
     return popupEl;
-}
-
-async function loadNextDepartures(stopId, containerId) {
-    const el = document.getElementById(containerId);
-    if (!el) return;
-    try {
-        const data = await apiFetch(`api/next-departures/${stopId}`);
-        const deps = data.departures || [];
-        if (!deps.length) {
-            el.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div><div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Aucun passage prévu</div>';
-            return;
-        }
-        const rows = deps.slice(0, 4).map(dep => {
-            const lineImg = lineImgHtml(getNewLineNumber(dep.line), '18px');
-            const dest = dep.dest_name || dep.dest_id || '—';
-            return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
-                <div style="flex-shrink:0;">${lineImg}</div>
-                <div style="flex:1;min-width:0;">
-                    <div style="font-size:10px;color:#8a90a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">→ ${dest}</div>
-                </div>
-                <div style="font-size:11px;text-align:right;flex-shrink:0;">${fmtDep(dep.expected || dep.aimed)}</div>
-            </div>`;
-        }).join('');
-        el.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>' + rows;
-    } catch(e) {
-        el.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div><div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
-    }
 }
 
 window.selectStopOnMap = async function(el) {
