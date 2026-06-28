@@ -845,20 +845,37 @@ async function showLineTrace(lineCode) {
         if (!s.lat || !s.lon) return;
         const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
         if (isNaN(lat) || isNaN(lon)) return;
-        L.circleMarker([lat, lon], {
+        const stopId  = String(s.id || s.code_station || '');
+        const stopNom = s.nom || 'Arrêt';
+        const cm = L.circleMarker([lat, lon], {
             radius: 5,
             fillColor: traceColor,
             color: '#fff',
             weight: 2,
             opacity: 1,
             fillOpacity: 1
-        }).bindPopup(`<div style="font-family:'TCL',sans-serif;padding:8px 10px;background:rgba(14,16,28,0.95);border-radius:10px;min-width:160px;">
-            <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
-                <div style="width:10px;height:10px;border-radius:50%;background:${traceColor};flex-shrink:0;"></div>
-                <div style="font-size:12px;font-weight:600;color:#edf0f8;">${s.nom||'Arrêt'}</div>
-            </div>
-            <div style="font-size:10px;color:#8a90a8;">${s.commune||''}</div>
-        </div>`, { className:'tcl-popup', maxWidth:200 }).addTo(lineTraceLayer);
+        }).addTo(lineTraceLayer);
+        cm.on('click', async () => {
+            if (currentStopMarker) { map.removeLayer(currentStopMarker); currentStopMarker = null; }
+            const popupEl = await buildStopPopupContent(stopNom, stopId, lat, lon, s.commune, s.zone);
+            const mmId = popupEl.querySelector('[id^="mm-"]')?.id;
+            currentStopMarker = L.marker([lat, lon], {
+                icon: L.divIcon({
+                    html: '<div style="background:#e2001a;width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(226,0,26,0.5);"></div>',
+                    iconSize: [16,16], iconAnchor: [8,8]
+                })
+            }).bindPopup(popupEl, { maxWidth: 260, className: 'tcl-popup' }).addTo(map);
+            map.setView([lat, lon], 16);
+            currentStopMarker.openPopup();
+            setTimeout(() => {
+                const c = document.getElementById(mmId);
+                if (!c) return;
+                const mm = L.map(c, { zoomControl:false, attributionControl:false, interactive:false }).setView([lat,lon], 17);
+                L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(mm);
+                L.marker([lat, lon]).addTo(mm);
+            }, 80);
+            if (stopId) loadNextDepartures(stopId, `deps-${stopId}`);
+        });
         bounds.push([lat, lon]);
     });
 
@@ -958,7 +975,7 @@ function renderStopList(term = '') {
     const html = chunk.map(s => {
         const lines = extractLines(s.desserte);
         const icon  = s.desserte?.match(/T[1-7]/) ? '🚊' : (s.desserte?.match(/^[ABCD]$/) ? '🚇' : '🚌');
-        return `<div class="info-item" data-lat="${s.lat}" data-lon="${s.lon}" data-id="${s.id||''}" data-nom="${(s.nom||'').replace(/"/g,'&quot;')}">
+        return `<div class="info-item" data-lat="${s.lat}" data-lon="${s.lon}" data-id="${s.id||''}" data-nom="${(s.nom||'').replace(/"/g,'&quot;')}" data-commune="${(s.commune||'').replace(/"/g,'&quot;')}" data-zone="${s.zone||''}">
             <div class="info-summary" onclick="selectStopOnMap(this)">
                 <div class="info-line-badge" style="font-size:18px;">${icon}</div>
                 <div class="info-summary-text">
@@ -994,23 +1011,29 @@ function fmtDep(isoStr) {
     return `<span style="color:#8a90a8">${hhmm}</span>`;
 }
 
-async function buildStopPopupContent(nom, id, lat, lon) {
-    // Popup unifié : mini-map + infos + prochains passages
-    const mmId = `mm-${id}-${Date.now()}`;
-    let nextHtml = '<div style="font-size:10px;color:#4a4f6a;text-align:center;padding:4px 0;">Chargement des passages...</div>';
+async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
+    // Popup unifié : mini-map + infos (commune, zone) + prochains passages
+    const safeId = id || ('loc_' + lat + '_' + lon);
+    const mmId = `mm-${safeId}-${Date.now()}`;
+
+    const metaHtml = [
+        commune ? `<span style="color:#ffb84d;">${commune}</span>` : '',
+        zone    ? `<span style="background:rgba(255,255,255,0.07);border:1px solid rgba(255,255,255,0.12);border-radius:4px;padding:1px 5px;">Zone ${zone}</span>` : '',
+        id      ? `<span style="color:#4a4f6a;font-family:monospace;">ID ${id}</span>` : '',
+    ].filter(Boolean).join('<span style="color:#4a4f6a;margin:0 4px;">·</span>');
 
     const popupEl = document.createElement('div');
     popupEl.style.cssText = 'width:240px;font-family:TCL,sans-serif;';
     popupEl.innerHTML = `
         <div id="${mmId}" style="width:240px;height:110px;border-radius:10px 10px 0 0;background:#111;overflow:hidden;"></div>
         <div style="background:rgba(14,16,28,0.97);border-radius:0 0 14px 14px;border:1px solid rgba(255,255,255,0.09);border-top:none;">
-            <div style="padding:10px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.07);">
-                <div style="font-size:14px;font-weight:700;color:#edf0f8;">📍 ${nom}</div>
-                <div style="font-size:10px;color:#4a4f6a;margin-top:2px;font-family:monospace;">ID : ${id}</div>
+            <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.07);">
+                <div style="font-size:14px;font-weight:700;color:#edf0f8;margin-bottom:5px;">📍 ${nom}</div>
+                <div style="font-size:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">${metaHtml}</div>
             </div>
-            <div id="deps-${id}" style="padding:8px 14px 10px;">
+            <div id="deps-${safeId}" style="padding:8px 14px 10px;">
                 <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>
-                ${nextHtml}
+                <div style="font-size:10px;color:#4a4f6a;text-align:center;padding:4px 0;">Chargement...</div>
             </div>
         </div>`;
     return popupEl;
@@ -1049,10 +1072,12 @@ window.selectStopOnMap = async function(el) {
     const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
     if (isNaN(lat) || isNaN(lon)) return;
     if (currentStopMarker) { map.removeLayer(currentStopMarker); currentStopMarker = null; }
-    const nom = item.dataset.nom || 'Arrêt';
-    const id  = item.dataset.id  || '';
+    const nom     = item.dataset.nom     || 'Arrêt';
+    const id      = item.dataset.id      || '';
+    const commune = item.dataset.commune || '';
+    const zone    = item.dataset.zone    || '';
 
-    const popupEl = await buildStopPopupContent(nom, id, lat, lon);
+    const popupEl = await buildStopPopupContent(nom, id, lat, lon, commune, zone);
     const mmId = popupEl.querySelector('[id^="mm-"]')?.id;
 
     currentStopMarker = L.marker([lat, lon], {
@@ -1074,7 +1099,8 @@ window.selectStopOnMap = async function(el) {
     }, 80);
 
     // Prochains passages (async, après ouverture popup)
-    loadNextDepartures(id, `deps-${id}`);
+    const safeId = id || ('loc_' + lat + '_' + lon);
+    loadNextDepartures(id, `deps-${safeId}`);
 };
 
 // ===== LIGNES =====
@@ -1245,9 +1271,10 @@ async function updateBus() {
             const r = 14;
 
             const arrowPath = (() => {
+                // Masquer si bearing absent, nul (inconnu), ou exactement 0 (valeur par défaut API = non renseigné)
                 const EPS = 0.00001;
                 if (Math.abs(lat) < EPS && Math.abs(lon) < EPS) return "";
-                if (!Number.isFinite(rot)) return "";
+                if (!Number.isFinite(rot) || rot === null || rot === 0) return "";
                 const angle = rot * Math.PI / 180;
                 const L = 26, W = 12;
                 const tipX = cx + Math.sin(angle) * L;
