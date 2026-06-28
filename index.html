@@ -865,6 +865,7 @@ async function showLineTrace(lineCode) {
                     iconSize: [16,16], iconAnchor: [8,8]
                 })
             }).bindPopup(popupEl, { maxWidth: 260, className: 'tcl-popup' }).addTo(map);
+            currentStopMarker.on('popupclose', _stopDepInterval);
             map.setView([lat, lon], 16);
             currentStopMarker.openPopup();
             setTimeout(() => {
@@ -999,16 +1000,80 @@ function renderStopList(term = '') {
         html + (stops.length > 300 ? `<div class="info-empty">+${stops.length-300} arrêts (affinez la recherche)</div>` : '');
 }
 
-// --- Formatage heure départ ---
-function fmtDep(isoStr) {
+// --- Formatage heure départ (statique, pour un instant donné) ---
+function fmtDepAt(isoStr, now) {
     if (!isoStr) return '—';
     const d = new Date(isoStr);
-    const now = Date.now();
-    const diff = Math.round((d.getTime() - now) / 60000);
+    const diffMs = d.getTime() - now;
+    const diffSec = Math.floor(diffMs / 1000);
     const hhmm = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    if (diff <= 0)  return `<span style="color:#4dff88">à quai</span> <span style="color:#4a4f6a;font-size:10px;">(${hhmm})</span>`;
-    if (diff < 60)  return `<span style="color:#edf0f8;font-weight:600">${diff} min</span> <span style="color:#4a4f6a;font-size:10px;">(${hhmm})</span>`;
+    if (diffSec <= 30)  return `<span style="color:#4dff88;font-weight:700;">à quai</span> <span style="color:#4a4f6a;font-size:10px;">(${hhmm})</span>`;
+    const diffMin = Math.floor(diffSec / 60);
+    const remSec  = diffSec % 60;
+    if (diffMin < 60) {
+        const secStr = remSec > 0 ? `<span style="color:#4a4f6a;font-size:10px;"> ${remSec}s</span>` : '';
+        return `<span style="color:#edf0f8;font-weight:700;">${diffMin} min</span>${secStr} <span style="color:#4a4f6a;font-size:10px;">(${hhmm})</span>`;
+    }
     return `<span style="color:#8a90a8">${hhmm}</span>`;
+}
+
+// Intervalle actif pour les compteurs de passages
+let _depInterval = null;
+function _stopDepInterval() {
+    if (_depInterval) { clearInterval(_depInterval); _depInterval = null; }
+}
+
+function _startDepInterval(containerId) {
+    _stopDepInterval();
+    _depInterval = setInterval(() => {
+        const container = document.getElementById(containerId);
+        if (!container) { _stopDepInterval(); return; }
+        const now = Date.now();
+        container.querySelectorAll('[data-dep-ts]').forEach(cell => {
+            const ts = parseFloat(cell.dataset.depTs);
+            if (!ts) return;
+            const isoStr = cell.dataset.depIso;
+            // Passage expiré depuis plus de 30s → retirer la ligne
+            if (now - ts * 1000 > 30000) {
+                cell.closest('[data-dep-row]')?.remove();
+                return;
+            }
+            cell.innerHTML = fmtDepAt(isoStr, now);
+        });
+    }, 1000);
+}
+
+async function loadNextDepartures(stopId, containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    _stopDepInterval();
+    try {
+        const data = await apiFetch(`api/next-departures/${stopId}`);
+        const deps = (data.departures || []).filter(d => d.ts * 1000 > Date.now() - 30000);
+        const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>';
+        if (!deps.length) {
+            el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Aucun passage prévu</div>';
+            return;
+        }
+        const now = Date.now();
+        const rows = deps.slice(0, 4).map((dep, i) => {
+            const lineImg = lineImgHtml(getNewLineNumber(dep.line), '18px');
+            const dest    = dep.dest_name || dep.dest_id || '—';
+            const isoStr  = dep.expected || dep.aimed;
+            return `<div data-dep-row="${i}" style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+                <div style="flex-shrink:0;">${lineImg}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:10px;color:#8a90a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">→ ${dest}</div>
+                </div>
+                <div data-dep-ts="${dep.ts}" data-dep-iso="${isoStr}" style="font-size:11px;text-align:right;flex-shrink:0;">${fmtDepAt(isoStr, now)}</div>
+            </div>`;
+        }).join('');
+        el.innerHTML = header + rows;
+        _startDepInterval(containerId);
+    } catch(e) {
+        const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>';
+        el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
+    }
 }
 
 async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
@@ -1086,6 +1151,7 @@ window.selectStopOnMap = async function(el) {
             iconSize: [16,16], iconAnchor: [8,8]
         })
     }).bindPopup(popupEl, { maxWidth: 260, className: 'tcl-popup' }).addTo(map);
+    currentStopMarker.on('popupclose', _stopDepInterval);
     map.setView([lat, lon], 16);
     currentStopMarker.openPopup();
 
