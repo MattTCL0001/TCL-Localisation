@@ -611,6 +611,13 @@ function getDispoColor(value, total) {
     return              { color: '#2ecc71', rgb: '46,204,113',  label: '✅ Disponible',  textColor: '#2ecc71' };
 }
 
+// Pour Vélo'v : violet si 0 vélo ET 0 place libre (fermée ou totalement vide)
+function getVelovDispoColor(bikes, stands, total) {
+    if (bikes === 0 && stands === 0)
+        return { color: '#4B0082', rgb: '75,0,130', label: '🟣 Fermée', textColor: '#9b59b6' };
+    return getDispoColor(bikes, total || (bikes + stands));
+}
+
 // ===== CARTE =====
 const map = L.map('map', { renderer: L.canvas() }).setView([45.757, 4.832], 13);
 
@@ -975,7 +982,68 @@ function renderStopList(term = '') {
         html + (stops.length > 300 ? `<div class="info-empty">+${stops.length-300} arrêts (affinez la recherche)</div>` : '');
 }
 
-window.selectStopOnMap = function(el) {
+// --- Formatage heure départ ---
+function fmtDep(isoStr) {
+    if (!isoStr) return '—';
+    const d = new Date(isoStr);
+    const now = Date.now();
+    const diff = Math.round((d.getTime() - now) / 60000);
+    const hhmm = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+    if (diff <= 0)  return `<span style="color:#4dff88">à quai</span> <span style="color:#4a4f6a;font-size:10px;">(${hhmm})</span>`;
+    if (diff < 60)  return `<span style="color:#edf0f8;font-weight:600">${diff} min</span> <span style="color:#4a4f6a;font-size:10px;">(${hhmm})</span>`;
+    return `<span style="color:#8a90a8">${hhmm}</span>`;
+}
+
+async function buildStopPopupContent(nom, id, lat, lon) {
+    // Popup unifié : mini-map + infos + prochains passages
+    const mmId = `mm-${id}-${Date.now()}`;
+    let nextHtml = '<div style="font-size:10px;color:#4a4f6a;text-align:center;padding:4px 0;">Chargement des passages...</div>';
+
+    const popupEl = document.createElement('div');
+    popupEl.style.cssText = 'width:240px;font-family:TCL,sans-serif;';
+    popupEl.innerHTML = `
+        <div id="${mmId}" style="width:240px;height:110px;border-radius:10px 10px 0 0;background:#111;overflow:hidden;"></div>
+        <div style="background:rgba(14,16,28,0.97);border-radius:0 0 14px 14px;border:1px solid rgba(255,255,255,0.09);border-top:none;">
+            <div style="padding:10px 14px 6px;border-bottom:1px solid rgba(255,255,255,0.07);">
+                <div style="font-size:14px;font-weight:700;color:#edf0f8;">📍 ${nom}</div>
+                <div style="font-size:10px;color:#4a4f6a;margin-top:2px;font-family:monospace;">ID : ${id}</div>
+            </div>
+            <div id="deps-${id}" style="padding:8px 14px 10px;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>
+                ${nextHtml}
+            </div>
+        </div>`;
+    return popupEl;
+}
+
+async function loadNextDepartures(stopId, containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    try {
+        const data = await apiFetch(`api/next-departures/${stopId}`);
+        const deps = data.departures || [];
+        if (!deps.length) {
+            el.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div><div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Aucun passage prévu</div>';
+            return;
+        }
+        const rows = deps.slice(0, 4).map(dep => {
+            const lineImg = lineImgHtml(getNewLineNumber(dep.line), '18px');
+            const dest = dep.dest_name || dep.dest_id || '—';
+            return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+                <div style="flex-shrink:0;">${lineImg}</div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:10px;color:#8a90a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">→ ${dest}</div>
+                </div>
+                <div style="font-size:11px;text-align:right;flex-shrink:0;">${fmtDep(dep.expected || dep.aimed)}</div>
+            </div>`;
+        }).join('');
+        el.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>' + rows;
+    } catch(e) {
+        el.innerHTML = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div><div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
+    }
+}
+
+window.selectStopOnMap = async function(el) {
     const item = el.closest('.info-item');
     if (!item) return;
     const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
@@ -983,25 +1051,30 @@ window.selectStopOnMap = function(el) {
     if (currentStopMarker) { map.removeLayer(currentStopMarker); currentStopMarker = null; }
     const nom = item.dataset.nom || 'Arrêt';
     const id  = item.dataset.id  || '';
+
+    const popupEl = await buildStopPopupContent(nom, id, lat, lon);
+    const mmId = popupEl.querySelector('[id^="mm-"]')?.id;
+
     currentStopMarker = L.marker([lat, lon], {
         icon: L.divIcon({
             html: '<div style="background:#e2001a;width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(226,0,26,0.5);"></div>',
             iconSize: [16,16], iconAnchor: [8,8]
         })
-    }).bindPopup(`<div style="min-width:220px;font-family:'TCL',sans-serif;">
-        <div id="mm-${id}" style="width:210px;height:110px;border-radius:8px;margin-bottom:8px;background:#111;"></div>
-        <div style="font-size:15px;font-weight:bold;margin-bottom:4px;">📍 ${nom}</div>
-        <div style="color:#aaa;font-size:11px;">🆔 ${id}</div>
-    </div>`).addTo(map);
+    }).bindPopup(popupEl, { maxWidth: 260, className: 'tcl-popup' }).addTo(map);
     map.setView([lat, lon], 16);
     currentStopMarker.openPopup();
+
+    // Mini-map
     setTimeout(() => {
-        const c = document.getElementById(`mm-${id}`);
+        const c = document.getElementById(mmId);
         if (!c) return;
         const mm = L.map(c, { zoomControl:false, attributionControl:false, interactive:false }).setView([lat,lon], 17);
         L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(mm);
         L.marker([lat, lon]).addTo(mm);
     }, 80);
+
+    // Prochains passages (async, après ouverture popup)
+    loadNextDepartures(id, `deps-${id}`);
 };
 
 // ===== LIGNES =====
@@ -1412,7 +1485,7 @@ function buildVelovPopup(s) {
     const stands = s.available_bike_stands || 0;
     const total  = s.bike_stands || (bikes + stands) || 0;
     const pct    = total > 0 ? (bikes / total) * 100 : 0;
-    const dispoInfo = getDispoColor(bikes, total) || { color: '#4B0082', textColor: '#9b59b6' };
+    const dispoInfo = getVelovDispoColor(bikes, stands, total);
 
     const ms = s.main_stands?.availabilities || {};
     const elec = ms.electricalBikes || 0;
@@ -1462,7 +1535,7 @@ function updateVisibleVelov() {
         const bikes  = s.available_bikes || 0;
         const stands = s.available_bike_stands || 0;
         const total  = s.bike_stands || (bikes + stands) || 0;
-        const dispoInfo = getDispoColor(bikes, total) || { color: '#4B0082' };
+        const dispoInfo = getVelovDispoColor(bikes, stands, total);
 
         const m = L.circleMarker([parseFloat(s.lat), parseFloat(s.lng)], {
             radius: 7, fillColor: dispoInfo.color, color: 'rgba(15,17,28,0.8)', weight: 2, opacity: 1, fillOpacity: 0.9
@@ -1615,7 +1688,7 @@ function renderVelovList(term) {
         const bikes  = s.available_bikes || 0;
         const stands = s.available_bike_stands || 0;
         const total  = s.bike_stands || (bikes + stands) || 0;
-        const dispoInfo = getDispoColor(bikes, total) || { color: '#4B0082', rgb: '75,0,130', label: '🟣 Fermée', textColor: '#9b59b6' };
+        const dispoInfo = getVelovDispoColor(bikes, stands, total);
         const { color, rgb, label: statusText, textColor } = dispoInfo;
 
         const ms = s.main_stands?.availabilities || {};
@@ -1675,7 +1748,7 @@ window.selectVelovOnMap = function(el) {
     const bikes  = station.available_bikes || 0;
     const stands = station.available_bike_stands || 0;
     const total  = station.bike_stands || (bikes + stands) || 0;
-    const dispoInfo = getDispoColor(bikes, total) || { color: '#4B0082' };
+    const dispoInfo = getVelovDispoColor(bikes, stands, total);
 
     currentVelovMarker = L.circleMarker([lat, lon], {
         radius: 10, fillColor: dispoInfo.color, color: '#fff', weight: 2.5, opacity: 1, fillOpacity: 1
