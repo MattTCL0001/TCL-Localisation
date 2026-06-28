@@ -1092,7 +1092,7 @@ async function loadVehicleJourney(vehicleId, containerId) {
     const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains arrêts</div>';
     try {
         const data = await apiFetch(`api/vehicle-journey/${vehicleId}`);
-        const stops = data.stops || [];
+        const stops = (data.stops || []).sort((a, b) => a.order - b.order); // tri côté client
         if (!stops.length) {
             el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Aucun arrêt à venir</div>';
             return;
