@@ -896,9 +896,9 @@ async function showLineTrace(lineCode) {
         bounds.push([lat, lon]);
     };
 
-    if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-    }
+if (Array.isArray(bounds) && bounds.length > 0) {
+    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+}
 
 function clearLineTrace() {
     lineTraceLayer.clearLayers();
