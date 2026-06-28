@@ -579,14 +579,12 @@ const API = 'https://matttcl-tcl-localisation.hf.space/';
 // ===== IMAGE CACHE =====
 const imgCache = new Map();
 
-// Lignes sans SVG connu → fallback direct sans requête HTTP
 const NO_SVG_PREFIXES = ['JD'];
 
 function lineImgHtml(lineNum, height = '20px') {
     const src = `Lignes/${lineNum}.svg`;
     const fallbackStyle = 'background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);padding:2px 6px;border-radius:4px;font-size:10px;margin:0 2px;color:#eee;display:inline-block;vertical-align:middle;';
 
-    // Marque IMMÉDIATEMENT comme erreur sans créer d'<img>
     if (NO_SVG_PREFIXES.some(p => String(lineNum).startsWith(p))) {
         imgCache.set(src, 'error');
         return `<span style="${fallbackStyle}">${lineNum}</span>`;
@@ -609,9 +607,8 @@ function modeImgHtml(modeFile, sizePx = 18) {
         onload="imgCache.set('${src}','ok')" onerror="imgCache.set('${src}','error');this.style.display='none'">`;
 }
 
-// ===== COULEURS DISPONIBILITÉ (partagées Vélo'v + P+R) =====
+// ===== COULEURS DISPONIBILITÉ =====
 function getDispoColor(value, total) {
-    // value = nb places/vélos dispo, total = capacité totale
     if (value === null || value === undefined || total === null || total === undefined) return null;
     if (value === 0 && total === 0) return { color: '#4B0082', rgb: '75,0,130', label: '🟣 Fermé', textColor: '#9b59b6' };
     if (value === 0) return { color: '#ff4d4d', rgb: '255,77,77', label: '❌ Complet', textColor: '#ff4d4d' };
@@ -622,7 +619,6 @@ function getDispoColor(value, total) {
     return              { color: '#2ecc71', rgb: '46,204,113',  label: '✅ Disponible',  textColor: '#2ecc71' };
 }
 
-// Pour Vélo'v : violet si 0 vélo ET 0 place libre (fermée ou totalement vide)
 function getVelovDispoColor(bikes, stands, total) {
     if (bikes === 0 && stands === 0)
         return { color: '#4B0082', rgb: '75,0,130', label: '🟣 Fermée', textColor: '#9b59b6' };
@@ -638,29 +634,27 @@ L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
     maxZoom: 20
 }).addTo(map);
 
-// Z-order (bottom → top): parkingMetro → parking P+R → lineTrace → velov → bus
-// Ordre de priorité superposition : Popup (géré par Leaflet) > Véhicules > Vélo'v > P+R > Parkings métro
-const parkingMetroLayer = L.layerGroup().addTo(map);  // z=1 (bas)
-const parkingLayer      = L.layerGroup().addTo(map);  // z=2
-const lineTraceLayer    = L.layerGroup().addTo(map);  // z=3
-const velovLayer        = L.layerGroup().addTo(map);  // z=4
-const busLayer          = L.layerGroup().addTo(map);  // z=5 (haut, sous popup)
-const agenceLayer       = L.layerGroup().addTo(map);  // z=6 (icônes agences, toujours visibles)
+const parkingMetroLayer = L.layerGroup().addTo(map);
+const parkingLayer      = L.layerGroup().addTo(map);
+const lineTraceLayer    = L.layerGroup().addTo(map);
+const velovLayer        = L.layerGroup().addTo(map);
+const busLayer          = L.layerGroup().addTo(map);
+const agenceLayer       = L.layerGroup().addTo(map);
 
 // ===== STATE =====
 let allStops = [], stopsMapping = {}, allLines = [];
 let allVelovStations = [];
-let allParkings = [];          // P+R TCL (données statiques)
-let parkingsTrData = {};       // P+R temps réel par id
-let allParkingsMetro = [];     // Parkings métropole
+let allParkings = [];
+let parkingsTrData = {};
+let allParkingsMetro = [];
 let currentStopMarker = null, currentVelovMarker = null;
 let parkingsLoaded = false;
 let parkingsMetroLoaded = false;
 let velovLoaded = false;
 const busMarkers      = new Map();
 const velovMarkerMap  = new Map();
-const parkingMarkerMap     = new Map(); // P+R viewport
-const parkingMetroMarkerMap = new Map(); // Métro viewport
+const parkingMarkerMap     = new Map();
+const parkingMetroMarkerMap = new Map();
 const VELOV_MIN_ZOOM          = 13;
 const PARKING_MIN_ZOOM        = 12;
 const PARKING_METRO_MIN_ZOOM  = 14;
@@ -875,6 +869,8 @@ async function showLineTrace(lineCode) {
             opacity: 1,
             fillOpacity: 1
         }).addTo(lineTraceLayer);
+
+        // FIX Bug 4 : L.marker() complet avec la syntaxe correcte
         cm.on('click', async () => {
             if (currentStopMarker) { map.removeLayer(currentStopMarker); currentStopMarker = null; }
             const popupEl = await buildStopPopupContent(stopNom, stopId, lat, lon, s.commune, s.zone);
@@ -882,7 +878,7 @@ async function showLineTrace(lineCode) {
             currentStopMarker = L.marker([lat, lon], {
                 icon: L.divIcon({
                     className: 'my-custom-marker',
-                    html: '...',
+                    html: '<div style="background:#e2001a;width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(226,0,26,0.5);"></div>',
                     iconSize: [16,16],
                     iconAnchor: [8,8]
                 })
@@ -893,7 +889,8 @@ async function showLineTrace(lineCode) {
             })
             .addTo(map);
             currentStopMarker.on('popupclose', _stopDepInterval);
-            map.setView([lat, lon], 16); currentStopMarker.openPopup();
+            map.setView([lat, lon], 16);
+            currentStopMarker.openPopup();
             setTimeout(() => {
                 const c = document.getElementById(mmId);
                 if (!c) return;
@@ -906,9 +903,10 @@ async function showLineTrace(lineCode) {
         bounds.push([lat, lon]);
     });
 
-if (Array.isArray(bounds) && bounds.length > 0) {
-    map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-}}
+    if (Array.isArray(bounds) && bounds.length > 0) {
+        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+    }
+}
 
 function clearLineTrace() {
     lineTraceLayer.clearLayers();
@@ -1025,7 +1023,7 @@ function renderStopList(term = '') {
         html + (stops.length > 300 ? `<div class="info-empty">+${stops.length-300} arrêts (affinez la recherche)</div>` : '');
 }
 
-// --- Formatage heure départ (statique, pour un instant donné) ---
+// ===== DÉPARTS =====
 function fmtDepAt(isoStr, now) {
     if (!isoStr) return '—';
     const d = new Date(isoStr);
@@ -1042,7 +1040,6 @@ function fmtDepAt(isoStr, now) {
     return `<span style="color:#8a90a8">${hhmm}</span>`;
 }
 
-// Intervalle actif pour les compteurs de passages
 let _depInterval = null;
 function _stopDepInterval() {
     if (_depInterval) { clearInterval(_depInterval); _depInterval = null; }
@@ -1058,7 +1055,6 @@ function _startDepInterval(containerId) {
             const ts = parseFloat(cell.dataset.depTs);
             if (!ts) return;
             const isoStr = cell.dataset.depIso;
-            // Passage expiré depuis plus de 30s → retirer la ligne
             if (now - ts * 1000 > 30000) {
                 cell.closest('[data-dep-row]')?.remove();
                 return;
@@ -1070,7 +1066,6 @@ function _startDepInterval(containerId) {
 
 async function loadNextDepartures(stopId, containerId) {
     if (!stopId) return;
-    // containerId peut être calculé avant que le DOM soit prêt — on attend un tick
     await new Promise(r => setTimeout(r, 0));
     const el = document.getElementById(containerId);
     if (!el) return;
@@ -1079,7 +1074,6 @@ async function loadNextDepartures(stopId, containerId) {
     try {
         const data = await apiFetch(`api/next-departures/${stopId}`);
         const nowSec = Date.now() / 1000;
-        // Filtrer les passages déjà passés (ts est en secondes UNIX côté Python)
         const deps = (data.departures || []).filter(d => d.ts > nowSec - 30);
         if (!deps.length) {
             el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Aucun passage prévu</div>';
@@ -1105,13 +1099,14 @@ async function loadNextDepartures(stopId, containerId) {
         el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
     }
 }
+
 async function loadVehicleJourney(vehicleId, containerId) {
     const el = document.getElementById(containerId);
     if (!el) return;
     const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains arrêts</div>';
     try {
         const data = await apiFetch(`api/vehicle-journey/${vehicleId}`);
-        const stops = (data.stops || []).sort((a, b) => a.order - b.order); // tri côté client
+        const stops = (data.stops || []).sort((a, b) => a.order - b.order);
         if (!stops.length) {
             el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Aucun arrêt à venir</div>';
             return;
@@ -1145,8 +1140,8 @@ async function loadVehicleJourney(vehicleId, containerId) {
         el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
     }
 }
+
 async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
-    // Popup unifié : mini-map + infos (commune, zone) + prochains passages
     const safeId = id || ('loc_' + lat + '_' + lon);
     const mmId = `mm-${safeId}-${Date.now()}`;
 
@@ -1173,6 +1168,7 @@ async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
     return popupEl;
 }
 
+// FIX Bug 1 + 2 + 3 : selectStopOnMap entièrement corrigé
 window.selectStopOnMap = async function(el) {
     const item = el.closest('.info-item');
     if (!item) return;
@@ -1187,13 +1183,19 @@ window.selectStopOnMap = async function(el) {
     const popupEl = await buildStopPopupContent(nom, id, lat, lon, commune, zone);
     const mmId = popupEl.querySelector('[id^="mm-"]')?.id;
 
+    // Récupère le safeId depuis l'id de la mini-map (format : "mm-{safeId}-{timestamp}")
+    const safeId = mmId ? mmId.replace(/^mm-/, '').replace(/-\d+$/, '') : (id || `loc_${lat}_${lon}`);
+
+    // FIX Bug 1 : L.marker() complet
+    currentStopMarker = L.marker([lat, lon], {
         icon: L.divIcon({
             className: 'my-custom-marker',
             html: '<div style="background:#e2001a;width:16px;height:16px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 8px rgba(226,0,26,0.5);"></div>',
             iconSize: [16,16],
             iconAnchor: [8,8]
         })
-    }.bindPopup(popupEl, { maxWidth: 260, className: 'tcl-popup' }).addTo(map);
+    }).bindPopup(popupEl, { maxWidth: 260, className: 'tcl-popup' }).addTo(map);
+
     currentStopMarker.on('popupclose', _stopDepInterval);
     map.setView([lat, lon], 16);
     currentStopMarker.openPopup();
@@ -1207,8 +1209,9 @@ window.selectStopOnMap = async function(el) {
         L.marker([lat, lon]).addTo(mm);
     }, 80);
 
-    // Prochains passages (async, après ouverture popup)
-    if (id) {loadNextDepartures(id, `deps-${safeId}`);}
+    // FIX Bug 2 : utilise safeId reconstruit plutôt que la variable non définie
+    if (id) { loadNextDepartures(id, `deps-${safeId}`); }
+}; // FIX Bug 3 : accolade fermante de la fonction
 
 // ===== LIGNES =====
 function extractAllLines() {
@@ -1378,7 +1381,6 @@ async function updateBus() {
             const r = 14;
 
             const arrowPath = (() => {
-                // Masquer si bearing absent, nul (inconnu), ou exactement 0 (valeur par défaut API = non renseigné)
                 const EPS = 0.00001;
                 if (Math.abs(lat) < EPS && Math.abs(lon) < EPS) return "";
                 if (!Number.isFinite(rot) || rot === null || rot === 0) return "";
@@ -1402,48 +1404,46 @@ async function updateBus() {
             const icon = L.divIcon({ html: iconHtml, className: '', iconSize: [svgSize, svgSize], iconAnchor: [svgSize/2, svgSize/2] });
 
             const busSnap = { ...bus, line, color, dest, delayOk, modeFile, lineRemapped };
-            // Remplace le .bindPopup(() => { ... }, { maxWidth:260, className:'tcl-popup' });
-// par ceci :
 
-const marker = L.marker([lat, lon], { icon });
-marker.bindPopup(() => {
-    const vehicleImg = `Vehicule/${busSnap.id}.jpg`;
-    const journeyId  = `journey-${busSnap.id}`;
-    return `<div style="width:260px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
-        <div style="position:relative;height:100px;background:#0a0b14;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-            <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.closest('div[style*=height]').style.background='linear-gradient(135deg,${busSnap.color}22,#0a0b14)';this.remove()">
-            <div style="position:absolute;inset:0;background:linear-gradient(135deg,${busSnap.color}33 0%,transparent 55%,${busSnap.color}22 100%);pointer-events:none;"></div>
-            <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,rgba(14,16,28,0.98));pointer-events:none;"></div>
-            <div style="position:absolute;bottom:8px;left:12px;">${lineImgHtml(busSnap.line, '30px')}</div>
-            <div onclick="filterLineFromPopup('${busSnap.line}')" title="Filtrer la ligne ${busSnap.line}"
-                 style="position:absolute;top:8px;right:8px;width:32px;height:32px;background:rgba(14,16,28,0.75);border:1px solid ${busSnap.color}55;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-                <img src="Lignes/${busSnap.modeFile}" style="width:18px;height:18px;" onerror="this.style.display='none'">
-            </div>
-        </div>
-        <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <div style="width:6px;height:6px;border-radius:50%;background:${busSnap.color};flex-shrink:0;"></div>
-                    <span style="font-size:11px;font-weight:600;color:#8a90a8;text-transform:uppercase;">Ligne ${busSnap.line}</span>
-                </div>
-                <span style="font-size:10px;padding:2px 8px;border-radius:20px;${busSnap.delayOk?'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);':'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">${busSnap.delayOk?"À l'heure":busSnap.delay}</span>
-            </div>
-            <div style="font-size:14px;font-weight:600;color:#edf0f8;margin-bottom:4px;">${busSnap.dest}</div>
-        </div>
-        <div style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
-            <div style="font-size:11px;color:#8a90a8;">🚌 ${getVehicleType(busSnap)}</div>
-            <div style="font-size:10px;color:#4a4f6a;font-family:monospace;">🔒 ${busSnap.id}</div>
-        </div>
-        <div id="${journeyId}" style="padding:8px 14px 10px;">
-            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains arrêts</div>
-            <div style="font-size:10px;color:#4a4f6a;text-align:center;">Chargement...</div>
-        </div>
-    </div>`;
-}, { maxWidth:270, className:'tcl-popup' });
+            const marker = L.marker([lat, lon], { icon });
+            marker.bindPopup(() => {
+                const vehicleImg = `Vehicule/${busSnap.id}.jpg`;
+                const journeyId  = `journey-${busSnap.id}`;
+                return `<div style="width:260px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
+                    <div style="position:relative;height:100px;background:#0a0b14;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+                        <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.closest('div[style*=height]').style.background='linear-gradient(135deg,${busSnap.color}22,#0a0b14)';this.remove()">
+                        <div style="position:absolute;inset:0;background:linear-gradient(135deg,${busSnap.color}33 0%,transparent 55%,${busSnap.color}22 100%);pointer-events:none;"></div>
+                        <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,rgba(14,16,28,0.98));pointer-events:none;"></div>
+                        <div style="position:absolute;bottom:8px;left:12px;">${lineImgHtml(busSnap.line, '30px')}</div>
+                        <div onclick="filterLineFromPopup('${busSnap.line}')" title="Filtrer la ligne ${busSnap.line}"
+                             style="position:absolute;top:8px;right:8px;width:32px;height:32px;background:rgba(14,16,28,0.75);border:1px solid ${busSnap.color}55;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                            <img src="Lignes/${busSnap.modeFile}" style="width:18px;height:18px;" onerror="this.style.display='none'">
+                        </div>
+                    </div>
+                    <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
+                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div style="width:6px;height:6px;border-radius:50%;background:${busSnap.color};flex-shrink:0;"></div>
+                                <span style="font-size:11px;font-weight:600;color:#8a90a8;text-transform:uppercase;">Ligne ${busSnap.line}</span>
+                            </div>
+                            <span style="font-size:10px;padding:2px 8px;border-radius:20px;${busSnap.delayOk?'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);':'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">${busSnap.delayOk?"À l'heure":busSnap.delay}</span>
+                        </div>
+                        <div style="font-size:14px;font-weight:600;color:#edf0f8;margin-bottom:4px;">${busSnap.dest}</div>
+                    </div>
+                    <div style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
+                        <div style="font-size:11px;color:#8a90a8;">🚌 ${getVehicleType(busSnap)}</div>
+                        <div style="font-size:10px;color:#4a4f6a;font-family:monospace;">🔒 ${busSnap.id}</div>
+                    </div>
+                    <div id="${journeyId}" style="padding:8px 14px 10px;">
+                        <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains arrêts</div>
+                        <div style="font-size:10px;color:#4a4f6a;text-align:center;">Chargement...</div>
+                    </div>
+                </div>`;
+            }, { maxWidth:270, className:'tcl-popup' });
 
-marker.on('popupopen', () => {
-    setTimeout(() => loadVehicleJourney(busSnap.id, `journey-${busSnap.id}`), 50);
-});
+            marker.on('popupopen', () => {
+                setTimeout(() => loadVehicleJourney(busSnap.id, `journey-${busSnap.id}`), 50);
+            });
 
             const showNow = !busLineFilter || lineRemapped === busLineFilter || line === busLineFilter;
             if (showNow) marker.addTo(busLayer);
@@ -1460,7 +1460,7 @@ marker.on('popupopen', () => {
     } catch(e) { console.error('Bus:', e); }
 }
 
-// ===== POPUP P+R UNIFIÉ =====
+// ===== POPUP P+R =====
 function buildParkingPopup(p, tr) {
     const dispo = tr?.nb_tot_place_dispo ?? null;
     const cap   = p.capacite || null;
@@ -1497,7 +1497,7 @@ function buildParkingPopup(p, tr) {
     </div>`;
 }
 
-// ===== P+R TCL — chargement viewport =====
+// ===== P+R TCL =====
 async function loadParkings() {
     if (parkingsLoaded) return;
     try {
@@ -1518,7 +1518,7 @@ async function loadParkings() {
 function getParkingDispoColor(p) {
     const dispo = p._tr?.nb_tot_place_dispo ?? null;
     const cap   = p.capacite || null;
-    if (dispo === null || cap === null) return '#0099cc'; // bleu neutre si pas de TR
+    if (dispo === null || cap === null) return '#0099cc';
     return getDispoColor(dispo, cap)?.color || '#0099cc';
 }
 
@@ -1562,7 +1562,7 @@ function updateVisibleParkings() {
     }
 }
 
-// ===== POPUP PARKING MÉTROPOLE UNIFIÉ =====
+// ===== POPUP PARKING MÉTROPOLE =====
 function buildParkingMetroPopup(p) {
     return `<div style="width:220px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
         <div style="font-size:13px;font-weight:600;color:#edf0f8;margin-bottom:4px;">🅿 ${p.nom||'Parking'}</div>
@@ -1578,7 +1578,7 @@ function buildParkingMetroPopup(p) {
     </div>`;
 }
 
-// ===== PARKINGS MÉTROPOLE — chargement viewport =====
+// ===== PARKINGS MÉTROPOLE =====
 async function loadParkingsMetro() {
     if (parkingsMetroLoaded) return;
     try {
@@ -1626,7 +1626,7 @@ function updateVisibleParkingsMetro() {
     }
 }
 
-// ===== VÉLO'V — popup unifié =====
+// ===== VÉLO'V =====
 function buildVelovPopup(s) {
     const bikes  = s.available_bikes || 0;
     const stands = s.available_bike_stands || 0;
@@ -1702,7 +1702,7 @@ async function updateVelov() {
     } catch(e) { console.error('Velov:', e); }
 }
 
-// ===== ÉVÉNEMENTS CARTE (viewport) =====
+// ===== ÉVÉNEMENTS CARTE =====
 let velovMoveTimer = null, parkingMoveTimer = null, parkingMetroMoveTimer = null;
 map.on('moveend zoomend', () => {
     clearTimeout(velovMoveTimer);
@@ -1800,7 +1800,7 @@ async function updateStopsData() {
     }
 }
 
-// ===== VELO'V LISTE =====
+// ===== VÉLO'V LISTE =====
 async function loadVelovList() {
     try {
         const data = await apiFetch('api/velov');
@@ -1889,7 +1889,6 @@ window.selectVelovOnMap = function(el) {
 
     if (currentVelovMarker) { map.removeLayer(currentVelovMarker); currentVelovMarker = null; }
 
-    // Trouver la station pour construire le popup unifié
     const station = allVelovStations[idx] || { name, lat, lng: lon, available_bikes: 0, available_bike_stands: 0 };
 
     const bikes  = station.available_bikes || 0;
@@ -1907,7 +1906,6 @@ window.selectVelovOnMap = function(el) {
         if (currentVelovMarker) { map.removeLayer(currentVelovMarker); currentVelovMarker = null; }
     }, 6000);
 };
-
 
 // ===== AGENCES TCL =====
 async function loadAgences() {
