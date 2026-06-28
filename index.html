@@ -894,7 +894,7 @@ async function showLineTrace(lineCode) {
             if (stopId) loadNextDepartures(stopId, `deps-${stopId}`);
         });
         bounds.push([lat, lon]);
-    };
+    });
 
 if (Array.isArray(bounds) && bounds.length > 0) {
     map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
