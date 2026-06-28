@@ -1080,7 +1080,46 @@ async function loadNextDepartures(stopId, containerId) {
         el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
     }
 }
-
+async function loadVehicleJourney(vehicleId, containerId) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains arrêts</div>';
+    try {
+        const data = await apiFetch(`api/vehicle-journey/${vehicleId}`);
+        const stops = data.stops || [];
+        if (!stops.length) {
+            el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Aucun arrêt à venir</div>';
+            return;
+        }
+        const now = Date.now();
+        const rows = stops.map((stop, i) => {
+            const isNext = i === 0;
+            const exp = stop.expected || stop.aimed;
+            let timeStr = '—';
+            if (exp) {
+                try {
+                    const d = new Date(exp);
+                    const diffMin = Math.round((d.getTime() - now) / 60000);
+                    const hhmm = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
+                    if (diffMin <= 0) timeStr = `<span style="color:#4dff88;">à quai</span>`;
+                    else if (diffMin < 60) timeStr = `<span style="color:#edf0f8;">${diffMin} min</span> <span style="color:#4a4f6a;font-size:9px;">(${hhmm})</span>`;
+                    else timeStr = `<span style="color:#8a90a8">${hhmm}</span>`;
+                } catch(e) { timeStr = '—'; }
+            }
+            return `<div style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);${isNext?'background:rgba(226,0,26,0.06);margin:0 -14px;padding:5px 14px;':''}">
+                <div style="width:6px;height:6px;border-radius:50%;flex-shrink:0;background:${isNext?'#e2001a':'rgba(255,255,255,0.15)'}"></div>
+                <div style="flex:1;min-width:0;">
+                    <div style="font-size:11px;${isNext?'color:#edf0f8;font-weight:600;':'color:#8a90a8;'}white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${stop.name}</div>
+                </div>
+                <div style="font-size:11px;text-align:right;flex-shrink:0;">${timeStr}</div>
+            </div>`;
+        }).join('');
+        el.innerHTML = header + rows;
+    } catch(e) {
+        console.error('loadVehicleJourney:', e);
+        el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
+    }
+}
 async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
     // Popup unifié : mini-map + infos (commune, zone) + prochains passages
     const safeId = id || ('loc_' + lat + '_' + lon);
@@ -1366,35 +1405,48 @@ async function updateBus() {
             const icon = L.divIcon({ html: iconHtml, className: '', iconSize: [svgSize, svgSize], iconAnchor: [svgSize/2, svgSize/2] });
 
             const busSnap = { ...bus, line, color, dest, delayOk, modeFile, lineRemapped };
-            const marker = L.marker([lat, lon], { icon }).bindPopup(() => {
-                const vehicleImg = `Vehicule/${busSnap.id}.jpg`;
-                return `<div style="width:240px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
-                <div style="position:relative;height:100px;background:#0a0b14;display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                    <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.style.display='none'">
-                    <div style="position:absolute;inset:0;background:linear-gradient(135deg,${busSnap.color}33 0%,transparent 55%,${busSnap.color}22 100%);pointer-events:none;"></div>
-                    <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,rgba(14,16,28,0.98));pointer-events:none;"></div>
-                    <div style="position:absolute;bottom:8px;left:12px;">${lineImgHtml(busSnap.line, '30px')}</div>
-                    <div onclick="filterLineFromPopup('${busSnap.line}')" title="Filtrer la ligne ${busSnap.line}"
-                         style="position:absolute;top:8px;right:8px;width:32px;height:32px;background:rgba(14,16,28,0.75);border:1px solid ${busSnap.color}55;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
-                        <img src="Lignes/${busSnap.modeFile}" style="width:18px;height:18px;" onerror="this.style.display='none'">
-                    </div>
+            // Remplace le .bindPopup(() => { ... }, { maxWidth:260, className:'tcl-popup' });
+// par ceci :
+
+const marker = L.marker([lat, lon], { icon });
+marker.bindPopup(() => {
+    const vehicleImg = `Vehicule/${busSnap.id}.jpg`;
+    const journeyId  = `journey-${busSnap.id}`;
+    return `<div style="width:260px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
+        <div style="position:relative;height:100px;background:#0a0b14;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+            <img src="${vehicleImg}" style="width:100%;height:100%;object-fit:cover;opacity:0.85;" loading="lazy" onerror="this.style.display='none'">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,${busSnap.color}33 0%,transparent 55%,${busSnap.color}22 100%);pointer-events:none;"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,rgba(14,16,28,0.98));pointer-events:none;"></div>
+            <div style="position:absolute;bottom:8px;left:12px;">${lineImgHtml(busSnap.line, '30px')}</div>
+            <div onclick="filterLineFromPopup('${busSnap.line}')" title="Filtrer la ligne ${busSnap.line}"
+                 style="position:absolute;top:8px;right:8px;width:32px;height:32px;background:rgba(14,16,28,0.75);border:1px solid ${busSnap.color}55;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;">
+                <img src="Lignes/${busSnap.modeFile}" style="width:18px;height:18px;" onerror="this.style.display='none'">
+            </div>
+        </div>
+        <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:6px;height:6px;border-radius:50%;background:${busSnap.color};flex-shrink:0;"></div>
+                    <span style="font-size:11px;font-weight:600;color:#8a90a8;text-transform:uppercase;">Ligne ${busSnap.line}</span>
                 </div>
-                <div style="padding:10px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
-                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                        <div style="display:flex;align-items:center;gap:8px;">
-                            <div style="width:6px;height:6px;border-radius:50%;background:${busSnap.color};flex-shrink:0;"></div>
-                            <span style="font-size:11px;font-weight:600;color:#8a90a8;text-transform:uppercase;">Ligne ${busSnap.line}</span>
-                        </div>
-                        <span style="font-size:10px;padding:2px 8px;border-radius:20px;${busSnap.delayOk?'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);':'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">${busSnap.delayOk?"À l'heure":busSnap.delay}</span>
-                    </div>
-                    <div style="font-size:14px;font-weight:600;color:#edf0f8;margin-bottom:4px;">${busSnap.dest}</div>
-                </div>
-                <div style="padding:8px 14px;display:flex;flex-direction:column;gap:5px;">
-                    <div style="font-size:11px;color:#8a90a8;">🚌 ${getVehicleType(busSnap)}</div>
-                    <div style="font-size:10px;color:#4a4f6a;font-family:monospace;">🔒 ${busSnap.id}</div>
-                </div>
-            </div>`;
-            }, { maxWidth:260, className:'tcl-popup' });
+                <span style="font-size:10px;padding:2px 8px;border-radius:20px;${busSnap.delayOk?'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);':'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">${busSnap.delayOk?"À l'heure":busSnap.delay}</span>
+            </div>
+            <div style="font-size:14px;font-weight:600;color:#edf0f8;margin-bottom:4px;">${busSnap.dest}</div>
+        </div>
+        <div style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
+            <div style="font-size:11px;color:#8a90a8;">🚌 ${getVehicleType(busSnap)}</div>
+            <div style="font-size:10px;color:#4a4f6a;font-family:monospace;">🔒 ${busSnap.id}</div>
+        </div>
+        <div id="${journeyId}" style="padding:8px 14px 10px;">
+            <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains arrêts</div>
+            <div style="font-size:10px;color:#4a4f6a;text-align:center;">Chargement...</div>
+        </div>
+    </div>`;
+}, { maxWidth:270, className:'tcl-popup' });
+
+marker.on('popupopen', () => {
+    setTimeout(() => loadVehicleJourney(busSnap.id, `journey-${busSnap.id}`), 50);
+});
 
             const showNow = !busLineFilter || lineRemapped === busLineFilter || line === busLineFilter;
             if (showNow) marker.addTo(busLayer);
