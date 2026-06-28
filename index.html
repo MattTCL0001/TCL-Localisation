@@ -1044,34 +1044,39 @@ function _startDepInterval(containerId) {
 }
 
 async function loadNextDepartures(stopId, containerId) {
+    if (!stopId) return;
+    // containerId peut être calculé avant que le DOM soit prêt — on attend un tick
+    await new Promise(r => setTimeout(r, 0));
     const el = document.getElementById(containerId);
     if (!el) return;
     _stopDepInterval();
+    const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>';
     try {
         const data = await apiFetch(`api/next-departures/${stopId}`);
-        const deps = (data.departures || []).filter(d => d.ts * 1000 > Date.now() - 30000);
-        const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>';
+        const nowSec = Date.now() / 1000;
+        // Filtrer les passages déjà passés (ts est en secondes UNIX côté Python)
+        const deps = (data.departures || []).filter(d => d.ts > nowSec - 30);
         if (!deps.length) {
             el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Aucun passage prévu</div>';
             return;
         }
-        const now = Date.now();
+        const nowMs = Date.now();
         const rows = deps.slice(0, 4).map((dep, i) => {
             const lineImg = lineImgHtml(getNewLineNumber(dep.line), '18px');
             const dest    = dep.dest_name || dep.dest_id || '—';
-            const isoStr  = dep.expected || dep.aimed;
+            const isoStr  = dep.expected || dep.aimed || '';
             return `<div data-dep-row="${i}" style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
                 <div style="flex-shrink:0;">${lineImg}</div>
                 <div style="flex:1;min-width:0;">
                     <div style="font-size:10px;color:#8a90a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">→ ${dest}</div>
                 </div>
-                <div data-dep-ts="${dep.ts}" data-dep-iso="${isoStr}" style="font-size:11px;text-align:right;flex-shrink:0;">${fmtDepAt(isoStr, now)}</div>
+                <div data-dep-ts="${dep.ts}" data-dep-iso="${isoStr}" style="font-size:11px;text-align:right;flex-shrink:0;">${fmtDepAt(isoStr, nowMs)}</div>
             </div>`;
         }).join('');
         el.innerHTML = header + rows;
         _startDepInterval(containerId);
     } catch(e) {
-        const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains passages</div>';
+        console.error('loadNextDepartures:', e);
         el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
     }
 }
