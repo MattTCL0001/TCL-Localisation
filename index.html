@@ -898,7 +898,7 @@ async function showLineTrace(lineCode) {
                 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(mm);
                 L.marker([lat, lon]).addTo(mm);
             }, 80);
-            if (stopId) loadNextDepartures(stopId, `deps-${stopId}`);
+            if (stopId) loadNextDepartures(stopId, `deps-${stopId}`, lat, lon);
         });
         bounds.push([lat, lon]);
     });
@@ -1064,7 +1064,39 @@ function _startDepInterval(containerId) {
     }, 1000);
 }
 
-async function loadNextDepartures(stopId, containerId) {
+// ===== UTILITAIRE DISTANCE =====
+function haversineMeters(lat1, lon1, lat2, lon2) {
+    const R = 6371000;
+    const dLat = (lat2 - lat1) * Math.PI / 180;
+    const dLon = (lon2 - lon1) * Math.PI / 180;
+    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+}
+
+// Cherche le véhicule le plus proche d'un arrêt pour une ligne donnée
+function findNearestVehicle(lineRemapped, stopLat, stopLon, maxMeters = 1500) {
+    let best = null, bestDist = Infinity;
+    for (const [, e] of busMarkers) {
+        const eRemapped = getNewLineNumber(e.line);
+        if (eRemapped !== lineRemapped && e.line !== lineRemapped) continue;
+        const pos = e.marker.getLatLng();
+        const dist = haversineMeters(stopLat, stopLon, pos.lat, pos.lng);
+        if (dist < maxMeters && dist < bestDist) {
+            bestDist = dist;
+            best = { marker: e.marker, dist, line: e.line };
+        }
+    }
+    return best ? { ...best } : null;
+}
+
+// Vitesse estimée selon le type de ligne (km/h → m/s)
+function estimatedSpeedMs(lineRemapped) {
+    const type = getLineType(lineRemapped);
+    const kmh = type === 'tram' ? 25 : type === 'metro' ? 35 : type === 'navgone' ? 15 : 18;
+    return kmh / 3.6;
+}
+
+async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
     if (!stopId) return;
     await new Promise(r => setTimeout(r, 0));
     const el = document.getElementById(containerId);
@@ -1080,25 +1112,102 @@ async function loadNextDepartures(stopId, containerId) {
             return;
         }
         const nowMs = Date.now();
-        const rows = deps.slice(0, 4).map((dep, i) => {
-            const lineImg = lineImgHtml(getNewLineNumber(dep.line), '18px');
+
+        const rows = deps.slice(0, 5).map((dep, i) => {
+            const lineRemapped = getNewLineNumber(dep.line);
+            const lineImg = lineImgHtml(lineRemapped, '18px');
             const dest    = dep.dest_name || dep.dest_id || '—';
             const isoStr  = dep.expected || dep.aimed || '';
-            return `<div data-dep-row="${i}" style="display:flex;align-items:center;gap:8px;padding:4px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
-                <div style="flex-shrink:0;">${lineImg}</div>
-                <div style="flex:1;min-width:0;">
-                    <div style="font-size:10px;color:#8a90a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">→ ${dest}</div>
+
+            // Détection véhicule proche
+            let detectedHtml = '';
+            let timeDisplay;
+            if (stopLat && stopLon) {
+                const nearest = findNearestVehicle(lineRemapped, stopLat, stopLon);
+                if (nearest) {
+                    const speedMs = estimatedSpeedMs(lineRemapped);
+                    const estSec  = Math.round(nearest.dist / speedMs);
+                    const estMin  = Math.floor(estSec / 60);
+                    const estSecR = estSec % 60;
+                    const distStr = nearest.dist < 1000
+                        ? `${Math.round(nearest.dist)} m`
+                        : `${(nearest.dist/1000).toFixed(1)} km`;
+
+                    if (estSec <= 30) {
+                        timeDisplay = `<span style="color:#4dff88;font-weight:700;">à quai</span>`;
+                    } else if (estMin < 60) {
+                        timeDisplay = `<span style="color:#edf0f8;font-weight:700;">${estMin} min</span>${estSecR>0?`<span style="color:#4a4f6a;font-size:10px;"> ${estSecR}s</span>`:''}`;
+                    } else {
+                        timeDisplay = fmtDepAt(isoStr, nowMs);
+                    }
+
+                    detectedHtml = `<div style="display:flex;align-items:center;gap:4px;margin-top:2px;">
+                        <span style="width:6px;height:6px;border-radius:50%;background:#4dff88;display:inline-block;flex-shrink:0;animation:blink 1.2s ease-in-out infinite;"></span>
+                        <span style="font-size:9px;color:#4dff88;">Détecté · ${distStr}</span>
+                    </div>`;
+                } else {
+                    timeDisplay = fmtDepAt(isoStr, nowMs);
+                }
+            } else {
+                timeDisplay = fmtDepAt(isoStr, nowMs);
+            }
+
+            // Bouton pour voir les prochains arrêts du véhicule (via vehicleId si dispo)
+            const vehicleId = dep.vehicle_id || dep.vehicleRef || null;
+            const journeyBtnId = `jbtn-${containerId}-${i}`;
+            const journeyDivId = `jdiv-${containerId}-${i}`;
+            const journeyBtn = vehicleId
+                ? `<button id="${journeyBtnId}" onclick="toggleVehicleJourney('${vehicleId}','${journeyDivId}','${journeyBtnId}')"
+                    style="font-size:9px;color:#4a4f6a;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;margin-top:3px;">
+                    ▶ Prochains arrêts
+                  </button>
+                  <div id="${journeyDivId}" style="display:none;margin-top:6px;"></div>`
+                : '';
+
+            return `<div data-dep-row="${i}" style="padding:5px 0;border-bottom:1px solid rgba(255,255,255,0.04);">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="flex-shrink:0;">${lineImg}</div>
+                    <div style="flex:1;min-width:0;">
+                        <div style="font-size:10px;color:#8a90a8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">→ ${dest}</div>
+                        ${detectedHtml}
+                        ${journeyBtn}
+                    </div>
+                    <div data-dep-ts="${dep.ts}" data-dep-iso="${isoStr}" style="font-size:11px;text-align:right;flex-shrink:0;">${timeDisplay}</div>
                 </div>
-                <div data-dep-ts="${dep.ts}" data-dep-iso="${isoStr}" style="font-size:11px;text-align:right;flex-shrink:0;">${fmtDepAt(isoStr, nowMs)}</div>
             </div>`;
         }).join('');
+
         el.innerHTML = header + rows;
+
+        // Inject CSS blink animation once
+        if (!document.getElementById('blink-style')) {
+            const s = document.createElement('style');
+            s.id = 'blink-style';
+            s.textContent = '@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}';
+            document.head.appendChild(s);
+        }
+
         _startDepInterval(containerId);
     } catch(e) {
         console.error('loadNextDepartures:', e);
         el.innerHTML = header + '<div style="font-size:11px;color:#4a4f6a;text-align:center;padding:4px 0;">Indisponible</div>';
     }
 }
+
+window.toggleVehicleJourney = async function(vehicleId, divId, btnId) {
+    const div = document.getElementById(divId);
+    const btn = document.getElementById(btnId);
+    if (!div) return;
+    if (div.style.display !== 'none') {
+        div.style.display = 'none';
+        if (btn) btn.textContent = '▶ Prochains arrêts';
+        return;
+    }
+    div.style.display = 'block';
+    if (btn) btn.textContent = '▼ Masquer';
+    div.innerHTML = '<div style="font-size:10px;color:#4a4f6a;padding:4px 0;">Chargement...</div>';
+    await loadVehicleJourney(vehicleId, divId);
+};
 
 async function loadVehicleJourney(vehicleId, containerId) {
     const el = document.getElementById(containerId);
@@ -1210,7 +1319,7 @@ window.selectStopOnMap = async function(el) {
     }, 80);
 
     // FIX Bug 2 : utilise safeId reconstruit plutôt que la variable non définie
-    if (id) { loadNextDepartures(id, `deps-${safeId}`); }
+    if (id) { loadNextDepartures(id, `deps-${safeId}`, lat, lon); }
 }; // FIX Bug 3 : accolade fermante de la fonction
 
 // ===== LIGNES =====
@@ -1370,7 +1479,7 @@ async function updateBus() {
             else if (line.startsWith('TB'))          modeFile = 'Mode_TB.svg';
             else if (line.startsWith('RX'))          modeFile = 'RX.svg';
             else if (line.startsWith('T'))           modeFile = 'Mode_T.svg';
-            else if (line.startsWith('7601'))        modeFile = 'Mode_NAVI.svg';
+            else if (line.startsWith('7601') || line.toUpperCase().startsWith('NAVI')) modeFile = 'Mode_NAVI.svg';
 
             const dest    = getStopName(bus.dest_code) || bus.dest_name || '';
             const delayOk = bus.delay === '0s';
