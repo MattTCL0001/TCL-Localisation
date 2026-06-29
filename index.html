@@ -525,24 +525,24 @@
                 Tous les arrêts
                 <span id="search-stats" class="search-stats" style="float:right;padding:0;">0/0</span>
             </div>
-            <div id="stops-list" class="info-list"><div class="info-empty">⚠️ Chargement...</div></div>
+            <div id="stops-list" class="info-list">'<div class="info-empty"><i class="ti ti-loader" style="font-size:16px;vertical-align:-3px;"></i> Chargement...</div>'</div>
         </div>
 
         <div id="lines-pane" class="tab-pane">
             <div class="filter-bar">
-                <label><input type="checkbox" id="filter-metro"   checked onchange="filterLines()"> 🚇 Métro</label>
-                <label><input type="checkbox" id="filter-tram"    checked onchange="filterLines()"> 🚊 Tramway</label>
-                <label><input type="checkbox" id="filter-tb"      checked onchange="filterLines()"> 🚋 Trambus</label>
-                <label><input type="checkbox" id="filter-funi"    checked onchange="filterLines()"> 🚠 Funiculaire</label>
-                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> ⛴️ Navgône</label>
-                <label><input type="checkbox" id="filter-chrono"  checked onchange="filterLines()"> 🔵 Chrono</label>
-                <label><input type="checkbox" id="filter-bus"     checked onchange="filterLines()"> 🚌 Bus</label>
-                <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> 🌴 Navette</label>
-                <label><input type="checkbox" id="filter-pl"      checked onchange="filterLines()"> 🌕 Pleine Lune</label>
-                <label><input type="checkbox" id="filter-jd"      checked onchange="filterLines()"> 📚 Junior Direct</label>
+                <label><input type="checkbox" id="filter-metro"   checked onchange="filterLines()"> <i class="ti ti-train"></i> Métro</label>
+                <label><input type="checkbox" id="filter-tram"    checked onchange="filterLines()"> <i class="ti ti-tram"></i> Tramway</label>
+                <label><input type="checkbox" id="filter-tb"      checked onchange="filterLines()"> <i class="ti ti-trolleybus"></i> Trambus</label>
+                <label><input type="checkbox" id="filter-funi"    checked onchange="filterLines()"> <i class="ti ti-cable-car"></i> Funiculaire</label>
+                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <i class="ti ti-boat"></i> Navigône</label>
+                <label><input type="checkbox" id="filter-chrono"  checked onchange="filterLines()"> <i class="ti ti-circle-filled"></i> Chrono</label>
+                <label><input type="checkbox" id="filter-bus"     checked onchange="filterLines()"> <i class="ti ti-bus"></i> Bus</label>
+                <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <i class="ti ti-flag"></i> Navette</label>
+                <label><input type="checkbox" id="filter-pl"      checked onchange="filterLines()"> <i class="ti ti-moon"></i> Pleine Lune</label>
+                <label><input type="checkbox" id="filter-jd"      checked onchange="filterLines()"> <i class="ti ti-school"></i> Junior Direct</label>
             </div>
             <div class="tab-header">Toutes les lignes</div>
-            <div id="lines-list" class="info-list"><div class="info-empty">⚠️ Chargement...</div></div>
+            <div id="lines-list" class="info-list">'<div class="info-empty"><i class="ti ti-loader" style="font-size:16px;vertical-align:-3px;"></i> Chargement...</div>'</div>
         </div>
 
         <div id="velov-pane" class="tab-pane">
@@ -554,17 +554,17 @@
                 Stations Vélo'v
                 <span id="velov-stats" class="search-stats" style="float:right;padding:0;">0/0</span>
             </div>
-            <div id="velov-list" class="info-list"><div class="info-empty">⚠️ Chargement...</div></div>
+            <div id="velov-list" class="info-list">'<div class="info-empty"><i class="ti ti-loader" style="font-size:16px;vertical-align:-3px;"></i> Chargement...</div>'</div>
         </div>
 
         <div id="credits-pane" class="tab-pane">
             <div class="tab-header">À propos</div>
             <div class="credits-content">
-                <div class="credits-section"><h3>🚍 TCL Localisation</h3><p>Application de localisation en temps réel des transports en commun lyonnais.</p></div>
-                <div class="credits-section"><h3>📡 Sources de données</h3><p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a></p></div>
-                <div class="credits-section"><h3>🗺️ Cartographie</h3><p>© <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors © <a href="https://carto.com/" target="_blank">CARTO</a></p></div>
-                <div class="credits-section"><h3>👨‍💻 Développeurs et Contributeurs</h3><p>Matt TCL, NDR, S1ba</p></div>
-                <div class="credits-section"><h3>👨‍💻 Développement</h3><p>Version BETA – v1 officielle prévue pour Septembre 2026</p></div>
+                <div class="credits-section"><h3><i class="ti ti-map-2" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>TCL Localisation</h3><p>Application de localisation en temps réel des transports en commun lyonnais.</p></div>
+                <div class="credits-section"><h3><i class="ti ti-satellite" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>Sources de données</h3><p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a></p></div>
+                <div class="credits-section"><h3><i class="ti ti-map" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>Cartographie</h3><p>© <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors © <a href="https://carto.com/" target="_blank">CARTO</a></p></div>
+                <div class="credits-section"><h3><i class="ti ti-users" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>Développeurs et Contributeurs</h3><p>Matt TCL, NDR, S1ba</p></div>
+                <div class="credits-section"><h3><i class="ti ti-code" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>Développement</h3><p>Version BETA – v1 officielle prévue pour Septembre 2026</p></div>
             </div>
         </div>
 
@@ -991,30 +991,34 @@ function renderStopList(term = '') {
     document.getElementById('search-stats').textContent = `${stops.length}/${allStops.length}`;
 
     if (!stops.length) {
-        document.getElementById('stops-list').innerHTML = '<div class="info-empty">🔍 Aucun arrêt trouvé</div>';
+        document.getElementById('stops-list').innerHTML = '<div class="info-empty"><i class="ti ti-search" style="font-size:16px;vertical-align:-3px;"></i> Aucun arrêt trouvé</div>';
         return;
     }
 
     const chunk = stops.slice(0, 300);
     const html = chunk.map(s => {
         const lines = extractLines(s.desserte);
-        const icon  = s.desserte?.match(/T[1-7]/) ? '🚊' : (s.desserte?.match(/^[ABCD]$/) ? '🚇' : '🚌');
+        const icon = s.desserte?.match(/T[1-7]/)
+            ? '<i class="ti ti-tram"  style="font-size:20px;"></i>'
+            : (s.desserte?.match(/^[ABCD]$/)
+                ? '<i class="ti ti-train" style="font-size:20px;"></i>'
+                : '<i class="ti ti-bus"   style="font-size:20px;"></i>');
         return `<div class="info-item" data-lat="${s.lat}" data-lon="${s.lon}" data-id="${s.id||''}" data-nom="${(s.nom||'').replace(/"/g,'&quot;')}" data-commune="${(s.commune||'').replace(/"/g,'&quot;')}" data-zone="${s.zone||''}">
             <div class="info-summary" onclick="selectStopOnMap(this)">
                 <div class="info-line-badge" style="font-size:18px;">${icon}</div>
                 <div class="info-summary-text">
-                    <div class="info-titre">${highlightText(s.nom||'Arrêt', term)}${s.pmr?'<span class="stop-pmr-badge">♿</span>':''}</div>
+                    <div class="info-titre">${highlightText(s.nom||'Arrêt', term)}${s.pmr?'<span class="stop-pmr-badge"><i class="ti ti-wheelchair" style="font-size:10px;"></i></span>':''}</div>
                     <div class="stop-commune">${highlightText(s.commune||'', term)} • Zone ${s.zone||'N/A'}</div>
                     <div class="stop-lines">${renderLineSvgs(lines)}</div>
                 </div>
                 <span class="info-chevron" onclick="event.stopPropagation();toggleInfoItem(this)">▼</span>
             </div>
             <div class="info-detail">
-                <strong>📍 Adresse :</strong> ${s.adresse||'Non renseignée'}<br>
-                <strong>🚏 Lignes :</strong> ${s.desserte||'Aucune'}<br>
-                <strong>♿ PMR :</strong> ${s.pmr?'✅ Accessible':'❌ Non accessible'}<br>
-                <strong>🏙️ Commune :</strong> ${s.commune||''}<br>
-                <strong>🔢 Zone :</strong> ${s.zone||'N/A'}
+                <strong><i class="ti ti-map-pin"></i> Adresse :</strong> ${s.adresse||'Non renseignée'}<br>
+                <strong><i class="ti ti-bus-stop"></i> Lignes :</strong> ${s.desserte||'Aucune'}<br>
+                <strong><i class="ti ti-wheelchair"></i> PMR :</strong> ${s.pmr?'✅ Accessible':'❌ Non accessible'}<br>
+                <strong><i class="ti ti-building-community"></i> Commune :</strong> ${s.commune||''}<br>
+                <strong><i class="ti ti-hash"></i> Zone :</strong> ${s.zone||'N/A'}
             </div>
         </div>`;
     }).join('');
@@ -1266,7 +1270,7 @@ async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
         <div id="${mmId}" style="width:240px;height:110px;border-radius:10px 10px 0 0;background:#111;overflow:hidden;"></div>
         <div style="background:rgba(14,16,28,0.97);border-radius:0 0 14px 14px;border:1px solid rgba(255,255,255,0.09);border-top:none;">
             <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.07);">
-                <div style="font-size:14px;font-weight:700;color:#edf0f8;margin-bottom:5px;">📍 ${nom}</div>
+                <div style="font-size:14px;font-weight:700;color:#edf0f8;margin-bottom:5px;display:flex;align-items:center;gap:6px;"><i class="ti ti-map-pin" style="color:#e2001a;font-size:16px;"></i>${nom}</div>
                 <div style="font-size:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">${metaHtml}</div>
             </div>
             <div id="deps-${safeId}" style="padding:8px 14px 10px;">
@@ -1340,19 +1344,19 @@ function extractAllLines() {
 }
 
 const TYPE_META = {
-    metro:      { icon:'🚇', name:'Métro',         color:'#E2001A' },
-    tram:       { icon:'🚊', name:'Tramway',        color:'#662483' },
-    tb:         { icon:'🚋', name:'Trambus',        color:'#fdc300' },
-    funiculaire:{ icon:'🚠', name:'Funiculaire',    color:'#6da432' },
-    navgone:    { icon:'⛴️', name:'Navgône',        color:'#00A3A6' },
-    chrono:     { icon:'⚫', name:'Chrono',         color:'#6E8997' },
-    bus:        { icon:'🚌', name:'Bus',            color:'#E2001A' },
-    navette:    { icon:'🌴', name:'Navette',        color:'#EC6608' },
-    pl:         { icon:'🌕', name:'Pleine Lune',    color:'#992358' },
-    jd:         { icon:'📚', name:'Junior Direct',  color:'#17297B' },
-    other:      { icon:'📌', name:'Autres',         color:'#888'    }
+    metro:      { icon:'<i class="ti ti-train"     style="font-size:14px;"></i>', name:'Métro',         color:'#E2001A' },
+    tram:       { icon:'<i class="ti ti-tram"      style="font-size:14px;"></i>', name:'Tramway',        color:'#662483' },
+    tb:         { icon:'<i class="ti ti-trolleybus"style="font-size:14px;"></i>', name:'Trambus',        color:'#fdc300' },
+    funiculaire:{ icon:'<i class="ti ti-train-2"   style="font-size:14px;"></i>', name:'Funiculaire',    color:'#6da432' },
+    navgone:    { icon:'<i class="ti ti-boat"      style="font-size:14px;"></i>', name:'Navigône',        color:'#00A3A6' },
+    chrono:     { icon:'<i class="ti ti-circle-filled" style="font-size:14px;"></i>', name:'Chrono',     color:'#6E8997' },
+    bus:        { icon:'<i class="ti ti-bus"       style="font-size:14px;"></i>', name:'Bus',            color:'#E2001A' },
+    navette:    { icon:'<i class="ti ti-sailboat"  style="font-size:14px;"></i>', name:'Navette',        color:'#EC6608' },
+    pl:         { icon:'<i class="ti ti-moon"      style="font-size:14px;"></i>', name:'Pleine Lune',    color:'#992358' },
+    jd:         { icon:'<i class="ti ti-school"    style="font-size:14px;"></i>', name:'Junior Direct',  color:'#17297B' },
+    other:      { icon:'<i class="ti ti-map-pin"   style="font-size:14px;"></i>', name:'Autres',         color:'#888'    }
 };
-
+    
 window.filterLines = () => {
     const ck = id => document.getElementById(`filter-${id}`)?.checked;
     const filters = {
@@ -1374,7 +1378,7 @@ window.filterLines = () => {
             </div>
         </div>`;
     }
-    document.getElementById('lines-list').innerHTML = html || '<div class="info-empty">📋 Aucune ligne</div>';
+    document.getElementById('lines-list').innerHTML = html || '<div class="info-empty"><i class="ti ti-list" style="font-size:16px;vertical-align:-3px;"></i> Aucune ligne</div>';
 };
 
 window.searchLineInStops = async function(line) {
@@ -1541,8 +1545,8 @@ async function updateBus() {
                         <div style="font-size:14px;font-weight:600;color:#edf0f8;margin-bottom:4px;">${busSnap.dest}</div>
                     </div>
                     <div style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
-                        <div style="font-size:11px;color:#8a90a8;">🚌 ${getVehicleType(busSnap)}</div>
-                        <div style="font-size:10px;color:#4a4f6a;font-family:monospace;">🔒 ${busSnap.id}</div>
+                        <div style="font-size:11px;color:#8a90a8;"><i class="ti ti-bus" style="font-size:12px;margin-right:4px;"></i>${getVehicleType(busSnap)}</div>
+                        <div style="font-size:10px;color:#4a4f6a;font-family:monospace;"><i class="ti ti-id" style="font-size:11px;margin-right:4px;"></i>${busSnap.id}</div>
                     </div>
                     <div id="${journeyId}" style="padding:8px 14px 10px;">
                         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains arrêts</div>
@@ -1831,7 +1835,7 @@ async function updateTraffic() {
         const data  = await apiFetch('api/traffic');
         const items = data.values || [];
         const list  = document.getElementById('traffic-list');
-        if (!items.length) { list.innerHTML = '<div class="info-empty">✅ Aucune perturbation</div>'; return; }
+        if (!items.length) { list.innerHTML = '<div class="info-empty"><i class="ti ti-circle-check" style="color:#4dff88;font-size:16px;vertical-align:-3px;"></i> Aucune perturbation</div>'; return; }
 
         const grouped = new Map();
         items.forEach(a => {
@@ -1846,8 +1850,11 @@ async function updateTraffic() {
         list.innerHTML = [...grouped.values()].map(a => {
             const isP = a.type?.toLowerCase().includes('perturbation');
             const isT = a.cause?.toLowerCase().includes('travaux');
-            const icon = isP ? '⚠️' : (isT ? '🛠️' : '🚧');
-            const bg   = isP ? 'rgba(255,77,77,0.15)'   : (isT ? 'rgba(255,184,77,0.15)' : 'rgba(0,210,255,0.15)');
+            const iconI = isP
+            ? '<i class="ti ti-alert-triangle" style="font-size:18px;color:#ff4d4d;"></i>'
+            : (isT
+                ? '<i class="ti ti-tools"        style="font-size:18px;color:#ffb84d;"></i>'
+                : '<i class="ti ti-barrier-block"style="font-size:18px;color:#00d2ff;"></i>');
             const bdr  = isP ? 'rgba(255,77,77,0.3)'    : (isT ? 'rgba(255,184,77,0.3)'  : 'rgba(0,210,255,0.3)');
             const linesHtml = [...a.lines].map(l => lineImgHtml(l, '28px')).join('');
             return `<div class="info-item">
@@ -1872,12 +1879,16 @@ async function updateAccessibility() {
         const data  = await apiFetch('api/accessibility');
         const items = data.values || [];
         const list  = document.getElementById('accessibility-list');
-        if (!items.length) { list.innerHTML = '<div class="info-empty">♿ Aucune alerte</div>'; return; }
+        if (!items.length) { list.innerHTML = '<div class="info-empty"><i class="ti ti-wheelchair" style="color:#4dff88;font-size:16px;vertical-align:-3px;"></i> Aucune alerte</div>'; return; }
 
         list.innerHTML = items.map(a => {
             const isAsc = a.type_equipement === 'ASCENSEUR';
             const isEsc = a.type_equipement === 'ESCALATOR';
-            const icon  = isAsc ? '🛗' : (isEsc ? '🪜' : '♿');
+            const icon = isAsc
+            ? '<i class="ti ti-elevator" style="font-size:18px;"></i>'
+            : (isEsc
+                ? '<i class="ti ti-escalator-up" style="font-size:18px;"></i>'
+                : '<i class="ti ti-wheelchair"   style="font-size:18px;"></i>');
             const bg    = a.cause==='Panne' ? 'rgba(255,77,77,0.15)' : 'rgba(255,184,77,0.15)';
             const bdr   = a.cause==='Panne' ? 'rgba(255,77,77,0.3)'  : 'rgba(255,184,77,0.3)';
             const debut = a.debut_indispo ? new Date(a.debut_indispo).toLocaleDateString('fr-FR') : '';
@@ -1906,7 +1917,7 @@ async function updateStopsData() {
         renderStopList('');
     } catch(e) {
         console.error('Arrêts:', e);
-        document.getElementById('stops-list').innerHTML = '<div class="info-empty">❌ Erreur de chargement</div>';
+        document.getElementById('stops-list').innerHTML = '<div class="info-empty"><i class="ti ti-alert-circle" style="font-size:16px;vertical-align:-3px;color:#ff4d4d;"></i> Erreur de chargement</div>';
     }
 }
 
@@ -1938,7 +1949,7 @@ function renderVelovList(term) {
     );
     stations.sort((a, b) => (a.name||'').localeCompare(b.name||''));
     document.getElementById('velov-stats').textContent = `${stations.length}/${allVelovStations.length}`;
-    if (!stations.length) { document.getElementById('velov-list').innerHTML = '<div class="info-empty">🔍 Aucune station trouvée</div>'; return; }
+    if (!stations.length) { document.getElementById('velov-list').innerHTML = '<div class="info-empty"><i class="ti ti-search" style="font-size:16px;vertical-align:-3px;"></i> Aucune station trouvée</div>'; return; }
 
     const shown = stations.slice(0, 300);
     const html = shown.map(s => {
@@ -1954,33 +1965,33 @@ function renderVelovList(term) {
 
         const velovTypeLine = (elec > 0 || meca > 0)
             ? `<div style="display:flex;gap:6px;margin-top:4px;">
-                ${elec>0?`<span style="font-size:10px;color:#00d2ff;">⚡ ${elec} élec</span>`:''}
-                ${meca>0?`<span style="font-size:10px;color:#8a90a8;">🔧 ${meca} méca</span>`:''}
+                ${elec>0?`<span style="font-size:10px;color:#00d2ff;"><i class="ti ti-bolt" style="font-size:11px;vertical-align:-1px;"></i> ${elec} élec</span>`:''}
+                ${meca>0?`<span style="font-size:10px;color:#8a90a8;"><i class="ti ti-tool" style="font-size:11px;vertical-align:-1px;"></i> ${meca} méca</span>`:''}
                </div>`
             : '';
 
         return `<div class="info-item" data-lat="${s.lat||''}" data-lon="${s.lng||''}" data-name="${(s.name||'').replace(/"/g,'&quot;')}" data-idx="${allVelovStations.indexOf(s)}">
             <div class="info-summary" onclick="selectVelovOnMap(this)">
-                <div class="info-line-badge" style="background:rgba(${rgb},0.12);border:1px solid rgba(${rgb},0.25);font-size:18px;">🚲</div>
+                <div class="info-line-badge" style="background:rgba(${rgb},0.12);border:1px solid rgba(${rgb},0.25);font-size:18px;"><i class="ti ti-bike"></i></div>
                 <div class="info-summary-text">
                     <div class="info-titre">${highlightText(s.name||'Station', term)} <span style="font-size:9px;color:${textColor};">${statusText}</span></div>
                     <div class="stop-commune">${highlightText(s.address||'', term)}</div>
                     <div style="display:flex;gap:12px;margin-top:4px;">
-                        <span style="font-size:11px;color:#4dff88;">🚲 ${bikes}</span>
-                        <span style="font-size:11px;color:#ffb84d;">🅿️ ${stands}</span>
-                        <span style="font-size:11px;color:var(--text-muted);">📊 ${total}</span>
+                        <span style="..."><i class="ti ti-bike" style="font-size:12px;"></i> ${bikes}</span>
+                        <span style="..."><i class="ti ti-parking" style="font-size:12px;"></i> ${stands}</span>
+                        <span style="..."><i class="ti ti-chart-bar" style="font-size:12px;"></i> ${total}</span>
                     </div>
                     ${velovTypeLine}
                 </div>
                 <span class="info-chevron" onclick="event.stopPropagation();toggleInfoItem(this)">▼</span>
             </div>
             <div class="info-detail">
-                <strong>📍</strong> ${s.address||'N/A'}<br>
-                <strong>🏙️</strong> ${s.commune||'N/A'}<br>
-                <strong>⚡ Élec :</strong> ${elec} · <strong>🔧 Méca :</strong> ${meca}<br>
-                <strong>💳</strong> ${s.banking?'CB acceptée':'Sans CB'}<br>
-                <strong>🟢</strong> ${s.status==='OPEN'?'Ouverte':'Fermée'}<br>
-                <strong>📅 Màj :</strong> ${s.last_update?new Date(s.last_update).toLocaleString('fr-FR'):'N/A'}
+                <strong><i class="ti ti-map-pin"  style="font-size:13px;"></i></strong> ${s.address||'N/A'}<br>
+                <strong><i class="ti ti-building-community"></i></strong> ${s.commune||'N/A'}<br>
+                <strong><i class="ti ti-bolt"></i> Élec :</strong> ${elec} · <strong><i class="ti ti-tool"></i> Méca :</strong> ${meca}<br>
+                <strong><i class="ti ti-credit-card"></i></strong> ${s.banking?'CB acceptée':'Sans CB'}<br>
+                <strong><i class="ti ti-circle-check"></i></strong> ${s.status==='OPEN'?'Ouverte':'Fermée'}<br>
+                <strong><i class="ti ti-calendar"></i> Màj :</strong> ${s.last_update?new Date(s.last_update).toLocaleString('fr-FR'):'N/A'}
             </div>
         </div>`;
     }).join('');
@@ -2029,13 +2040,13 @@ async function loadAgences() {
                 (a.adr||'').toUpperCase()
             ].filter(Boolean).join(' ');
             const cp = a.codepostal || '';
-            const facea = a.facea === true ? '✅ Oui' : (a.facea === false ? '❌ Non' : '—');
+            const facea = a.facea === true ? '<i class="ti ti-check" style="color:#4dff88;font-size:13px;vertical-align:-2px;"></i> Oui' : (a.facea === false ? '<i class="ti ti-x" style="color:#ff4d4d;font-size:13px;vertical-align:-2px;"></i> Non' : '—');
             const horaires = a.horaires || 'Non renseignés';
 
             const popup = `<div style="width:230px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
                 <div style="background:linear-gradient(135deg,rgba(226,0,26,0.25),rgba(226,0,26,0.08));padding:12px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <div style="width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;">🏢</div>
+                        <div style="width:32px;height:32px;background:var(--accent);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;"><i class="ti ti-building" style="font-size:17px;color:#fff;"></i></div>
                         <div>
                             <div style="font-size:13px;font-weight:700;color:#edf0f8;line-height:1.2;">${a.nom}</div>
                             <div style="font-size:10px;color:#8a90a8;margin-top:2px;">Agence commerciale TCL</div>
@@ -2044,18 +2055,18 @@ async function loadAgences() {
                 </div>
                 <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px;">
                     <div style="display:flex;align-items:flex-start;gap:8px;">
-                        <span style="font-size:13px;flex-shrink:0;">📍</span>
+                        <span style="font-size:13px;flex-shrink:0;"><i class="ti ti-map-pin"  style="font-size:13px;"></i></span>
                         <div>
                             <div style="font-size:12px;color:#edf0f8;">${adresse}</div>
                             <div style="font-size:11px;color:#8a90a8;">${cp}</div>
                         </div>
                     </div>
                     <div style="display:flex;align-items:center;gap:8px;">
-                        <span style="font-size:13px;">🪟</span>
+                        <span style="font-size:13px;"><i class="ti ti-window"   style="font-size:13px;"></i></span>
                         <span style="font-size:12px;color:#8a90a8;">Face à face : <span style="color:#edf0f8;">${facea}</span></span>
                     </div>
                     <div style="display:flex;align-items:flex-start;gap:8px;">
-                        <span style="font-size:13px;flex-shrink:0;">🕐</span>
+                        <span style="font-size:13px;flex-shrink:0;"><i class="ti ti-clock"    style="font-size:13px;"></i></span>
                         <span style="font-size:12px;color:#8a90a8;">${horaires}</span>
                     </div>
                 </div>
@@ -2064,7 +2075,7 @@ async function loadAgences() {
             L.marker([a.lat, a.lon], {
                 icon: L.divIcon({
                     html: `<div style="position:relative;width:32px;height:32px;">
-                        <div style="width:32px;height:32px;background:#e2001a;border-radius:8px;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 2px 8px rgba(226,0,26,0.5);">🏢</div>
+                        <div style="width:32px;height:32px;background:#e2001a;border-radius:8px;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 2px 8px rgba(226,0,26,0.5);"><i class="ti ti-building" style="font-size:16px;color:#fff;"></i></div>
                     </div>`,
                     className: '',
                     iconSize: [32, 32],
