@@ -2128,7 +2128,9 @@ async function loadAgences() {
             L.marker([a.lat, a.lon], {
                 icon: L.divIcon({
                     html: `<div style="position:relative;width:32px;height:32px;">
-                        <div style="width:32px;height:32px;background:#e2001a;border-radius:8px;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;font-size:17px;box-shadow:0 2px 8px rgba(226,0,26,0.5);"><img src="Agence.svg" class="svg-ic" style="width:14px;height:14px;"></i></div>
+                        <div style="width:32px;height:32px;background:linear-gradient(135deg, #ff4d4d, #e2001a);border-radius:8px;border:2px solid rgba(255,255,255,0.25);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(226,0,26,0.5);">
+                            <img src="Agence.svg" style="width:18px;height:18px;">
+                        </div>
                     </div>`,
                     className: '',
                     iconSize: [32, 32],
