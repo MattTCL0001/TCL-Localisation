@@ -377,6 +377,7 @@
             font-size: 12px;
             font-family: inherit;
         }
+        .search-bar label { display: flex; align-items: center; gap: 6px; flex: 1; }
         .search-stats { font-size: 10px; color: var(--text-muted); padding: 5px 12px; }
 
         .filter-bar {
@@ -472,21 +473,23 @@
             background: rgba(255,255,255,0.15);
             transform: scale(1.1);
         }
+
+        .svg-ic { filter: brightness(0) invert(1); vertical-align: -2px; }
     </style>
 </head>
 <body>
 <div class="app-container">
     <div class="app-header">
         <div class="logo-badge">
-            <img src="logo.svg" style="object-fit:contain;display:block;" onerror="this.outerHTML='<i class=\'ti ti-map-2\' style=\'color:var(--accent);font-size:22px;\'></i>'">
+            <img src="logo.svg" style="object-fit:contain;display:block;" onerror="this.outerHTML='<img src=\'SVG_Icons/lignes.svg\' class=\'svg-ic\' style=\'width:22px;height:22px;\'>'">
         </div>
         <nav class="header-tabs" role="tablist">
-            <button class="header-tab active" data-tab="traffic"><img src="SVG_Icons/trafic.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Infos trafic</button>
-            <button class="header-tab" data-tab="accessibility"><img src="SVG_Icons/PMR.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Accessibilité</button>
-            <button class="header-tab" data-tab="stops"><img src="SVG_Icons/arrêt.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Arrêts</button>
-            <button class="header-tab" data-tab="lines"><img src="SVG_Icons/lignes.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Lignes</button>
-            <button class="header-tab" data-tab="velov"><img src="SVG_Icons/velo.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Vélo'v</button>
-            <button class="header-tab" data-tab="credits"><img src="SVG_Icons/id.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Crédits</button>
+            <button class="header-tab active" data-tab="traffic"><img src="SVG_Icons/trafic.svg" class="svg-ic" style="width:14px;height:14px;"> Infos trafic</button>
+            <button class="header-tab" data-tab="accessibility"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:14px;height:14px;"> Accessibilité</button>
+            <button class="header-tab" data-tab="stops"><img src="SVG_Icons/arrêt.svg" class="svg-ic" style="width:14px;height:14px;"> Arrêts</button>
+            <button class="header-tab" data-tab="lines"><img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:14px;height:14px;"> Lignes</button>
+            <button class="header-tab" data-tab="velov"><img src="SVG_Icons/velo.svg" class="svg-ic" style="width:14px;height:14px;"> Vélo'v</button>
+            <button class="header-tab" data-tab="credits"><img src="SVG_Icons/id.svg" class="svg-ic" style="width:14px;height:14px;"> Crédits</button>
         </nav>
     </div>
     <div class="map-container">
@@ -494,7 +497,7 @@
         <div id="bus-filter-banner">
             <span id="bus-filter-label">Véhicules filtrés · </span>
             <button id="bus-filter-clear" onclick="clearAllFilters()">
-                <img src="SVG_Icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);" alt=""> 
+                <img src="SVG_Icons/refusé.svg" class="svg-ic" style="width:14px;height:14px;" alt=""> 
                 Retirer le filtre
             </button>
         </div>
@@ -518,7 +521,7 @@
         <div id="stops-pane" class="tab-pane">
             <div class="search-bar">
                 <label>
-                    <img src="SVG_Icons/loupe.svg" style="width:16px;height:16px;vertical-align:-3px;filter:brightness(0) invert(1);">
+                    <img src="SVG_Icons/loupe.svg" class="svg-ic" style="width:16px;height:16px;">
                     <input type="text" id="stop-search" placeholder="Rechercher..." oninput="filterStops()">
                 </label>
                 <button onclick="filterStops()">Rechercher</button>
@@ -526,7 +529,7 @@
             <div id="stop-filter-banner">
                 <span id="stop-filter-label">Arrêts · </span>
                     <button id="stop-filter-clear" onclick="clearAllFilters()">
-                        <img src="SVG_Icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);" alt=""> 
+                        <img src="SVG_Icons/refusé.svg" class="svg-ic" style="width:14px;height:14px;" alt=""> 
                         Retirer le filtre
                     </button>
             </div>
@@ -534,45 +537,48 @@
                 Tous les arrêts
                 <span id="search-stats" class="search-stats" style="float:right;padding:0;">0/0</span>
             </div>
-            <div id="stops-list" class="info-list">'<div class="info-empty"><i class="ti ti-loader" style="font-size:16px;vertical-align:-3px;"></i> Chargement...</div>'</div>
+            <div id="stops-list" class="info-list"><div class="info-empty"><img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:16px;height:16px;"> Chargement...</div></div>
         </div>
 
         <div id="lines-pane" class="tab-pane">
             <div class="filter-bar">
-                <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="SVG_Icons/metro.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Métro</label>
-                <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="SVG_Icons/tramway.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Tramway</label>
-                <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="SVG_Icons/trolleybus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> TramBus</label>
-                <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="SVG_Icons/funicular.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Funiculaire</label>
-                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="SVG_Icons/navigone.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Navigône</label>
-                <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="SVG_Icons/chrono.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Chrono</label>
-                <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="SVG_Icons/bus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Bus</label>
-                <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="SVG_Icons/navette.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Navette</label>
-                <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="SVG_Icons/pleine_lune.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Pleine Lune</label>
-                <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="SVG_Icons/JD.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Junior Direct</label>
+                <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="SVG_Icons/metro.svg" class="svg-ic" style="width:14px;height:14px;"> Métro</label>
+                <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="SVG_Icons/tramway.svg" class="svg-ic" style="width:14px;height:14px;"> Tramway</label>
+                <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="SVG_Icons/trolleybus.svg" class="svg-ic" style="width:14px;height:14px;"> TramBus</label>
+                <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="SVG_Icons/funicular.svg" class="svg-ic" style="width:14px;height:14px;"> Funiculaire</label>
+                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="SVG_Icons/navigone.svg" class="svg-ic" style="width:14px;height:14px;"> Navigône</label>
+                <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="SVG_Icons/chrono.svg" class="svg-ic" style="width:14px;height:14px;"> Chrono</label>
+                <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="SVG_Icons/bus.svg" class="svg-ic" style="width:14px;height:14px;"> Bus</label>
+                <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="SVG_Icons/navette.svg" class="svg-ic" style="width:14px;height:14px;"> Navette</label>
+                <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="SVG_Icons/pleine_lune.svg" class="svg-ic" style="width:14px;height:14px;"> Pleine Lune</label>
+                <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="SVG_Icons/JD.svg" class="svg-ic" style="width:14px;height:14px;"> Junior Direct</label>
             </div>
             <div class="tab-header">Toutes les lignes</div>
-            <div id="lines-list" class="info-list">'<div class="info-empty"><i class="ti ti-loader" style="font-size:16px;vertical-align:-3px;"></i> Chargement...</div>'</div>
+            <div id="lines-list" class="info-list"><div class="info-empty"><img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:16px;height:16px;"> Chargement...</div></div>
         </div>
 
         <div id="velov-pane" class="tab-pane">
             <div class="search-bar">
-                <input type="text" id="velov-search" placeholder="🔍 Adresse, nom ou numéro..." oninput="filterVelovStations()">
+                <label>
+                    <img src="SVG_Icons/loupe.svg" class="svg-ic" style="width:16px;height:16px;">
+                    <input type="text" id="velov-search" placeholder="Adresse, nom ou numéro..." oninput="filterVelovStations()">
+                </label>
                 <button onclick="filterVelovStations()">Rechercher</button>
             </div>
             <div class="tab-header">
                 Stations Vélo'v
                 <span id="velov-stats" class="search-stats" style="float:right;padding:0;">0/0</span>
             </div>
-            <div id="velov-list" class="info-list">'<div class="info-empty"><i class="ti ti-loader" style="font-size:16px;vertical-align:-3px;"></i> Chargement...</div>'</div>
+            <div id="velov-list" class="info-list"><div class="info-empty"><img src="SVG_Icons/velo.svg" class="svg-ic" style="width:16px;height:16px;"> Chargement...</div></div>
         </div>
 
         <div id="credits-pane" class="tab-pane">
             <div class="tab-header">À propos</div>
             <div class="credits-content">
-                <div class="credits-section"><h3><i class="ti ti-map-2" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>TCL Localisation</h3><p>Application de localisation en temps réel des transports en commun lyonnais.</p></div>
+                <div class="credits-section"><h3><img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:15px;height:15px;margin-right:6px;filter:invert(13%) sepia(94%) saturate(6000%) hue-rotate(350deg) brightness(95%);">TCL Localisation</h3><p>Application de localisation en temps réel des transports en commun lyonnais.</p></div>
                 <div class="credits-section"><h3><i class="ti ti-satellite" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>Sources de données</h3><p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a></p></div>
                 <div class="credits-section"><h3><i class="ti ti-map" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>Cartographie</h3><p>© <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors © <a href="https://carto.com/" target="_blank">CARTO</a></p></div>
-                <div class="credits-section"><h3><i class="ti ti-users" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>Développeurs et Contributeurs</h3><p>Matt TCL, NDR, S1ba</p></div>
+                <div class="credits-section"><h3><img src="SVG_Icons/id.svg" class="svg-ic" style="width:15px;height:15px;margin-right:6px;filter:invert(13%) sepia(94%) saturate(6000%) hue-rotate(350deg) brightness(95%);">Développeurs et Contributeurs</h3><p>Matt TCL, NDR, S1ba</p></div>
                 <div class="credits-section"><h3><i class="ti ti-code" style="color:var(--accent);font-size:15px;vertical-align:-2px;margin-right:6px;"></i>Développement</h3><p>Version BETA – v1 officielle prévue pour Septembre 2026</p></div>
             </div>
         </div>
@@ -611,7 +617,7 @@ function modeImgHtml(modeFile, sizePx = 18) {
     const src = `Lignes/${modeFile}`;
     const state = imgCache.get(src);
     if (state === 'ok')    return `<img src="${src}" style="width:${sizePx}px;height:${sizePx}px;display:block;">`;
-    if (state === 'error') return `<span style="font-size:${sizePx}px;line-height:1;">🚌</span>`;
+    if (state === 'error') return `<img src="SVG_Icons/bus.svg" class="svg-ic" style="width:${sizePx}px;height:${sizePx}px;display:block;">`;
     return `<img src="${src}" style="width:${sizePx}px;height:${sizePx}px;display:block;" loading="lazy"
         onload="imgCache.set('${src}','ok')" onerror="imgCache.set('${src}','error');this.style.display='none'">`;
 }
@@ -671,7 +677,7 @@ function getDispoColor(value, total) {
 
 function getVelovDispoColor(bikes, stands, total) {
     if (bikes === 0 && stands === 0)
-        return { color: '#4B0082', rgb: '75,0,130', label: '🟣 Fermée', textColor: '#9b59b6' };
+        return { color: '#4B0082', rgb: '75,0,130', label: '<img src="SVG_Icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Fermée', textColor: '#9b59b6' };
     return getDispoColor(bikes, total || (bikes + stands));
 }
 
@@ -922,7 +928,6 @@ async function showLineTrace(lineCode) {
             fillOpacity: 1
         }).addTo(lineTraceLayer);
 
-        // FIX Bug 4 : L.marker() complet avec la syntaxe correcte
         cm.on('click', async () => {
             if (currentStopMarker) { map.removeLayer(currentStopMarker); currentStopMarker = null; }
             const popupEl = await buildStopPopupContent(stopNom, stopId, lat, lon, s.commune, s.zone);
@@ -1043,7 +1048,7 @@ function renderStopList(term = '') {
     document.getElementById('search-stats').textContent = `${stops.length}/${allStops.length}`;
 
     if (!stops.length) {
-        document.getElementById('stops-list').innerHTML = '<div class="info-empty"><i class="ti ti-search" style="font-size:16px;vertical-align:-3px;"></i> Aucun arrêt trouvé</div>';
+        document.getElementById('stops-list').innerHTML = `<div class="info-empty"><img src="SVG_Icons/loupe.svg" class="svg-ic" style="width:16px;height:16px;"> Aucun arrêt trouvé</div>`;
         return;
     }
 
@@ -1051,33 +1056,29 @@ function renderStopList(term = '') {
     const html = chunk.map(s => {
         const lines = extractLines(s.desserte);
         const icon = s.desserte?.match(/T[1-7]/)
-            ? '<i class="ti ti-tram"  style="font-size:20px;"></i>'
+            ? '<img src="SVG_Icons/tramway.svg" class="svg-ic" style="width:20px;height:20px;">'
             : (s.desserte?.match(/^[ABCD]$/)
-                ? '<i class="ti ti-train" style="font-size:20px;"></i>'
-                : '<i class="ti ti-bus"   style="font-size:20px;"></i>');
+                ? '<img src="SVG_Icons/metro.svg" class="svg-ic" style="width:20px;height:20px;">'
+                : '<img src="SVG_Icons/bus.svg" class="svg-ic" style="width:20px;height:20px;">');
         return `<div class="info-item" data-lat="${s.lat}" data-lon="${s.lon}" data-id="${s.id||''}" data-nom="${(s.nom||'').replace(/"/g,'&quot;')}" data-commune="${(s.commune||'').replace(/"/g,'&quot;')}" data-zone="${s.zone||''}">
             <div class="info-summary" onclick="selectStopOnMap(this)">
                 <div class="info-line-badge" style="font-size:18px;">${icon}</div>
                 <div class="info-summary-text">
-                    <div class="info-titre">${highlightText(s.nom||'Arrêt', term)}${s.pmr?'<span class="stop-pmr-badge"><i class="ti ti-wheelchair" style="font-size:10px;"></i></span>':''}</div>
+                    <div class="info-titre">${highlightText(s.nom||'Arrêt', term)}${s.pmr?'<span class="stop-pmr-badge"><img src="SVG_Icons/PMR.svg" style="width:10px;height:10px;vertical-align:-1px;filter:brightness(0) invert(1);"></span>':''}</div>
                     <div class="stop-commune">${highlightText(s.commune||'', term)} • Zone ${s.zone||'N/A'}</div>
                     <div class="stop-lines">${renderLineSvgs(lines)}</div>
                 </div>
                 <span class="info-chevron" onclick="event.stopPropagation();toggleInfoItem(this)">▼</span>
             </div>
-            // Déclare tes variables globalement sans const si tu veux (var ou rien du tout)
-            path = 'SVG_Icons/';
-            iconStyle = 'style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"';
-            
-            // Et ton morceau simplifié :
-            `<div class="info-detail">
-                <strong><i class="ti ti-map-pin"></i> Adresse :</strong> ${s.adresse||'Non renseignée'}<br>
-                <strong><img src="${path}lignes.svg" ${iconStyle}> Lignes :</strong> ${s.desserte||'Aucune'}<br>
-                <strong><img src="${path}PMR.svg" ${iconStyle}> PMR :</strong> ${s.pmr ? '<img src="'+path+'validé.svg" '+iconStyle+'> Accessible' : '<img src="'+path+'refusé.svg" '+iconStyle+'> Non accessible'}<br>
+            <div class="info-detail">
+                <strong><img src="SVG_Icons/arrêt.svg" class="svg-ic" style="width:14px;height:14px;"> Adresse :</strong> ${s.adresse||'Non renseignée'}<br>
+                <strong><img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:14px;height:14px;"> Lignes :</strong> ${s.desserte||'Aucune'}<br>
+                <strong><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:14px;height:14px;"> PMR :</strong> ${s.pmr ? '<img src="SVG_Icons/validé.svg" class="svg-ic" style="width:14px;height:14px;"> Accessible' : '<img src="SVG_Icons/refusé.svg" class="svg-ic" style="width:14px;height:14px;"> Non accessible'}<br>
                 <strong><i class="ti ti-building-community"></i> Commune :</strong> ${s.commune||''}<br>
                 <strong><i class="ti ti-hash"></i> Zone :</strong> ${s.zone||'N/A'}
             </div>
-            </div>`;
+        </div>`;
+    }).join('');
 
     document.getElementById('stops-list').innerHTML =
         html + (stops.length > 300 ? `<div class="info-empty">+${stops.length-300} arrêts (affinez la recherche)</div>` : '');
@@ -1326,7 +1327,7 @@ async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
         <div id="${mmId}" style="width:240px;height:110px;border-radius:10px 10px 0 0;background:#111;overflow:hidden;"></div>
         <div style="background:rgba(14,16,28,0.97);border-radius:0 0 14px 14px;border:1px solid rgba(255,255,255,0.09);border-top:none;">
             <div style="padding:10px 14px 8px;border-bottom:1px solid rgba(255,255,255,0.07);">
-                <div style="font-size:14px;font-weight:700;color:#edf0f8;margin-bottom:5px;display:flex;align-items:center;gap:6px;"><i class="ti ti-map-pin" style="color:#e2001a;font-size:16px;"></i>${nom}</div>
+                <div style="font-size:14px;font-weight:700;color:#edf0f8;margin-bottom:5px;display:flex;align-items:center;gap:6px;"><img src="SVG_Icons/arrêt.svg" style="width:16px;height:16px;filter:invert(13%) sepia(94%) saturate(6000%) hue-rotate(350deg) brightness(95%);">${nom}</div>
                 <div style="font-size:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">${metaHtml}</div>
             </div>
             <div id="deps-${safeId}" style="padding:8px 14px 10px;">
@@ -1337,7 +1338,6 @@ async function buildStopPopupContent(nom, id, lat, lon, commune, zone) {
     return popupEl;
 }
 
-// FIX Bug 1 + 2 + 3 : selectStopOnMap entièrement corrigé
 window.selectStopOnMap = async function(el) {
     const item = el.closest('.info-item');
     if (!item) return;
@@ -1352,10 +1352,8 @@ window.selectStopOnMap = async function(el) {
     const popupEl = await buildStopPopupContent(nom, id, lat, lon, commune, zone);
     const mmId = popupEl.querySelector('[id^="mm-"]')?.id;
 
-    // Récupère le safeId depuis l'id de la mini-map (format : "mm-{safeId}-{timestamp}")
     const safeId = mmId ? mmId.replace(/^mm-/, '').replace(/-\d+$/, '') : (id || `loc_${lat}_${lon}`);
 
-    // FIX Bug 1 : L.marker() complet
     currentStopMarker = L.marker([lat, lon], {
         icon: L.divIcon({
             className: 'my-custom-marker',
@@ -1369,7 +1367,6 @@ window.selectStopOnMap = async function(el) {
     map.setView([lat, lon], 16);
     currentStopMarker.openPopup();
 
-    // Mini-map
     setTimeout(() => {
         const c = document.getElementById(mmId);
         if (!c) return;
@@ -1378,9 +1375,8 @@ window.selectStopOnMap = async function(el) {
         L.marker([lat, lon]).addTo(mm);
     }, 80);
 
-    // FIX Bug 2 : utilise safeId reconstruit plutôt que la variable non définie
     if (id) { loadNextDepartures(id, `deps-${safeId}`, lat, lon); }
-}; // FIX Bug 3 : accolade fermante de la fonction
+};
 
 // ===== LIGNES =====
 function extractAllLines() {
@@ -1400,17 +1396,17 @@ function extractAllLines() {
 }
 
 const TYPE_META = {
-    metro:      { icon:'<i class="ti ti-train"     style="font-size:14px;"></i>', name:'Métro',         color:'#E2001A' },
-    tram:       { icon:'<i class="ti ti-tram"      style="font-size:14px;"></i>', name:'Tramway',        color:'#662483' },
-    tb:         { icon:'<i class="ti ti-trolleybus"style="font-size:14px;"></i>', name:'TramBus',        color:'#fdc300' },
-    funiculaire:{ icon:'<i class="ti ti-train-2"   style="font-size:14px;"></i>', name:'Funiculaire',    color:'#6da432' },
-    navgone:    { icon:'<i class="ti ti-boat"      style="font-size:14px;"></i>', name:'Navigône',        color:'#00A3A6' },
-    chrono:     { icon:'<i class="ti ti-circle-filled" style="font-size:14px;"></i>', name:'Chrono',     color:'#6E8997' },
-    bus:        { icon:'<i class="ti ti-bus"       style="font-size:14px;"></i>', name:'Bus',            color:'#E2001A' },
-    navette:    { icon:'<i class="ti ti-sailboat"  style="font-size:14px;"></i>', name:'Navette',        color:'#EC6608' },
-    pl:         { icon:'<i class="ti ti-moon"      style="font-size:14px;"></i>', name:'Pleine Lune',    color:'#992358' },
-    jd:         { icon:'<i class="ti ti-school"    style="font-size:14px;"></i>', name:'Junior Direct',  color:'#17297B' },
-    other:      { icon:'<i class="ti ti-map-pin"   style="font-size:14px;"></i>', name:'Autres',         color:'#888'    }
+    metro:      { icon:'<img src="SVG_Icons/metro.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Métro',         color:'#E2001A' },
+    tram:       { icon:'<img src="SVG_Icons/tramway.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Tramway',        color:'#662483' },
+    tb:         { icon:'<img src="SVG_Icons/trolleybus.svg" class="svg-ic" style="width:14px;height:14px;">', name:'TramBus',        color:'#fdc300' },
+    funiculaire:{ icon:'<img src="SVG_Icons/funicular.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Funiculaire',    color:'#6da432' },
+    navgone:    { icon:'<img src="SVG_Icons/navigone.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Navigône',        color:'#00A3A6' },
+    chrono:     { icon:'<img src="SVG_Icons/chrono.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Chrono',     color:'#6E8997' },
+    bus:        { icon:'<img src="SVG_Icons/bus.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Bus',            color:'#E2001A' },
+    navette:    { icon:'<img src="SVG_Icons/navette.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Navette',        color:'#EC6608' },
+    pl:         { icon:'<img src="SVG_Icons/pleine_lune.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Pleine Lune',    color:'#992358' },
+    jd:         { icon:'<img src="SVG_Icons/JD.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Junior Direct',  color:'#17297B' },
+    other:      { icon:'<img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Autres',         color:'#888'    }
 };
     
 window.filterLines = () => {
@@ -1434,7 +1430,7 @@ window.filterLines = () => {
             </div>
         </div>`;
     }
-    document.getElementById('lines-list').innerHTML = html || '<div class="info-empty"><i class="ti ti-list" style="font-size:16px;vertical-align:-3px;"></i> Aucune ligne</div>';
+    document.getElementById('lines-list').innerHTML = html || `<div class="info-empty"><img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:16px;height:16px;"> Aucune ligne</div>`;
 };
 
 window.searchLineInStops = async function(line) {
@@ -1601,8 +1597,8 @@ async function updateBus() {
                         <div style="font-size:14px;font-weight:600;color:#edf0f8;margin-bottom:4px;">${busSnap.dest}</div>
                     </div>
                     <div style="padding:8px 14px;border-bottom:1px solid rgba(255,255,255,0.07);">
-                        <div style="font-size:11px;color:#8a90a8;"><i class="ti ti-bus" style="font-size:12px;margin-right:4px;"></i>${getVehicleType(busSnap)}</div>
-                        <div style="font-size:10px;color:#4a4f6a;font-family:monospace;"><i class="ti ti-id" style="font-size:11px;margin-right:4px;"></i>${busSnap.id}</div>
+                        <div style="font-size:11px;color:#8a90a8;"><img src="SVG_Icons/bus.svg" class="svg-ic" style="width:12px;height:12px;margin-right:4px;">${getVehicleType(busSnap)}</div>
+                        <div style="font-size:10px;color:#4a4f6a;font-family:monospace;"><img src="SVG_Icons/id.svg" class="svg-ic" style="width:11px;height:11px;margin-right:4px;">${busSnap.id}</div>
                     </div>
                     <div id="${journeyId}" style="padding:8px 14px 10px;">
                         <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#4a4f6a;margin-bottom:6px;">Prochains arrêts</div>
@@ -1662,8 +1658,8 @@ function buildParkingPopup(p, tr) {
         <div style="font-size:13px;font-weight:600;color:#edf0f8;margin-bottom:4px;">🅿️ P+R ${p.nom}</div>
         <div style="font-size:11px;color:#8a90a8;">${p.horaires||'Horaires non disponibles'}</div>
         ${dispoSection}
-        ${p.place_handi&&dispo===null?`<div style="margin-top:6px;font-size:11px;color:#8a90a8;">♿ ${p.place_handi} places PMR</div>`:''}
-        <div style="margin-top:6px;font-size:10px;color:${p.p_surv?'#4dff88':'#4a4f6a'}">${p.p_surv?'✔ Surveillé':'Non surveillé'}</div>
+        ${p.place_handi&&dispo===null?`<div style="margin-top:6px;font-size:11px;color:#8a90a8;"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:12px;height:12px;"> ${p.place_handi} places PMR</div>`:''}
+        <div style="margin-top:6px;font-size:10px;color:${p.p_surv?'#4dff88':'#4a4f6a'}">${p.p_surv?`<img src="SVG_Icons/validé.svg" class="svg-ic" style="width:11px;height:11px;"> Surveillé`:'Non surveillé'}</div>
     </div>`;
 }
 
@@ -1739,8 +1735,8 @@ function buildParkingMetroPopup(p) {
         <div style="font-size:10px;color:#8a90a8;margin-bottom:6px;">${p.commune||''} · ${p.typeparking||'Parking'}</div>
         <div style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:6px;">
             ${p.capacite?`<span style="background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);border-radius:6px;padding:3px 8px;font-size:11px;color:#edf0f8;">🚗 ${p.capacite} places</span>`:''}
-            ${p.capacitepmr?`<span style="background:rgba(77,255,136,0.08);border:1px solid rgba(77,255,136,0.2);border-radius:6px;padding:3px 8px;font-size:11px;color:#4dff88;">♿ ${p.capacitepmr}</span>`:''}
-            ${p.capacitevelo?`<span style="background:rgba(0,210,255,0.08);border:1px solid rgba(0,210,255,0.2);border-radius:6px;padding:3px 8px;font-size:11px;color:#00d2ff;">🚲 ${p.capacitevelo}</span>`:''}
+            ${p.capacitepmr?`<span style="background:rgba(77,255,136,0.08);border:1px solid rgba(77,255,136,0.2);border-radius:6px;padding:3px 8px;font-size:11px;color:#4dff88;"><img src="SVG_Icons/PMR.svg" style="width:11px;height:11px;vertical-align:-1px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> ${p.capacitepmr}</span>`:''}
+            ${p.capacitevelo?`<span style="background:rgba(0,210,255,0.08);border:1px solid rgba(0,210,255,0.2);border-radius:6px;padding:3px 8px;font-size:11px;color:#00d2ff;"><img src="SVG_Icons/velo.svg" style="width:11px;height:11px;vertical-align:-1px;filter:invert(67%) sepia(82%) saturate(2000%) hue-rotate(160deg);"> ${p.capacitevelo}</span>`:''}
         </div>
         <div style="font-size:11px;color:#8a90a8;">${p.reglementation||''}</div>
         <div style="font-size:11px;color:#8a90a8;">${p.fermeture||''}</div>
@@ -1815,7 +1811,7 @@ function buildVelovPopup(s) {
         </div>` : '';
 
     return `<div style="width:210px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);padding:12px 14px;">
-        <div style="font-size:12px;font-weight:600;color:#edf0f8;margin-bottom:8px;">${s.name}</div>
+        <div style="font-size:12px;font-weight:600;color:#edf0f8;margin-bottom:8px;"><img src="SVG_Icons/velo.svg" class="svg-ic" style="width:13px;height:13px;"> ${s.name}</div>
         <div style="display:flex;gap:8px;">
             <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:8px;padding:6px;">
                 <div style="font-size:18px;font-weight:700;color:${dispoInfo.textColor};">${bikes}</div>
@@ -1891,7 +1887,7 @@ async function updateTraffic() {
         const data  = await apiFetch('api/traffic');
         const items = data.values || [];
         const list  = document.getElementById('traffic-list');
-        if (!items.length) { list.innerHTML = '<div class="info-empty"><i class="ti ti-circle-check" style="color:#4dff88;font-size:16px;vertical-align:-3px;"></i> Aucune perturbation</div>'; return; }
+        if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/validé.svg" class="svg-ic" style="width:16px;height:16px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune perturbation</div>`; return; }
 
         const grouped = new Map();
         items.forEach(a => {
@@ -1906,11 +1902,12 @@ async function updateTraffic() {
         list.innerHTML = [...grouped.values()].map(a => {
             const isP = a.type?.toLowerCase().includes('perturbation');
             const isT = a.cause?.toLowerCase().includes('travaux');
-            const iconI = isP
-            ? '<i class="ti ti-alert-triangle" style="font-size:18px;color:#ff4d4d;"></i>'
+            const icon = isP
+            ? '<img src="SVG_Icons/trafic.svg" style="width:18px;height:18px;filter:invert(36%) sepia(74%) saturate(3000%) hue-rotate(340deg) brightness(95%);">'
             : (isT
-                ? '<i class="ti ti-tools"        style="font-size:18px;color:#ffb84d;"></i>'
-                : '<i class="ti ti-barrier-block"style="font-size:18px;color:#00d2ff;"></i>');
+                ? '<img src="SVG_Icons/trafic.svg" style="width:18px;height:18px;filter:invert(72%) sepia(46%) saturate(800%) hue-rotate(1deg) brightness(105%);">'
+                : '<img src="SVG_Icons/trafic.svg" style="width:18px;height:18px;filter:invert(67%) sepia(82%) saturate(2000%) hue-rotate(160deg);">');
+            const bg   = isP ? 'rgba(255,77,77,0.15)' : (isT ? 'rgba(255,184,77,0.15)' : 'rgba(0,210,255,0.15)');
             const bdr  = isP ? 'rgba(255,77,77,0.3)'    : (isT ? 'rgba(255,184,77,0.3)'  : 'rgba(0,210,255,0.3)');
             const linesHtml = [...a.lines].map(l => lineImgHtml(l, '28px')).join('');
             return `<div class="info-item">
@@ -1935,16 +1932,16 @@ async function updateAccessibility() {
         const data  = await apiFetch('api/accessibility');
         const items = data.values || [];
         const list  = document.getElementById('accessibility-list');
-        if (!items.length) { list.innerHTML = '<div class="info-empty"><i class="ti ti-wheelchair" style="color:#4dff88;font-size:16px;vertical-align:-3px;"></i> Aucune alerte</div>'; return; }
+        if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:16px;height:16px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune alerte</div>`; return; }
 
         list.innerHTML = items.map(a => {
             const isAsc = a.type_equipement === 'ASCENSEUR';
             const isEsc = a.type_equipement === 'ESCALATOR';
             const icon = isAsc
-            ? '<i class="ti ti-elevator" style="font-size:18px;"></i>'
+            ? '<img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:18px;height:18px;">'
             : (isEsc
-                ? '<i class="ti ti-escalator-up" style="font-size:18px;"></i>'
-                : '<i class="ti ti-wheelchair"   style="font-size:18px;"></i>');
+                ? '<img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:18px;height:18px;">'
+                : '<img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:18px;height:18px;">');
             const bg    = a.cause==='Panne' ? 'rgba(255,77,77,0.15)' : 'rgba(255,184,77,0.15)';
             const bdr   = a.cause==='Panne' ? 'rgba(255,77,77,0.3)'  : 'rgba(255,184,77,0.3)';
             const debut = a.debut_indispo ? new Date(a.debut_indispo).toLocaleDateString('fr-FR') : '';
@@ -1973,7 +1970,7 @@ async function updateStopsData() {
         renderStopList('');
     } catch(e) {
         console.error('Arrêts:', e);
-        document.getElementById('stops-list').innerHTML = '<div class="info-empty"><i class="ti ti-alert-circle" style="font-size:16px;vertical-align:-3px;color:#ff4d4d;"></i> Erreur de chargement</div>';
+        document.getElementById('stops-list').innerHTML = `<div class="info-empty"><img src="SVG_Icons/refusé.svg" class="svg-ic" style="width:16px;height:16px;filter:invert(36%) sepia(74%) saturate(3000%) hue-rotate(340deg) brightness(95%);"> Erreur de chargement</div>`;
     }
 }
 
@@ -2005,7 +2002,7 @@ function renderVelovList(term) {
     );
     stations.sort((a, b) => (a.name||'').localeCompare(b.name||''));
     document.getElementById('velov-stats').textContent = `${stations.length}/${allVelovStations.length}`;
-    if (!stations.length) { document.getElementById('velov-list').innerHTML = '<div class="info-empty"><i class="ti ti-search" style="font-size:16px;vertical-align:-3px;"></i> Aucune station trouvée</div>'; return; }
+    if (!stations.length) { document.getElementById('velov-list').innerHTML = `<div class="info-empty"><img src="SVG_Icons/loupe.svg" class="svg-ic" style="width:16px;height:16px;"> Aucune station trouvée</div>`; return; }
 
     const shown = stations.slice(0, 300);
     const html = shown.map(s => {
@@ -2021,21 +2018,21 @@ function renderVelovList(term) {
 
         const velovTypeLine = (elec > 0 || meca > 0)
             ? `<div style="display:flex;gap:6px;margin-top:4px;">
-                ${elec>0?`<span style="font-size:10px;color:#00d2ff;"><i class="ti ti-bolt" style="font-size:11px;vertical-align:-1px;"></i> ${elec} élec</span>`:''}
-                ${meca>0?`<span style="font-size:10px;color:#8a90a8;"><i class="ti ti-tool" style="font-size:11px;vertical-align:-1px;"></i> ${meca} méca</span>`:''}
+                ${elec>0?`<span style="font-size:10px;color:#00d2ff;">⚡ ${elec} élec</span>`:''}
+                ${meca>0?`<span style="font-size:10px;color:#8a90a8;">🔧 ${meca} méca</span>`:''}
                </div>`
             : '';
 
         return `<div class="info-item" data-lat="${s.lat||''}" data-lon="${s.lng||''}" data-name="${(s.name||'').replace(/"/g,'&quot;')}" data-idx="${allVelovStations.indexOf(s)}">
             <div class="info-summary" onclick="selectVelovOnMap(this)">
-                <div class="info-line-badge" style="background:rgba(${rgb},0.12);border:1px solid rgba(${rgb},0.25);font-size:18px;"><i class="ti ti-bike"></i></div>
+                <div class="info-line-badge" style="background:rgba(${rgb},0.12);border:1px solid rgba(${rgb},0.25);font-size:18px;"><img src="SVG_Icons/velo.svg" style="width:18px;height:18px;filter:brightness(0) invert(1);"></div>
                 <div class="info-summary-text">
                     <div class="info-titre">${highlightText(s.name||'Station', term)} <span style="font-size:9px;color:${textColor};">${statusText}</span></div>
                     <div class="stop-commune">${highlightText(s.address||'', term)}</div>
                     <div style="display:flex;gap:12px;margin-top:4px;">
-                        <span style="..."><i class="ti ti-bike" style="font-size:12px;"></i> ${bikes}</span>
-                        <span style="..."><i class="ti ti-parking" style="font-size:12px;"></i> ${stands}</span>
-                        <span style="..."><i class="ti ti-chart-bar" style="font-size:12px;"></i> ${total}</span>
+                        <span style="font-size:11px;color:#8a90a8;"><img src="SVG_Icons/velo.svg" class="svg-ic" style="width:12px;height:12px;"> ${bikes}</span>
+                        <span style="font-size:11px;color:#8a90a8;"><i class="ti ti-parking" style="font-size:12px;"></i> ${stands}</span>
+                        <span style="font-size:11px;color:#8a90a8;"><i class="ti ti-chart-bar" style="font-size:12px;"></i> ${total}</span>
                     </div>
                     ${velovTypeLine}
                 </div>
@@ -2044,9 +2041,9 @@ function renderVelovList(term) {
             <div class="info-detail">
                 <strong><i class="ti ti-map-pin"  style="font-size:13px;"></i></strong> ${s.address||'N/A'}<br>
                 <strong><i class="ti ti-building-community"></i></strong> ${s.commune||'N/A'}<br>
-                <strong><i class="ti ti-bolt"></i> Élec :</strong> ${elec} · <strong><i class="ti ti-tool"></i> Méca :</strong> ${meca}<br>
+                <strong>⚡ Élec :</strong> ${elec} · <strong>🔧 Méca :</strong> ${meca}<br>
                 <strong><i class="ti ti-credit-card"></i></strong> ${s.banking?'CB acceptée':'Sans CB'}<br>
-                <strong><i class="ti ti-circle-check"></i></strong> ${s.status==='OPEN'?'Ouverte':'Fermée'}<br>
+                <strong>${s.status==='OPEN'?`<img src="SVG_Icons/validé.svg" class="svg-ic" style="width:12px;height:12px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);">`:`<img src="SVG_Icons/refusé.svg" class="svg-ic" style="width:12px;height:12px;filter:invert(36%) sepia(74%) saturate(3000%) hue-rotate(340deg);">`}</strong> ${s.status==='OPEN'?'Ouverte':'Fermée'}<br>
                 <strong><i class="ti ti-calendar"></i> Màj :</strong> ${s.last_update?new Date(s.last_update).toLocaleString('fr-FR'):'N/A'}
             </div>
         </div>`;
@@ -2096,7 +2093,7 @@ async function loadAgences() {
                 (a.adr||'').toUpperCase()
             ].filter(Boolean).join(' ');
             const cp = a.codepostal || '';
-            const facea = a.facea === true ? '<i class="ti ti-check" style="color:#4dff88;font-size:13px;vertical-align:-2px;"></i> Oui' : (a.facea === false ? '<i class="ti ti-x" style="color:#ff4d4d;font-size:13px;vertical-align:-2px;"></i> Non' : '—');
+            const facea = a.facea === true ? '<img src="SVG_Icons/validé.svg" style="width:13px;height:13px;vertical-align:-2px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Oui' : (a.facea === false ? '<img src="SVG_Icons/refusé.svg" style="width:13px;height:13px;vertical-align:-2px;filter:invert(36%) sepia(74%) saturate(3000%) hue-rotate(340deg);"> Non' : '—');
             const horaires = a.horaires || 'Non renseignés';
 
             const popup = `<div style="width:230px;background:rgba(14,16,28,0.95);border-radius:14px;overflow:hidden;font-family:'TCL',sans-serif;border:1px solid rgba(255,255,255,0.09);">
@@ -2111,7 +2108,7 @@ async function loadAgences() {
                 </div>
                 <div style="padding:10px 14px;display:flex;flex-direction:column;gap:6px;">
                     <div style="display:flex;align-items:flex-start;gap:8px;">
-                        <span style="font-size:13px;flex-shrink:0;"><i class="ti ti-map-pin"  style="font-size:13px;"></i></span>
+                        <span style="font-size:13px;flex-shrink:0;"><img src="SVG_Icons/arrêt.svg" style="width:13px;height:13px;filter:brightness(0) invert(1);"></span>
                         <div>
                             <div style="font-size:12px;color:#edf0f8;">${adresse}</div>
                             <div style="font-size:11px;color:#8a90a8;">${cp}</div>
