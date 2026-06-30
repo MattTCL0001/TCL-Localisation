@@ -481,25 +481,28 @@
             <img src="logo.svg" style="object-fit:contain;display:block;" onerror="this.outerHTML='<i class=\'ti ti-map-2\' style=\'color:var(--accent);font-size:22px;\'></i>'">
         </div>
         <nav class="header-tabs" role="tablist">
-            <button class="header-tab active" data-tab="traffic"><i class="ti ti-alert-triangle"></i>Infos trafic</button>
-            <button class="header-tab" data-tab="accessibility"><i class="ti ti-wheelchair"></i>Accessibilité</button>
-            <button class="header-tab" data-tab="stops"><i class="ti ti-bus-stop"></i>Arrêts</button>
-            <button class="header-tab" data-tab="lines"><i class="ti ti-list"></i>Lignes</button>
-            <button class="header-tab" data-tab="velov"><i class="ti ti-bike"></i>Vélo'v</button>
-            <button class="header-tab" data-tab="credits"><i class="ti ti-info-circle"></i>Crédits</button>
+            <button class="header-tab active" data-tab="traffic"><img src="SVG_icons/trafic.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Infos trafic</button>
+            <button class="header-tab" data-tab="accessibility"><img src="SVG_icons/PMR.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Accessibilité</button>
+            <button class="header-tab" data-tab="stops"><img src="SVG_icons/arrêt.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Arrêts</button>
+            <button class="header-tab" data-tab="lines"><img src="SVG_icons/lignes.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Lignes</button>
+            <button class="header-tab" data-tab="velov"><img src="SVG_icons/velo.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Vélo'v</button>
+            <button class="header-tab" data-tab="credits"><img src="SVG_icons/id.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Crédits</button>
         </nav>
     </div>
     <div class="map-container">
         <div id="map"></div>
         <div id="bus-filter-banner">
             <span id="bus-filter-label">Véhicules filtrés · </span>
-            <button id="bus-filter-clear" onclick="clearAllFilters()">✕ Retirer le filtre</button>
+            <button id="bus-filter-clear" onclick="clearAllFilters()">
+                <img src="SVG_icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);" alt=""> 
+                Retirer le filtre
+            </button>
         </div>
     </div>
 </div>
 
 <div id="info-panel">
-    <div class="panel-toggle" onclick="togglePanel()"><span>▶</span></div>
+    <div class="panel-toggle" onclick="togglePanel()"><span>❯</span></div>
     <div class="tab-content">
 
         <div id="traffic-pane" class="tab-pane active">
@@ -514,12 +517,18 @@
 
         <div id="stops-pane" class="tab-pane">
             <div class="search-bar">
-                <input type="text" id="stop-search" placeholder="🔍 Rechercher..." oninput="filterStops()">
+                <label>
+                    <img src="SVG_icons/loupe.svg" style="width:16px;height:16px;vertical-align:-3px;filter:brightness(0) invert(1);">
+                    <input type="text" id="stop-search" placeholder="Rechercher..." oninput="filterStops()">
+                </label>
                 <button onclick="filterStops()">Rechercher</button>
             </div>
             <div id="stop-filter-banner">
                 <span id="stop-filter-label">Arrêts · </span>
-                <button id="stop-filter-clear" onclick="clearAllFilters()">✕ Retirer le filtre</button>
+                    <button id="stop-filter-clear" onclick="clearAllFilters()">
+                        <img src="SVG_icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);" alt=""> 
+                        Retirer le filtre
+                    </button>
             </div>
             <div class="tab-header">
                 Tous les arrêts
@@ -530,16 +539,16 @@
 
         <div id="lines-pane" class="tab-pane">
             <div class="filter-bar">
-                <label><img src="SVG_icons/metro.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"></i> Métro</label>
-                <label><img src="SVG_icons/tramway.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"></i> Tramway</label>
-                <label><img src="SVG_icons/trolleybus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"></i> Trambus</label>
-                <label><img src="SVG_icons/funicular.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"></i> Funiculaire</label>
-                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <i class="ti ti-ferry"></i> Navigône</label>
-                <label><input type="checkbox" id="filter-chrono"  checked onchange="filterLines()"> <i class="ti ti-circle-filled"></i> Chrono</label>
-                <label><img src="SVG_icons/bus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"></i> Bus</label>
-                <label><img src="SVG_icons/navette.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"></i> Navette</label>
-                <label><input type="checkbox" id="filter-pl"      checked onchange="filterLines()"> <i class="ti ti-moon"></i> Pleine Lune</label>
-                <label><input type="checkbox" id="filter-jd"      checked onchange="filterLines()"> <i class="ti ti-school"></i> Junior Direct</label>
+                <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="SVG_icons/metro.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Métro</label>
+                <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="SVG_icons/tramway.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Tramway</label>
+                <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="SVG_icons/trolleybus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> TramBus</label>
+                <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="SVG_icons/funicular.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Funiculaire</label>
+                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="SVG_icons/navigone.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Navigône</label>
+                <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="SVG_icons/chrono.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Chrono</label>
+                <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="SVG_icons/bus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Bus</label>
+                <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="SVG_icons/navette.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Navette</label>
+                <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="SVG_icons/pleine_lune.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Pleine Lune</label>
+                <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="SVG_icons/JD.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Junior Direct</label>
             </div>
             <div class="tab-header">Toutes les lignes</div>
             <div id="lines-list" class="info-list">'<div class="info-empty"><i class="ti ti-loader" style="font-size:16px;vertical-align:-3px;"></i> Chargement...</div>'</div>
@@ -610,13 +619,54 @@ function modeImgHtml(modeFile, sizePx = 18) {
 // ===== COULEURS DISPONIBILITÉ =====
 function getDispoColor(value, total) {
     if (value === null || value === undefined || total === null || total === undefined) return null;
-    if (value === 0 && total === 0) return { color: '#4B0082', rgb: '75,0,130', label: '🟣 Fermé', textColor: '#9b59b6' };
-    if (value === 0) return { color: '#ff4d4d', rgb: '255,77,77', label: '❌ Complet', textColor: '#ff4d4d' };
+    
+    // Chemin de base pour tes icônes
+    const path = 'SVG_icons/';
+    const style = 'style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"';
+    
+    // Fermé (violet)
+    if (value === 0 && total === 0) return { 
+        color: '#4B0082', rgb: '75,0,130', 
+        label: `<img src="${path}refusé.svg" ${style}> Fermé`, 
+        textColor: '#9b59b6' 
+    };
+    
+    // Complet (❌ rouge)
+    if (value === 0) return { 
+        color: '#ff4d4d', rgb: '255,77,77', 
+        label: `<img src="${path}refusé.svg" ${style}> Complet`, 
+        textColor: '#ff4d4d' 
+    };
+    
     const pct = total > 0 ? (value / total) * 100 : 0;
-    if (pct <= 25)  return { color: '#ffb84d', rgb: '255,184,77',  label: '⚠️ Faible',      textColor: '#ffb84d' };
-    if (pct <= 50)  return { color: '#00d2ff', rgb: '0,210,255',   label: 'ℹ️ Moyen',       textColor: '#00d2ff' };
-    if (pct <= 75)  return { color: '#4dff88', rgb: '77,255,136',  label: '☑️ Correct',     textColor: '#4dff88' };
-    return              { color: '#2ecc71', rgb: '46,204,113',  label: '✅ Disponible',  textColor: '#2ecc71' };
+    
+    // Faible (⚠️ orange / Trafic)
+    if (pct <= 25) return { 
+        color: '#ffb84d', rgb: '255,184,77', 
+        label: `<img src="${path}trafic.svg" ${style}> Trafic`, 
+        textColor: '#ffb84d' 
+    };
+    
+    // Moyen (☑️ jaune)
+    if (pct <= 50) return { 
+        color: '#f1c40f', rgb: '241,196,15', 
+        label: `<img src="${path}validé.svg" ${style}> Moyen`, 
+        textColor: '#f1c40f' 
+    };
+    
+    // Correct (✅ vert)
+    if (pct <= 75) return { 
+        color: '#00d2ff', rgb: '0,210,255',
+        label: `<img src="${path}validé.svg" ${style}> Correct`, 
+        textColor: '#00d2ff' 
+    };
+    
+    // Disponible (✅✅ bleu)
+    return {  
+        color: '#4dff88', rgb: '77,255,136', 
+        label: `<img src="${path}validé.svg" ${style}> Disponible`, 
+        textColor: '#4dff88' 
+    };
 }
 
 function getVelovDispoColor(bikes, stands, total) {
@@ -704,7 +754,7 @@ function getLineType(line) {
     if (/^[ABCD]$/.test(u)) return 'metro';
     if (/^NAVI|^7601/.test(u)) return 'navgone';
     if (u === '203' || u === '204') return 'chrono';
-    if (u === 'A32' || u === 'A71' || u === 'T36') return 'bus';
+    if (u === 'A32' || u === 'A71' || u === 'T36' || u === 'C7' || u === 'C19') return 'bus';
     if (/^104[A-Z]$/.test(u)) return 'bus';
     if (/^BR/.test(u)) return 'bus relais';
     if (/^ZI/.test(u)) return 'bus';
@@ -793,8 +843,10 @@ const LINE_COLORS_JS = {
     'T2':'#6ba230','C27':'#6ba230','34':'#6ba230','105':'#6ba230','5':'#6ba230','106EX':'#6ba230','6E':'#6ba230','135':'#6ba230','142':'#6ba230','156':'#6ba230','S7':'#6ba230','S11':'#6ba230','C3':'#6ba230','C11':'#6ba230','240':'#6ba230',
     '33':'#31287d','106':'#31287d','136':'#31287d',
     '6':'#31287d','S14':'#31287d',
-    'C15':'#d3d800','44':'#d3d800','61':'#d3d800','98':'#d3d800','129':'#d3d800','220':'#d3d800','N181':'#d3d800','N81':'#d3d800',
-    'F2':'#006f9e','49':'#006f9e','85':'#006f9e','118':'#006f9e','148':'#006f9e','243':'#006f9e','18':'#006f9e',
+    'C15':'#d3d800','44':'#d3d800','61':'#d3d800','98':'#d3d800','129':'#d3d800','220':'#d3d800','N181':'#d3d800',
+    'N81':'#d3d800',
+    'F2':'#006f9e','49':'#006f9e','85':'#006f9e','118':'#006f9e','148':'#006f9e','243':'#006f9e',
+    '18':'#006f9e',
     '36':'#6e8997','87':'#6e8997','110EX':'#6e8997','218':'#6e8997','222':'#6e8997','150':'#6e8997','164':'#6e8997','C7':'#6e8997','10E':'#6e8997','ZI8':'#6e8997',
     'C9':'#c88817','50':'#c88817','119':'#c88817','88':'#c88817','149':'#c88817','151':'#c88817','19':'#c88817','ZI5':'#c88817',
     'TB12':'#80682e','C22EX':'#80682e','46':'#80682e','84':'#80682e','117':'#80682e','128':'#80682e','N185':'#80682e','17':'#80682e','N20':'#80682e',
@@ -1015,8 +1067,13 @@ function renderStopList(term = '') {
             </div>
             <div class="info-detail">
                 <strong><i class="ti ti-map-pin"></i> Adresse :</strong> ${s.adresse||'Non renseignée'}<br>
-                <strong><i class="ti ti-bus-stop"></i> Lignes :</strong> ${s.desserte||'Aucune'}<br>
-                <strong><i class="ti ti-wheelchair"></i> PMR :</strong> ${s.pmr?'✅ Accessible':'❌ Non accessible'}<br>
+                    // Définition des styles et chemin pour les icônes
+                    const path = 'SVG_icons/';
+                    const iconStyle = 'style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"';
+                    
+                    // Remplacement dans ton code :
+                    `<strong><img src="${path}lignes.svg" ${iconStyle}> Lignes :</strong> ${s.desserte||'Aucune'}<br>
+                     <strong><img src="${path}PMR.svg" ${iconStyle}> PMR :</strong> ${s.pmr ? '<img src="' + path + 'validé.svg" ' + iconStyle + '> Accessible' : '<img src="' + path + 'refusé.svg" ' + iconStyle + '> Non accessible'}<br>`
                 <strong><i class="ti ti-building-community"></i> Commune :</strong> ${s.commune||''}<br>
                 <strong><i class="ti ti-hash"></i> Zone :</strong> ${s.zone||'N/A'}
             </div>
@@ -1163,7 +1220,7 @@ async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
             const journeyBtn = vehicleId
                 ? `<button id="${journeyBtnId}" onclick="toggleVehicleJourney('${vehicleId}','${journeyDivId}','${journeyBtnId}')"
                     style="font-size:9px;color:#4a4f6a;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.08);border-radius:4px;padding:2px 6px;cursor:pointer;font-family:inherit;margin-top:3px;">
-                    ▶ Prochains arrêts
+                    ❯ Prochains arrêts
                   </button>
                   <div id="${journeyDivId}" style="display:none;margin-top:6px;"></div>`
                 : '';
@@ -1204,7 +1261,7 @@ window.toggleVehicleJourney = async function(vehicleId, divId, btnId) {
     if (!div) return;
     if (div.style.display !== 'none') {
         div.style.display = 'none';
-        if (btn) btn.textContent = '▶ Prochains arrêts';
+        if (btn) btn.textContent = '❯ Prochains arrêts';
         return;
     }
     div.style.display = 'block';
@@ -1346,7 +1403,7 @@ function extractAllLines() {
 const TYPE_META = {
     metro:      { icon:'<i class="ti ti-train"     style="font-size:14px;"></i>', name:'Métro',         color:'#E2001A' },
     tram:       { icon:'<i class="ti ti-tram"      style="font-size:14px;"></i>', name:'Tramway',        color:'#662483' },
-    tb:         { icon:'<i class="ti ti-trolleybus"style="font-size:14px;"></i>', name:'Trambus',        color:'#fdc300' },
+    tb:         { icon:'<i class="ti ti-trolleybus"style="font-size:14px;"></i>', name:'TramBus',        color:'#fdc300' },
     funiculaire:{ icon:'<i class="ti ti-train-2"   style="font-size:14px;"></i>', name:'Funiculaire',    color:'#6da432' },
     navgone:    { icon:'<i class="ti ti-boat"      style="font-size:14px;"></i>', name:'Navigône',        color:'#00A3A6' },
     chrono:     { icon:'<i class="ti ti-circle-filled" style="font-size:14px;"></i>', name:'Chrono',     color:'#6E8997' },
