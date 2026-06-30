@@ -1065,18 +1065,19 @@ function renderStopList(term = '') {
                 </div>
                 <span class="info-chevron" onclick="event.stopPropagation();toggleInfoItem(this)">▼</span>
             </div>
-            <div class="info-detail">
-                <strong><i class="ti ti-map-pin"></i> Adresse :</strong> ${s.adresse||'Non renseignée'}<br>                  
-                    // Remplacement dans ton code :
-                    `<strong><img src="${path}lignes.svg" ${iconStyle}> Lignes :</strong> ${s.desserte||'Aucune'}<br>
-                     <strong><img src="${path}PMR.svg" ${iconStyle}> PMR :</strong> ${s.pmr ? '<img src="' + path + 'validé.svg" ' + iconStyle + '> Accessible' : '<img src="' + path + 'refusé.svg" ' + iconStyle + '> Non accessible'}<br>`
+            // Déclare tes variables globalement sans const si tu veux (var ou rien du tout)
+            path = 'SVG_Icons/';
+            iconStyle = 'style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"';
+            
+            // Et ton morceau simplifié :
+            `<div class="info-detail">
+                <strong><i class="ti ti-map-pin"></i> Adresse :</strong> ${s.adresse||'Non renseignée'}<br>
+                <strong><img src="${path}lignes.svg" ${iconStyle}> Lignes :</strong> ${s.desserte||'Aucune'}<br>
+                <strong><img src="${path}PMR.svg" ${iconStyle}> PMR :</strong> ${s.pmr ? '<img src="'+path+'validé.svg" '+iconStyle+'> Accessible' : '<img src="'+path+'refusé.svg" '+iconStyle+'> Non accessible'}<br>
                 <strong><i class="ti ti-building-community"></i> Commune :</strong> ${s.commune||''}<br>
                 <strong><i class="ti ti-hash"></i> Zone :</strong> ${s.zone||'N/A'}
             </div>
-        </div>`;
-    }).join('');
-    const path = 'SVG_Icons/';
-    const iconStyle = 'style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"';
+            </div>`;
 
     document.getElementById('stops-list').innerHTML =
         html + (stops.length > 300 ? `<div class="info-empty">+${stops.length-300} arrêts (affinez la recherche)</div>` : '');
