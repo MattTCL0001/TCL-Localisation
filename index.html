@@ -481,12 +481,12 @@
             <img src="logo.svg" style="object-fit:contain;display:block;" onerror="this.outerHTML='<i class=\'ti ti-map-2\' style=\'color:var(--accent);font-size:22px;\'></i>'">
         </div>
         <nav class="header-tabs" role="tablist">
-            <button class="header-tab active" data-tab="traffic"><img src="SVG_icons/trafic.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Infos trafic</button>
-            <button class="header-tab" data-tab="accessibility"><img src="SVG_icons/PMR.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Accessibilité</button>
-            <button class="header-tab" data-tab="stops"><img src="SVG_icons/arrêt.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Arrêts</button>
-            <button class="header-tab" data-tab="lines"><img src="SVG_icons/lignes.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Lignes</button>
-            <button class="header-tab" data-tab="velov"><img src="SVG_icons/velo.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Vélo'v</button>
-            <button class="header-tab" data-tab="credits"><img src="SVG_icons/id.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Crédits</button>
+            <button class="header-tab active" data-tab="traffic"><img src="SVG_Icons/trafic.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Infos trafic</button>
+            <button class="header-tab" data-tab="accessibility"><img src="SVG_Icons/PMR.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Accessibilité</button>
+            <button class="header-tab" data-tab="stops"><img src="SVG_Icons/arrêt.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Arrêts</button>
+            <button class="header-tab" data-tab="lines"><img src="SVG_Icons/lignes.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Lignes</button>
+            <button class="header-tab" data-tab="velov"><img src="SVG_Icons/velo.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Vélo'v</button>
+            <button class="header-tab" data-tab="credits"><img src="SVG_Icons/id.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Crédits</button>
         </nav>
     </div>
     <div class="map-container">
@@ -494,7 +494,7 @@
         <div id="bus-filter-banner">
             <span id="bus-filter-label">Véhicules filtrés · </span>
             <button id="bus-filter-clear" onclick="clearAllFilters()">
-                <img src="SVG_icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);" alt=""> 
+                <img src="SVG_Icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);" alt=""> 
                 Retirer le filtre
             </button>
         </div>
@@ -518,7 +518,7 @@
         <div id="stops-pane" class="tab-pane">
             <div class="search-bar">
                 <label>
-                    <img src="SVG_icons/loupe.svg" style="width:16px;height:16px;vertical-align:-3px;filter:brightness(0) invert(1);">
+                    <img src="SVG_Icons/loupe.svg" style="width:16px;height:16px;vertical-align:-3px;filter:brightness(0) invert(1);">
                     <input type="text" id="stop-search" placeholder="Rechercher..." oninput="filterStops()">
                 </label>
                 <button onclick="filterStops()">Rechercher</button>
@@ -526,7 +526,7 @@
             <div id="stop-filter-banner">
                 <span id="stop-filter-label">Arrêts · </span>
                     <button id="stop-filter-clear" onclick="clearAllFilters()">
-                        <img src="SVG_icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);" alt=""> 
+                        <img src="SVG_Icons/refusé.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);" alt=""> 
                         Retirer le filtre
                     </button>
             </div>
@@ -539,16 +539,16 @@
 
         <div id="lines-pane" class="tab-pane">
             <div class="filter-bar">
-                <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="SVG_icons/metro.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Métro</label>
-                <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="SVG_icons/tramway.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Tramway</label>
-                <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="SVG_icons/trolleybus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> TramBus</label>
-                <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="SVG_icons/funicular.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Funiculaire</label>
-                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="SVG_icons/navigone.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Navigône</label>
-                <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="SVG_icons/chrono.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Chrono</label>
-                <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="SVG_icons/bus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Bus</label>
-                <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="SVG_icons/navette.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Navette</label>
-                <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="SVG_icons/pleine_lune.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Pleine Lune</label>
-                <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="SVG_icons/JD.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Junior Direct</label>
+                <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="SVG_Icons/metro.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Métro</label>
+                <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="SVG_Icons/tramway.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Tramway</label>
+                <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="SVG_Icons/trolleybus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> TramBus</label>
+                <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="SVG_Icons/funicular.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Funiculaire</label>
+                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="SVG_Icons/navigone.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Navigône</label>
+                <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="SVG_Icons/chrono.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Chrono</label>
+                <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="SVG_Icons/bus.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Bus</label>
+                <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="SVG_Icons/navette.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Navette</label>
+                <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="SVG_Icons/pleine_lune.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Pleine Lune</label>
+                <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="SVG_Icons/JD.svg" style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"> Junior Direct</label>
             </div>
             <div class="tab-header">Toutes les lignes</div>
             <div id="lines-list" class="info-list">'<div class="info-empty"><i class="ti ti-loader" style="font-size:16px;vertical-align:-3px;"></i> Chargement...</div>'</div>
@@ -621,7 +621,7 @@ function getDispoColor(value, total) {
     if (value === null || value === undefined || total === null || total === undefined) return null;
     
     // Chemin de base pour tes icônes
-    const path = 'SVG_icons/';
+    const path = 'SVG_Icons/';
     const style = 'style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"';
     
     // Fermé (violet)
@@ -1068,7 +1068,7 @@ function renderStopList(term = '') {
             <div class="info-detail">
                 <strong><i class="ti ti-map-pin"></i> Adresse :</strong> ${s.adresse||'Non renseignée'}<br>
                     // Définition des styles et chemin pour les icônes
-                    const path = 'SVG_icons/';
+                    const path = 'SVG_Icons/';
                     const iconStyle = 'style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"';
                     
                     // Remplacement dans ton code :
