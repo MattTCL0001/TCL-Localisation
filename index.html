@@ -1192,7 +1192,11 @@ async function updateBus() {
 
 // ===== PARKINGS & VÉLO'V =====
 function buildParkingPopup(p, tr) {
-    const dispo = tr?.nb_tot_place_dispo ?? null, cap = p.capacite || null;
+    // Priorité aux données temps réel directes (nouveau format normalisé), 
+    // sinon fallback sur l'ancienne jointure avec tr
+    const dispo = p._nb_dispo ?? p.nb_place_dispo ?? tr?.nb_tot_place_dispo ?? null;
+    const cap = p.capacite ?? p.nb_place_tot ?? null;
+    
     let dispoSection = '';
     if (dispo !== null && cap !== null) {
         const dispoInfo = getDispoColor(dispo, cap);
@@ -1207,9 +1211,10 @@ function buildParkingPopup(p, tr) {
             </div>
         </div>`;
     }
+    
     return `<div style="width:220px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
-        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">🅿️ P+R ${p.nom}</div>
-        <div style="font-size:11px;color:var(--text-secondary);">${p.horaires||'Horaires non disponibles'}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">🅿️ ${p.nom}</div>
+        <div style="font-size:11px;color:var(--text-secondary);">${p.horaires || 'Horaires non disponibles'}</div>
         ${dispoSection}
     </div>`;
 }
