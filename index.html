@@ -447,7 +447,6 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ===== CONFIG =====
-// Utilise l'URL actuelle si hébergé sur le même domaine, sinon l'URL HF Space
 const API = window.location.hostname.includes('hf.space') ? '' : 'https://matttcl-tcl-localisation.hf.space/';
 const imgCache = new Map();
 const NO_SVG_PREFIXES = ['JD'];
@@ -494,7 +493,6 @@ function getVelovDispoColor(bikes, stands, total) {
 
 // ===== CARTE =====
 const map = L.map('map', { zoomControl: false, attributionControl: false, renderer: L.canvas() }).setView([45.757, 4.832], 13);
-
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(map);
 
 const parkingMetroLayer = L.layerGroup().addTo(map);
@@ -513,10 +511,7 @@ const busMarkers = new Map(), velovMarkerMap = new Map(), parkingMarkerMap = new
 let currentLineFilter = null, busLineFilter = null;
 
 // ===== UI INTERACTIONS =====
-const togglePanel = () => {
-    document.getElementById('info-panel').classList.toggle('collapsed');
-    setTimeout(() => map.invalidateSize(), 300);
-};
+const togglePanel = () => { document.getElementById('info-panel').classList.toggle('collapsed'); setTimeout(() => map.invalidateSize(), 300); };
 const toggleInfoItem = (el) => el.closest('.info-item').classList.toggle('expanded');
 
 window.addEventListener('resize', () => setTimeout(() => map.invalidateSize(), 250));
@@ -612,13 +607,10 @@ function desserteContainsLine(desserte, targetMapped) {
 async function applyLineFilter(line) {
     currentLineFilter = line;
     busLineFilter = line;
-
     document.getElementById('stop-filter-label').innerHTML = `Arrêts : &nbsp;${lineImgHtml(line, '18px')}`;
     document.getElementById('stop-filter-banner').classList.add('visible');
-
     document.getElementById('bus-filter-label').innerHTML = `Véhicules : &nbsp;${lineImgHtml(line, '18px')}`;
     document.getElementById('bus-filter-banner').classList.add('visible');
-
     applyBusLineFilter();
     await showLineTrace(line);
 }
@@ -660,11 +652,7 @@ function renderStopList(term = '') {
     if (currentLineFilter) {
         stops = stops.filter(s => desserteContainsLine(s.desserte, currentLineFilter));
     } else if (term) {
-        stops = stops.filter(s =>
-            (s.nom||'').toLowerCase().includes(term) ||
-            (s.commune||'').toLowerCase().includes(term) ||
-            (s.desserte||'').toLowerCase().includes(term)
-        );
+        stops = stops.filter(s => (s.nom||'').toLowerCase().includes(term) || (s.commune||'').toLowerCase().includes(term) || (s.desserte||'').toLowerCase().includes(term));
     }
 
     document.getElementById('search-stats').textContent = `${stops.length}/${allStops.length}`;
@@ -757,7 +745,6 @@ function estimatedSpeedMs(lineRemapped) {
     return kmh / 3.6;
 }
 
-// MODIFIÉ : Gestion du 503 (Lazy Loading backend)
 async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
     if (!stopId) return;
     await new Promise(r => setTimeout(r, 0));
@@ -767,11 +754,9 @@ async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
     const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">Prochains passages</div>';
     try {
         const data = await apiFetch(`api/next-departures/${stopId}`);
-        
-        // NOUVEAU : Si le backend est encore en train de charger les stops
         if (data.is_loading) {
             el.innerHTML = header + '<div style="font-size:11px;color:#f1c40f;text-align:center;padding:8px 0;">⏳ Initialisation des données en cours...</div>';
-            setTimeout(() => loadNextDepartures(stopId, containerId, stopLat, stopLon), 2000); // Réessaie dans 2s
+            setTimeout(() => loadNextDepartures(stopId, containerId, stopLat, stopLon), 2000);
             return;
         }
 
@@ -827,7 +812,6 @@ async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
     }
 }
 
-// MODIFIÉ : Gestion du 503 pour le véhicule
 window.toggleVehicleJourney = async function(vehicleId, divId, btnId) {
     const div = document.getElementById(divId), btn = document.getElementById(btnId);
     if (!div) return;
@@ -842,7 +826,6 @@ async function loadVehicleJourney(vehicleId, containerId) {
     if (!el) return;
     try {
         const data = await apiFetch(`api/vehicle-journey/${vehicleId}`);
-        
         if (data.is_loading) {
             el.innerHTML = '<div style="font-size:10px;color:#f1c40f;padding:4px 0;">⏳ Initialisation...</div>';
             setTimeout(() => loadVehicleJourney(vehicleId, containerId), 2000);
@@ -1058,13 +1041,10 @@ window.filterLineFromPopup = async function(line) {
     if (panel.classList.contains('collapsed')) { panel.classList.remove('collapsed'); setTimeout(() => map.invalidateSize(), 300); }
 };
 
-// ===== API & DATA LOADING =====
-// MODIFIÉ : Gestion robuste des erreurs et du 503
+// ===== API & DATA LOADING (CORRIGÉ AVEC RETRY) =====
 async function apiFetch(path) {
     const res = await fetch(API + path);
-    if (res.status === 503) {
-        return { is_loading: true };
-    }
+    if (res.status === 503) return { is_loading: true };
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
 }
@@ -1072,13 +1052,14 @@ async function apiFetch(path) {
 async function loadStopsMapping() {
     try {
         const data = await apiFetch('api/stops');
-        if (data.is_loading) return; // Attendre le prochain cycle
+        if (data.is_loading) { setTimeout(loadStopsMapping, 2000); return; } // RETRY
         (data.values||[]).forEach(s => {
             if (s.id && s.nom) stopsMapping[s.id] = s.nom;
             if (s.code_station && s.nom) stopsMapping[s.code_station] = s.nom;
         });
-    } catch(e) { console.error('stopsMapping:', e); }
+    } catch(e) { setTimeout(loadStopsMapping, 3000); }
 }
+
 const getStopName = code => {
     if (!code) return null;
     const clean = code.includes(':') ? code.split(':').pop() : code;
@@ -1088,12 +1069,13 @@ const getStopName = code => {
 async function updateStopsData() {
     try {
         const data = await apiFetch('api/stops');
-        if (data.is_loading) return;
+        if (data.is_loading) { setTimeout(updateStopsData, 2000); return; } // RETRY
         allStops = data.values || [];
         extractAllLines();
         renderStopList('');
     } catch(e) {
-        document.getElementById('stops-list').innerHTML = `<div class="info-empty">Erreur de chargement</div>`;
+        document.getElementById('stops-list').innerHTML = `<div class="info-empty">Erreur de chargement (réessai...)</div>`;
+        setTimeout(updateStopsData, 3000);
     }
 }
 
@@ -1114,6 +1096,7 @@ function getVehicleType(bus) {
 async function updateBus() {
     try {
         const buses = await apiFetch('api/buses');
+        if (buses.is_loading) { setTimeout(updateBus, 2000); return; } // RETRY
         const seen = new Set();
         for (const bus of buses) {
             const lat = parseFloat(bus.lat), lon = parseFloat(bus.lon);
@@ -1168,7 +1151,6 @@ async function updateBus() {
                         <img src="Vehicule/${busSnap.id}.jpg" style="width:100%;height:100%;object-fit:cover;opacity:0.8;" loading="lazy" onerror="this.closest('div').style.background='linear-gradient(135deg,${busSnap.color}22,#08090f)';this.remove()">
                         <div style="position:absolute;inset:0;background:linear-gradient(135deg,${busSnap.color}33 0%,transparent 55%,${busSnap.color}22 100%);pointer-events:none;"></div>
                         <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,var(--glass-bg-heavy));pointer-events:none;"></div>
-                        
                         <div onclick="filterLineFromPopup('${busSnap.line}')" title="Filtrer la ligne ${busSnap.line}" style="position:absolute;bottom:12px;left:12px;background:rgba(13,15,24,0.75);border:1px solid ${busSnap.color}66;border-radius:12px;padding:6px;cursor:pointer;backdrop-filter:blur(12px);box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)';this.style.borderColor='${busSnap.color}'" onmouseout="this.style.transform='scale(1)';this.style.borderColor='${busSnap.color}66'">
                             ${lineImgHtml(busSnap.line, '30px')}
                         </div>
@@ -1205,7 +1187,7 @@ async function updateBus() {
             if (!seen.has(id)) { busLayer.removeLayer(e.marker); busMarkers.delete(id); }
         }
         applyBusLineFilter();
-    } catch(e) { console.error('Bus:', e); }
+    } catch(e) { setTimeout(updateBus, 3000); }
 }
 
 // ===== PARKINGS & VÉLO'V =====
@@ -1239,12 +1221,13 @@ async function loadParkings() {
             apiFetch('api/parkings'),
             apiFetch('api/parkings-tr').catch(() => ({ values: [] }))
         ]);
-        if (parkingsData.is_loading) return;
+        if (parkingsData.is_loading) { setTimeout(loadParkings, 2000); return; } // RETRY
+        
         const trById = {}; (trData.values || []).forEach(p => { if (p.id) trById[p.id] = p; });
         allParkings = parkingsData.map(p => ({ ...p, _tr: trById[p.id] || null }));
         parkingsLoaded = true;
         updateVisibleParkings();
-    } catch(e) { console.error('Parkings:', e); }
+    } catch(e) { setTimeout(loadParkings, 3000); }
 }
 
 function updateVisibleParkings() {
@@ -1300,10 +1283,10 @@ function buildVelovPopup(s) {
 async function updateVelov() {
     try {
         const data = await apiFetch('api/velov');
-        if (data.is_loading) return;
+        if (data.is_loading) { setTimeout(updateVelov, 2000); return; } // RETRY
         allVelovStations = data.values || [];
         updateVisibleVelov();
-    } catch(e) { console.error('Velov:', e); }
+    } catch(e) { setTimeout(updateVelov, 3000); }
 }
 
 function updateVisibleVelov() {
@@ -1330,10 +1313,10 @@ function updateVisibleVelov() {
 async function loadVelovList() {
     try {
         const data = await apiFetch('api/velov');
-        if (data.is_loading) return;
+        if (data.is_loading) { setTimeout(loadVelovList, 2000); return; } // RETRY
         allVelovStations = data.values || [];
         renderVelovList('');
-    } catch(e) { console.error("Velo'v list:", e); }
+    } catch(e) { setTimeout(loadVelovList, 3000); }
 }
 
 let velovSearchTimer = null;
@@ -1400,7 +1383,7 @@ window.selectVelovOnMap = function(el) {
 async function updateTraffic() {
     try {
         const data = await apiFetch('api/traffic');
-        if (data.is_loading) return;
+        if (data.is_loading) { setTimeout(updateTraffic, 2000); return; } // RETRY
         const items = data.values || [];
         const list = document.getElementById('traffic-list');
         if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/validé.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune perturbation</div>`; return; }
@@ -1433,13 +1416,13 @@ async function updateTraffic() {
                 <div class="info-detail">${a.message||'Aucun détail'}</div>
             </div>`;
         }).join('');
-    } catch(e) { console.error('Traffic:', e); }
+    } catch(e) { setTimeout(updateTraffic, 3000); }
 }
 
 async function updateAccessibility() {
     try {
         const data = await apiFetch('api/accessibility');
-        if (data.is_loading) return;
+        if (data.is_loading) { setTimeout(updateAccessibility, 2000); return; } // RETRY
         const items = data.values || [];
         const list = document.getElementById('accessibility-list');
         if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune alerte</div>`; return; }
@@ -1461,13 +1444,13 @@ async function updateAccessibility() {
                 <div class="info-detail">${a.equipement||''}<br>📅 ${debut} → ${fin}</div>
             </div>`;
         }).join('');
-    } catch(e) { console.error('Accessibilité:', e); }
+    } catch(e) { setTimeout(updateAccessibility, 3000); }
 }
 
 async function loadAgences() {
     try {
         const data = await apiFetch('api/agences');
-        if (data.is_loading) return;
+        if (data.is_loading) { setTimeout(loadAgences, 2000); return; } // RETRY
         const allAgences = (data || []).filter(a => a.lat && a.lon);
         allAgences.forEach(a => {
             const adresse = [a.numero, (a.typevoie||'').charAt(0).toUpperCase() + (a.typevoie||'').slice(1).toLowerCase(), (a.adr||'').toUpperCase()].filter(Boolean).join(' ');
@@ -1495,10 +1478,10 @@ async function loadAgences() {
                 })
             }).bindPopup(popup, { maxWidth: 250, className: 'tcl-popup' }).addTo(agenceLayer);
         });
-    } catch(e) { console.error('Agences:', e); }
+    } catch(e) { setTimeout(loadAgences, 3000); }
 }
 
-// ===== NOUVEAU : Vérification de l'état du système =====
+// ===== VÉRIFICATION DE L'ÉTAT DU SYSTÈME =====
 async function checkSystemStatus() {
     try {
         const res = await fetch(API);
@@ -1511,9 +1494,7 @@ async function checkSystemStatus() {
             dot.classList.remove('ready');
             dot.title = "Initialisation des données en cours...";
         }
-    } catch(e) {
-        // En cas d'erreur, on garde le statut jaune
-    }
+    } catch(e) { /* En cas d'erreur, on garde le statut jaune */ }
 }
 
 // ===== INIT =====
@@ -1522,7 +1503,6 @@ async function init() {
     await Promise.all([
         updateBus(), loadParkings(), updateVelov(), updateTraffic(), updateAccessibility(), updateStopsData(), loadAgences()
     ]);
-    // Lancer la vérification de statut après un court délai
     setTimeout(checkSystemStatus, 3000);
 }
 init();
@@ -1533,7 +1513,7 @@ setInterval(updateVelov, 60_000);
 setInterval(updateTraffic, 60_000);
 setInterval(updateAccessibility, 60_000);
 setInterval(updateStopsData, 300_000);
-setInterval(checkSystemStatus, 10_000); // Vérifie toutes les 10s si le backend a fini de charger
+setInterval(checkSystemStatus, 10_000);
 
 let moveTimer = null;
 map.on('moveend zoomend', () => {
