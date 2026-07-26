@@ -19,7 +19,6 @@
             --text-secondary: #8a90a8;
             --text-muted: #4a4f6a;
             
-            /* Liquid Glass Variables */
             --glass-bg: rgba(13, 15, 24, 0.65);
             --glass-bg-heavy: rgba(13, 15, 24, 0.85);
             --glass-border: rgba(255, 255, 255, 0.08);
@@ -76,13 +75,23 @@
             flex-shrink: 0;
         }
 
+        .logo-badge { display: flex; align-items: center; gap: 10px; }
         .logo-badge img { height: 24px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
+        
+        /* NOUVEAU : Indicateur d'état du système */
+        .system-status-dot {
+            width: 8px; height: 8px; border-radius: 50%;
+            background: #f1c40f; /* Jaune par défaut (chargement) */
+            box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+            transition: all 0.3s ease;
+        }
+        .system-status-dot.ready {
+            background: #4dff88;
+            box-shadow: 0 0 8px rgba(77, 255, 136, 0.5);
+        }
 
         .header-tabs {
-            display: flex;
-            gap: 4px;
-            overflow-x: auto;
-            scrollbar-width: none;
+            display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
             mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
             -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
             padding: 0 4px;
@@ -90,43 +99,21 @@
         .header-tabs::-webkit-scrollbar { display: none; }
 
         .header-tab {
-            display: flex;
-            align-items: center;
-            gap: 6px;
-            padding: 8px 14px;
-            border-radius: var(--radius-sm);
-            border: 1px solid transparent;
-            background: transparent;
-            color: var(--text-secondary);
-            font-size: 13px;
-            font-weight: 500;
-            cursor: pointer;
-            white-space: nowrap;
+            display: flex; align-items: center; gap: 6px; padding: 8px 14px;
+            border-radius: var(--radius-sm); border: 1px solid transparent;
+            background: transparent; color: var(--text-secondary);
+            font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;
             transition: all 0.2s ease;
         }
         .header-tab:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
         .header-tab.active {
-            background: rgba(226, 0, 26, 0.12);
-            border-color: rgba(226, 0, 26, 0.3);
-            color: #ff4d62;
-            box-shadow: 0 0 12px rgba(226, 0, 26, 0.15);
+            background: rgba(226, 0, 26, 0.12); border-color: rgba(226, 0, 26, 0.3);
+            color: #ff4d62; box-shadow: 0 0 12px rgba(226, 0, 26, 0.15);
         }
         .header-tab i, .header-tab img { width: 15px; height: 15px; }
 
-        .map-container {
-            flex: 1;
-            position: relative;
-            background: #08090f;
-            min-height: 0;
-        }
-        #map { 
-            position: absolute; 
-            inset: 0; 
-            width: 100%; 
-            height: 100%; 
-            background: #08090f;
-            z-index: 1;
-        }
+        .map-container { flex: 1; position: relative; background: #08090f; min-height: 0; }
+        #map { position: absolute; inset: 0; width: 100%; height: 100%; background: #08090f; z-index: 1; }
 
         .leaflet-container { background: #08090f !important; font-family: inherit !important; }
         .leaflet-control-zoom, .leaflet-control-attribution { display: none !important; }
@@ -134,113 +121,69 @@
         .leaflet-tile-container { filter: contrast(1.1) brightness(0.9); }
 
         .leaflet-popup-content-wrapper {
-            background: var(--glass-bg-heavy) !important;
-            backdrop-filter: var(--glass-blur) !important;
-            -webkit-backdrop-filter: var(--glass-blur) !important;
-            color: var(--text-primary) !important;
-            border: 1px solid var(--glass-border-highlight) !important;
-            border-radius: var(--radius-md) !important;
-            padding: 0 !important;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1) !important;
+            background: var(--glass-bg-heavy) !important; backdrop-filter: var(--glass-blur) !important;
+            -webkit-backdrop-filter: var(--glass-blur) !important; color: var(--text-primary) !important;
+            border: 1px solid var(--glass-border-highlight) !important; border-radius: var(--radius-md) !important;
+            padding: 0 !important; box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1) !important;
         }
         .leaflet-popup-tip { 
-            background: var(--glass-bg-heavy) !important; 
-            border: 1px solid var(--glass-border-highlight) !important;
-            border-top: none !important;
-            border-left: none !important;
+            background: var(--glass-bg-heavy) !important; border: 1px solid var(--glass-border-highlight) !important;
+            border-top: none !important; border-left: none !important;
         }
         .leaflet-popup-content { margin: 0 !important; font-family: 'Segoe UI', system-ui, sans-serif !important; }
         .leaflet-popup-close-button { color: var(--text-secondary) !important; padding: 8px !important; font-size: 18px !important; }
         .leaflet-popup-close-button:hover { color: var(--text-primary) !important; background: rgba(255,255,255,0.05) !important; border-radius: 50% !important; }
 
         #bus-filter-banner, #stop-filter-banner {
-            display: none;
-            position: absolute;
-            top: 16px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 1001;
-            background: rgba(13, 15, 24, 0.8);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(0, 210, 255, 0.2);
-            border-radius: 100px;
-            padding: 8px 16px;
-            align-items: center;
-            gap: 12px;
-            font-size: 12px;
-            white-space: nowrap;
+            display: none; position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
+            z-index: 1001; background: rgba(13, 15, 24, 0.8); backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 100px; padding: 8px 16px; align-items: center; gap: 12px;
+            font-size: 12px; white-space: nowrap;
             box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
         }
         #bus-filter-banner.visible, #stop-filter-banner.visible { display: flex; }
         #bus-filter-label, #stop-filter-label { color: #00d2ff; display: flex; align-items: center; gap: 6px; font-weight: 500; }
         
         .filter-clear-btn {
-            cursor: pointer;
-            color: var(--text-secondary);
-            background: rgba(255,255,255,0.06);
-            border: 1px solid var(--glass-border);
-            border-radius: 20px;
-            padding: 4px 10px;
-            font-size: 11px;
-            font-family: inherit;
-            transition: all 0.15s;
+            cursor: pointer; color: var(--text-secondary); background: rgba(255,255,255,0.06);
+            border: 1px solid var(--glass-border); border-radius: 20px; padding: 4px 10px;
+            font-size: 11px; font-family: inherit; transition: all 0.15s;
             display: flex; align-items: center; gap: 4px;
         }
         .filter-clear-btn:hover { background: rgba(255,255,255,0.12); color: var(--text-primary); }
 
         #info-panel {
-            position: fixed;
-            top: 70px; right: 16px; bottom: 16px;
-            width: 380px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            pointer-events: none;
+            position: fixed; top: 70px; right: 16px; bottom: 16px; width: 380px;
+            z-index: 1000; display: flex; flex-direction: column; pointer-events: none;
             transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
         }
         #info-panel.collapsed { transform: translateX(calc(100% + 32px)); }
         #info-panel > * { pointer-events: all; }
 
         .panel-toggle {
-            position: absolute;
-            left: -44px; top: 24px;
-            background: var(--glass-bg-heavy);
-            backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border-highlight);
-            border-right: none;
-            color: var(--text-secondary);
-            width: 44px; height: 44px;
-            cursor: pointer;
+            position: absolute; left: -44px; top: 24px;
+            background: var(--glass-bg-heavy); backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border-highlight); border-right: none;
+            color: var(--text-secondary); width: 44px; height: 44px; cursor: pointer;
             display: flex; align-items: center; justify-content: center;
-            border-radius: var(--radius-sm) 0 0 var(--radius-sm);
-            transition: all 0.2s;
+            border-radius: var(--radius-sm) 0 0 var(--radius-sm); transition: all 0.2s;
             box-shadow: -4px 4px 12px rgba(0,0,0,0.3);
         }
         .panel-toggle:hover { color: var(--accent); background: rgba(226, 0, 26, 0.1); }
         #info-panel.collapsed .panel-toggle span { transform: rotate(180deg); }
 
         .tab-content {
-            flex: 1;
-            overflow-y: auto;
-            background: var(--glass-bg-heavy);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border-highlight);
-            border-radius: var(--radius-md);
+            flex: 1; overflow-y: auto; background: var(--glass-bg-heavy);
+            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
+            border: 1px solid var(--glass-border-highlight); border-radius: var(--radius-md);
             box-shadow: 0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
+            display: flex; flex-direction: column; overflow: hidden;
         }
 
         @media (max-width: 768px), (orientation: portrait) {
             #info-panel {
-                top: auto;
-                right: 0; left: 0;
-                bottom: 0;
-                width: 100%;
-                height: var(--panel-height);
+                top: auto; right: 0; left: 0; bottom: 0; width: 100%; height: var(--panel-height);
                 padding-bottom: env(safe-area-inset-bottom, 0px);
                 transform: translateY(calc(100% - 56px));
             }
@@ -248,27 +191,19 @@
             #info-panel:not(.collapsed) { transform: translateY(0); }
             
             .panel-toggle {
-                left: 50%; top: -48px;
-                transform: translateX(-50%);
+                left: 50%; top: -48px; transform: translateX(-50%);
                 border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-                border: 1px solid var(--glass-border-highlight);
-                border-bottom: none;
-                width: 56px; height: 48px;
-                box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
+                border: 1px solid var(--glass-border-highlight); border-bottom: none;
+                width: 56px; height: 48px; box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
             }
             .panel-toggle::before {
-                content: '';
-                position: absolute;
-                top: 12px; left: 50%; transform: translateX(-50%);
-                width: 32px; height: 4px;
-                background: rgba(255,255,255,0.2);
-                border-radius: 4px;
+                content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
+                width: 32px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px;
             }
             .panel-toggle span { display: none; }
 
             .tab-content {
-                border-radius: var(--radius-lg) var(--radius-lg) 0 0;
-                border-bottom: none;
+                border-radius: var(--radius-lg) var(--radius-lg) 0 0; border-bottom: none;
                 box-shadow: 0 -8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
             }
             #bus-filter-banner, #stop-filter-banner { top: 70px; }
@@ -279,22 +214,15 @@
         .tab-pane.active { display: flex; }
 
         .tab-header {
-            padding: 14px 16px;
-            border-bottom: 1px solid var(--glass-border);
-            font-size: 11px;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: var(--text-muted);
-            flex-shrink: 0;
-            background: rgba(0,0,0,0.2);
-            position: sticky; top: 0; z-index: 10;
+            padding: 14px 16px; border-bottom: 1px solid var(--glass-border);
+            font-size: 11px; font-weight: 700; text-transform: uppercase;
+            letter-spacing: 0.1em; color: var(--text-muted); flex-shrink: 0;
+            background: rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 10;
             display: flex; justify-content: space-between; align-items: center;
         }
 
         .info-list { 
-            flex: 1; overflow-y: auto; 
-            scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; 
+            flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; 
         }
         .info-list::-webkit-scrollbar { width: 4px; }
         .info-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
@@ -303,16 +231,10 @@
         .info-item:last-child { border-bottom: none; }
         .info-item:active { background: rgba(255,255,255,0.03); }
 
-        .info-summary {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; cursor: pointer;
-        }
+        .info-summary { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; }
         .info-line-badge {
-            flex-shrink: 0;
-            width: 38px; height: 38px;
-            border-radius: var(--radius-sm);
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--glass-border);
+            flex-shrink: 0; width: 38px; height: 38px; border-radius: var(--radius-sm);
+            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
             display: flex; align-items: center; justify-content: center;
             box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
         }
@@ -325,8 +247,7 @@
         .info-detail {
             display: none; padding: 0 16px 16px 66px;
             font-size: 12px; color: var(--text-secondary); line-height: 1.7;
-            background: rgba(0,0,0,0.15);
-            border-top: 1px solid var(--glass-border);
+            background: rgba(0,0,0,0.15); border-top: 1px solid var(--glass-border);
             animation: slideDown 0.25s ease-out;
         }
         .info-item.expanded .info-detail { display: block; }
@@ -335,76 +256,50 @@
         .info-empty { padding: 40px 16px; text-align: center; color: var(--text-muted); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
 
         .search-bar {
-            background: rgba(0,0,0,0.2);
-            border-bottom: 1px solid var(--glass-border);
-            padding: 12px;
-            display: flex; gap: 8px;
-            position: sticky; top: 0; z-index: 10;
+            background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--glass-border);
+            padding: 12px; display: flex; gap: 8px; position: sticky; top: 0; z-index: 10;
         }
         .search-bar input {
-            flex: 1;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--glass-border);
-            color: var(--text-primary);
-            padding: 10px 14px;
-            border-radius: var(--radius-sm);
-            font-size: 13px;
-            font-family: inherit;
-            transition: all 0.2s;
+            flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
+            color: var(--text-primary); padding: 10px 14px; border-radius: var(--radius-sm);
+            font-size: 13px; font-family: inherit; transition: all 0.2s;
         }
         .search-bar input:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.06); box-shadow: 0 0 0 3px rgba(226,0,26,0.1); }
         .search-bar input::placeholder { color: var(--text-muted); }
         .search-bar button {
-            background: var(--accent);
-            border: none; color: #fff;
-            padding: 10px 16px;
-            border-radius: var(--radius-sm);
-            cursor: pointer; font-weight: 600; font-size: 13px;
+            background: var(--accent); border: none; color: #fff; padding: 10px 16px;
+            border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 13px;
             transition: all 0.2s;
         }
         .search-bar button:hover { background: #ff1a35; box-shadow: 0 4px 12px var(--accent-glow); }
         .search-bar label { display: flex; align-items: center; gap: 8px; flex: 1; }
 
         .filter-bar {
-            padding: 10px 12px;
-            background: rgba(0,0,0,0.2);
-            border-bottom: 1px solid var(--glass-border);
-            display: flex; flex-wrap: wrap; gap: 6px;
-            position: sticky; top: 43px; z-index: 9;
+            padding: 10px 12px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--glass-border);
+            display: flex; flex-wrap: wrap; gap: 6px; position: sticky; top: 43px; z-index: 9;
         }
         .filter-bar label {
-            display: flex; align-items: center; gap: 5px;
-            cursor: pointer; padding: 5px 10px;
-            border-radius: 100px;
-            border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.03);
-            color: var(--text-secondary);
-            font-size: 11px; font-weight: 500;
-            transition: all 0.15s;
+            display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 5px 10px;
+            border-radius: 100px; border: 1px solid var(--glass-border);
+            background: rgba(255,255,255,0.03); color: var(--text-secondary);
+            font-size: 11px; font-weight: 500; transition: all 0.15s;
         }
         .filter-bar label:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
         .filter-bar label:has(input:checked) {
-            background: rgba(226, 0, 26, 0.1);
-            border-color: rgba(226, 0, 26, 0.3);
-            color: #ff4d62;
+            background: rgba(226, 0, 26, 0.1); border-color: rgba(226, 0, 26, 0.3); color: #ff4d62;
         }
         .filter-bar input { display: none; }
 
         .line-group { margin-top: 8px; }
         .line-group-header {
-            padding: 8px 16px;
-            font-weight: 700; font-size: 11px; letter-spacing: 0.05em;
-            border-left: 3px solid currentColor;
-            background: rgba(0,0,0,0.2);
+            padding: 8px 16px; font-weight: 700; font-size: 11px; letter-spacing: 0.05em;
+            border-left: 3px solid currentColor; background: rgba(0,0,0,0.2);
             display: flex; align-items: center; gap: 8px;
         }
         .line-items { display: flex; flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
         .line-item {
-            padding: 6px 10px; cursor: pointer;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-sm);
-            transition: all 0.15s;
+            padding: 6px 10px; cursor: pointer; background: rgba(255,255,255,0.04);
+            border: 1px solid var(--glass-border); border-radius: var(--radius-sm); transition: all 0.15s;
         }
         .line-item:hover { transform: translateY(-1px); background: rgba(255,255,255,0.08); border-color: var(--glass-border-highlight); }
         .line-item img { height: 22px; width: auto; }
@@ -426,7 +321,6 @@
         .credits-section h3 { color: var(--text-primary); margin-bottom: 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
 
         .svg-ic { filter: brightness(0) invert(1); vertical-align: -2px; }
-        
         @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
     </style>
 </head>
@@ -436,6 +330,8 @@
     <div class="app-header">
         <div class="logo-badge">
             <img src="logo.svg" onerror="this.outerHTML='<img src=\'SVG_Icons/lignes.svg\' class=\'svg-ic\' style=\'width:24px;height:24px;\'>'">
+            <!-- NOUVEAU : Indicateur d'état -->
+            <div id="system-status-dot" class="system-status-dot" title="Initialisation des données en cours..."></div>
         </div>
         <nav class="header-tabs" role="tablist">
             <button class="header-tab active" data-tab="traffic"><img src="SVG_Icons/trafic.svg" class="svg-ic"> <span>Trafic</span></button>
@@ -449,7 +345,6 @@
     
     <div class="map-container">
         <div id="map"></div>
-        
         <div id="bus-filter-banner">
             <span id="bus-filter-label">Véhicules filtrés</span>
             <button class="filter-clear-btn" onclick="clearAllFilters()">
@@ -552,7 +447,8 @@
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
 // ===== CONFIG =====
-const API = 'https://matttcl-tcl-localisation.hf.space/';
+// Utilise l'URL actuelle si hébergé sur le même domaine, sinon l'URL HF Space
+const API = window.location.hostname.includes('hf.space') ? '' : 'https://matttcl-tcl-localisation.hf.space/';
 const imgCache = new Map();
 const NO_SVG_PREFIXES = ['JD'];
 
@@ -597,15 +493,9 @@ function getVelovDispoColor(bikes, stands, total) {
 }
 
 // ===== CARTE =====
-const map = L.map('map', { 
-    zoomControl: false, 
-    attributionControl: false, 
-    renderer: L.canvas() 
-}).setView([45.757, 4.832], 13);
+const map = L.map('map', { zoomControl: false, attributionControl: false, renderer: L.canvas() }).setView([45.757, 4.832], 13);
 
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd', maxZoom: 20
-}).addTo(map);
+L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(map);
 
 const parkingMetroLayer = L.layerGroup().addTo(map);
 const parkingLayer = L.layerGroup().addTo(map);
@@ -667,7 +557,7 @@ function getLineType(line) {
     if (/^N\d*/.test(u) || /^BGS\d*/.test(u)) return 'navette';
     if (/^PL/.test(u)) return 'pl';
     if (/^JD/.test(u)) return 'jd';
-    if (/^BR/.test(u)) return 'bus'; // Bus Relais considéré comme bus
+    if (/^BR/.test(u)) return 'bus';
     return 'bus';
 }
 
@@ -867,6 +757,7 @@ function estimatedSpeedMs(lineRemapped) {
     return kmh / 3.6;
 }
 
+// MODIFIÉ : Gestion du 503 (Lazy Loading backend)
 async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
     if (!stopId) return;
     await new Promise(r => setTimeout(r, 0));
@@ -876,6 +767,14 @@ async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
     const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">Prochains passages</div>';
     try {
         const data = await apiFetch(`api/next-departures/${stopId}`);
+        
+        // NOUVEAU : Si le backend est encore en train de charger les stops
+        if (data.is_loading) {
+            el.innerHTML = header + '<div style="font-size:11px;color:#f1c40f;text-align:center;padding:8px 0;">⏳ Initialisation des données en cours...</div>';
+            setTimeout(() => loadNextDepartures(stopId, containerId, stopLat, stopLon), 2000); // Réessaie dans 2s
+            return;
+        }
+
         const nowSec = Date.now() / 1000;
         const deps = (data.departures || []).filter(d => d.ts > nowSec - 30);
         if (!deps.length) {
@@ -928,6 +827,7 @@ async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
     }
 }
 
+// MODIFIÉ : Gestion du 503 pour le véhicule
 window.toggleVehicleJourney = async function(vehicleId, divId, btnId) {
     const div = document.getElementById(divId), btn = document.getElementById(btnId);
     if (!div) return;
@@ -942,6 +842,13 @@ async function loadVehicleJourney(vehicleId, containerId) {
     if (!el) return;
     try {
         const data = await apiFetch(`api/vehicle-journey/${vehicleId}`);
+        
+        if (data.is_loading) {
+            el.innerHTML = '<div style="font-size:10px;color:#f1c40f;padding:4px 0;">⏳ Initialisation...</div>';
+            setTimeout(() => loadVehicleJourney(vehicleId, containerId), 2000);
+            return;
+        }
+
         const stops = (data.stops || []).sort((a, b) => a.order - b.order);
         if (!stops.length) { el.innerHTML = '<div style="font-size:11px;color:var(--text-muted);text-align:center;">Aucun arrêt à venir</div>'; return; }
         const now = Date.now();
@@ -1152,14 +1059,20 @@ window.filterLineFromPopup = async function(line) {
 };
 
 // ===== API & DATA LOADING =====
+// MODIFIÉ : Gestion robuste des erreurs et du 503
 async function apiFetch(path) {
     const res = await fetch(API + path);
+    if (res.status === 503) {
+        return { is_loading: true };
+    }
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     return res.json();
 }
 
 async function loadStopsMapping() {
     try {
         const data = await apiFetch('api/stops');
+        if (data.is_loading) return; // Attendre le prochain cycle
         (data.values||[]).forEach(s => {
             if (s.id && s.nom) stopsMapping[s.id] = s.nom;
             if (s.code_station && s.nom) stopsMapping[s.code_station] = s.nom;
@@ -1175,6 +1088,7 @@ const getStopName = code => {
 async function updateStopsData() {
     try {
         const data = await apiFetch('api/stops');
+        if (data.is_loading) return;
         allStops = data.values || [];
         extractAllLines();
         renderStopList('');
@@ -1215,7 +1129,6 @@ async function updateBus() {
             const isTram = line.startsWith('T') || line.startsWith('RX');
             const color = bus.color || (isTram ? '#00d2ff' : '#da291c');
 
-            // LOGIQUE MODE FICHIER (AJOUT DE BR)
             let modeFile = 'Mode_Bus.svg';
             if (line.startsWith('BR')) modeFile = 'Mode_BR.svg';
             else if (line === 'C7' || line === 'C19') modeFile = 'Mode_Bus.svg';
@@ -1256,7 +1169,6 @@ async function updateBus() {
                         <div style="position:absolute;inset:0;background:linear-gradient(135deg,${busSnap.color}33 0%,transparent 55%,${busSnap.color}22 100%);pointer-events:none;"></div>
                         <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,var(--glass-bg-heavy));pointer-events:none;"></div>
                         
-                        <!-- BULLE CLIQUABLE EN BAS À GAUCHE (Remplace l'ancien bouton haut-droit) -->
                         <div onclick="filterLineFromPopup('${busSnap.line}')" title="Filtrer la ligne ${busSnap.line}" style="position:absolute;bottom:12px;left:12px;background:rgba(13,15,24,0.75);border:1px solid ${busSnap.color}66;border-radius:12px;padding:6px;cursor:pointer;backdrop-filter:blur(12px);box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)';this.style.borderColor='${busSnap.color}'" onmouseout="this.style.transform='scale(1)';this.style.borderColor='${busSnap.color}66'">
                             ${lineImgHtml(busSnap.line, '30px')}
                         </div>
@@ -1327,6 +1239,7 @@ async function loadParkings() {
             apiFetch('api/parkings'),
             apiFetch('api/parkings-tr').catch(() => ({ values: [] }))
         ]);
+        if (parkingsData.is_loading) return;
         const trById = {}; (trData.values || []).forEach(p => { if (p.id) trById[p.id] = p; });
         allParkings = parkingsData.map(p => ({ ...p, _tr: trById[p.id] || null }));
         parkingsLoaded = true;
@@ -1387,6 +1300,7 @@ function buildVelovPopup(s) {
 async function updateVelov() {
     try {
         const data = await apiFetch('api/velov');
+        if (data.is_loading) return;
         allVelovStations = data.values || [];
         updateVisibleVelov();
     } catch(e) { console.error('Velov:', e); }
@@ -1416,6 +1330,7 @@ function updateVisibleVelov() {
 async function loadVelovList() {
     try {
         const data = await apiFetch('api/velov');
+        if (data.is_loading) return;
         allVelovStations = data.values || [];
         renderVelovList('');
     } catch(e) { console.error("Velo'v list:", e); }
@@ -1485,6 +1400,7 @@ window.selectVelovOnMap = function(el) {
 async function updateTraffic() {
     try {
         const data = await apiFetch('api/traffic');
+        if (data.is_loading) return;
         const items = data.values || [];
         const list = document.getElementById('traffic-list');
         if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/validé.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune perturbation</div>`; return; }
@@ -1523,6 +1439,7 @@ async function updateTraffic() {
 async function updateAccessibility() {
     try {
         const data = await apiFetch('api/accessibility');
+        if (data.is_loading) return;
         const items = data.values || [];
         const list = document.getElementById('accessibility-list');
         if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune alerte</div>`; return; }
@@ -1550,6 +1467,7 @@ async function updateAccessibility() {
 async function loadAgences() {
     try {
         const data = await apiFetch('api/agences');
+        if (data.is_loading) return;
         const allAgences = (data || []).filter(a => a.lat && a.lon);
         allAgences.forEach(a => {
             const adresse = [a.numero, (a.typevoie||'').charAt(0).toUpperCase() + (a.typevoie||'').slice(1).toLowerCase(), (a.adr||'').toUpperCase()].filter(Boolean).join(' ');
@@ -1580,12 +1498,32 @@ async function loadAgences() {
     } catch(e) { console.error('Agences:', e); }
 }
 
+// ===== NOUVEAU : Vérification de l'état du système =====
+async function checkSystemStatus() {
+    try {
+        const res = await fetch(API);
+        const data = await res.json();
+        const dot = document.getElementById('system-status-dot');
+        if (data.data_loaded && data.data_loaded.stops) {
+            dot.classList.add('ready');
+            dot.title = "Toutes les données sont chargées et prêtes";
+        } else {
+            dot.classList.remove('ready');
+            dot.title = "Initialisation des données en cours...";
+        }
+    } catch(e) {
+        // En cas d'erreur, on garde le statut jaune
+    }
+}
+
 // ===== INIT =====
 async function init() {
     await loadStopsMapping();
     await Promise.all([
         updateBus(), loadParkings(), updateVelov(), updateTraffic(), updateAccessibility(), updateStopsData(), loadAgences()
     ]);
+    // Lancer la vérification de statut après un court délai
+    setTimeout(checkSystemStatus, 3000);
 }
 init();
 
@@ -1595,6 +1533,7 @@ setInterval(updateVelov, 60_000);
 setInterval(updateTraffic, 60_000);
 setInterval(updateAccessibility, 60_000);
 setInterval(updateStopsData, 300_000);
+setInterval(checkSystemStatus, 10_000); // Vérifie toutes les 10s si le backend a fini de charger
 
 let moveTimer = null;
 map.on('moveend zoomend', () => {
