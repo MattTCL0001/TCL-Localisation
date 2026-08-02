@@ -595,7 +595,7 @@ function getOriginalCodes(targetMapped) {
     return codes;
 }
 
-function desserteContainsLine(desserte, targetMapped) {
+function stopServesLine(desserte, targetMapped) {
     if (!desserte) return false;
     const codes = getOriginalCodes(targetMapped);
     return desserte.split(',').some(entry => {
@@ -651,7 +651,7 @@ window.filterStops = () => {
 function renderStopList(term = '') {
     let stops = [...allStops].sort((a, b) => (a.nom||'').localeCompare(b.nom||''));
     if (currentLineFilter) {
-        stops = stops.filter(s => desserteContainsLine(s.desserte, currentLineFilter));
+        stops = stops.filter(s => stopServesLine(s.desserte, currentLineFilter));
     } else if (term) {
         stops = stops.filter(s => (s.nom||'').toLowerCase().includes(term) || (s.commune||'').toLowerCase().includes(term) || (s.desserte||'').toLowerCase().includes(term));
     }
@@ -928,7 +928,7 @@ function getLineColorFallback(lineCode) { return LINE_COLORS_JS[lineCode] || LIN
 async function showLineTrace(lineCode) {
     lineTraceLayer.clearLayers();
     const fallbackColor = getLineColorFallback(lineCode);
-    const lineStops = allStops.filter(s => desserteContainsLine(s.desserte, lineCode));
+    const lineStops = allStops.filter(s => stopServesLine(s.desserte, lineCode));
     const bounds = [];
     let traceColor = fallbackColor;
 
@@ -1264,19 +1264,19 @@ function updateVisibleParkings() {
     for (const [k, m] of parkingMarkerMap) { if (!seen.has(k)) { parkingLayer.removeLayer(m); parkingMarkerMap.delete(k); } }
 }
 
-async function loadParcsRelais() {
+async function loadParkAndRideLots() {
     if (parcsRelaisLoaded) return;
     try {
-        const data = await apiFetch('api/parcs-relais');
-        if (data.is_loading) { setTimeout(loadParcsRelais, 2000); return; } // RETRY
+        const data = await apiFetch('api/park-and-ride');
+        if (data.is_loading) { setTimeout(loadParkAndRideLots, 2000); return; } // RETRY
         allParcsRelais = Array.isArray(data) ? data : [];
         parcsRelaisLoaded = true;
-        updateVisibleParcsRelais();
-    } catch(e) { setTimeout(loadParcsRelais, 3000); }
+        updateVisibleParkAndRideLots();
+    } catch(e) { setTimeout(loadParkAndRideLots, 3000); }
 }
 
-function updateVisibleParcsRelais() {
-    if (!parcsRelaisLoaded) { loadParcsRelais(); return; }
+function updateVisibleParkAndRideLots() {
+    if (!parcsRelaisLoaded) { loadParkAndRideLots(); return; }
     if (map.getZoom() < 11) { parcsRelaisMarkerMap.forEach(m => parcsRelaisLayer.removeLayer(m)); parcsRelaisMarkerMap.clear(); return; }
     const bounds = map.getBounds();
     const visible = allParcsRelais.filter(p => {
@@ -1493,10 +1493,10 @@ async function updateAccessibility() {
     } catch(e) { setTimeout(updateAccessibility, 3000); }
 }
 
-async function loadAgences() {
+async function loadAgencies() {
     try {
-        const data = await apiFetch('api/agences');
-        if (data.is_loading) { setTimeout(loadAgences, 2000); return; } // RETRY
+        const data = await apiFetch('api/agencies');
+        if (data.is_loading) { setTimeout(loadAgencies, 2000); return; } // RETRY
         const allAgences = (data || []).filter(a => a.lat && a.lon);
         allAgences.forEach(a => {
             const adresse = [a.numero, (a.typevoie||'').charAt(0).toUpperCase() + (a.typevoie||'').slice(1).toLowerCase(), (a.adr||'').toUpperCase()].filter(Boolean).join(' ');
@@ -1524,7 +1524,7 @@ async function loadAgences() {
                 })
             }).bindPopup(popup, { maxWidth: 250, className: 'tcl-popup' }).addTo(agenceLayer);
         });
-    } catch(e) { setTimeout(loadAgences, 3000); }
+    } catch(e) { setTimeout(loadAgencies, 3000); }
 }
 
 // ===== VÉRIFICATION DE L'ÉTAT DU SYSTÈME =====
@@ -1547,7 +1547,7 @@ async function checkSystemStatus() {
 async function init() {
     await loadStopsMapping();
     await Promise.all([
-        updateBus(), loadParkings(), loadParcsRelais(), updateVelov(), updateTraffic(), updateAccessibility(), updateStopsData(), loadAgences()
+        updateBus(), loadParkings(), loadParkAndRideLots(), updateVelov(), updateTraffic(), updateAccessibility(), updateStopsData(), loadAgencies()
     ]);
     setTimeout(checkSystemStatus, 3000);
 }
@@ -1567,7 +1567,7 @@ map.on('moveend zoomend', () => {
     moveTimer = setTimeout(() => {
         updateVisibleVelov();
         updateVisibleParkings();
-        updateVisibleParcsRelais();
+        updateVisibleParkAndRideLots();
     }, 200);
 }, { passive: true });
 
