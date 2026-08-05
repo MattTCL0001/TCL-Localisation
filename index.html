@@ -133,7 +133,6 @@
         .leaflet-popup-close-button { color: var(--text-secondary) !important; padding: 8px !important; font-size: 18px !important; }
         .leaflet-popup-close-button:hover { color: var(--text-primary) !important; background: rgba(255,255,255,0.05) !important; border-radius: 50% !important; }
 
-        /* Layer Control */
         .layer-control {
             position: absolute;
             top: 16px;
@@ -162,6 +161,7 @@
             transition: all 0.15s;
             font-size: 12px;
             color: var(--text-secondary);
+            user-select: none;
         }
         .layer-toggle:hover {
             background: rgba(255,255,255,0.08);
@@ -422,7 +422,7 @@
                 <span>Vélo'v</span>
             </div>
             <div class="layer-toggle active" data-layer="parking" onclick="toggleLayer('parking')">
-                <div class="layer-toggle-icon"><img src="SVG_Icons/Park.svg" class="svg-ic" style="width:14px;height:14px;"></div>
+                <div class="layer-toggle-icon">🅿️</div>
                 <span>Parkings</span>
             </div>
         </div>
@@ -526,7 +526,8 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>// ===== CONFIG =====
+<script>
+// ===== CONFIG =====
 const API = window.location.hostname.includes('hf.space') ? '' : 'https://matttcl-tcl-localisation.hf.space/';
 const imgCache = new Map();
 
@@ -545,7 +546,6 @@ async function apiFetch(path, attempt = 1) {
         });
         clearTimeout(timeoutId);
         
-        // 429 = rate limit HuggingFace
         if (res.status === 429) {
             const wait = Math.min(_fetchBackoff * attempt * 2, 30000);
             console.warn(`⏳ 429 rate limit sur ${path}, attente ${wait/1000}s...`);
@@ -665,29 +665,22 @@ function getVelovDispoColor(bikes, stands, total) {
 const map = L.map('map', { zoomControl: false, attributionControl: false, renderer: L.canvas() }).setView([45.757, 4.832], 13);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(map);
 
-// Panes personnalisés pour z-index
-if (!map.getPane('tracePane')) {
-    map.createPane('tracePane');
-    map.getPane('tracePane').style.zIndex = 390;
-}
-if (!map.getPane('parkingPane')) {
-    map.createPane('parkingPane');
-    map.getPane('parkingPane').style.zIndex = 410;
-}
-if (!map.getPane('velovPane')) {
-    map.createPane('velovPane');
-    map.getPane('velovPane').style.zIndex = 420;
-}
-if (!map.getPane('stopPane')) {
-    map.createPane('stopPane');
-    map.getPane('stopPane').style.zIndex = 430;
-}
-if (!map.getPane('vehiclePane')) {
-    map.createPane('vehiclePane');
-    map.getPane('vehiclePane').style.zIndex = 440;
-}
+// Panes personnalisés pour z-index (ordre : tracés < parkings < vélov < arrêts < véhicules)
+map.createPane('tracePane');
+map.getPane('tracePane').style.zIndex = 390;
 
-const parkingMetroLayer = L.layerGroup().addTo(map);
+map.createPane('parkingPane');
+map.getPane('parkingPane').style.zIndex = 410;
+
+map.createPane('velovPane');
+map.getPane('velovPane').style.zIndex = 420;
+
+map.createPane('stopPane');
+map.getPane('stopPane').style.zIndex = 430;
+
+map.createPane('vehiclePane');
+map.getPane('vehiclePane').style.zIndex = 440;
+
 const parkingLayer = L.layerGroup().addTo(map);
 const parcsRelaisLayer = L.layerGroup().addTo(map);
 const lineTraceLayer = L.layerGroup().addTo(map);
@@ -697,14 +690,15 @@ const agenceLayer = L.layerGroup().addTo(map);
 const stopMapLayer = L.layerGroup().addTo(map);
 
 let allStops = [], stopsMapping = {}, allLines = [];
-let allVelovStations = [], allParkings = [], allParkingsMetro = [], allParcsRelais = [];
+let allVelovStations = [], allParkings = [], allParcsRelais = [];
 let currentStopMarker = null, currentVelovMarker = null;
-let parkingsLoaded = false, parkingsMetroLoaded = false, velovLoaded = false, parcsRelaisLoaded = false;
-const busMarkers = new Map(), velovMarkerMap = new Map(), parkingMarkerMap = new Map(), parkingMetroMarkerMap = new Map(), parcsRelaisMarkerMap = new Map();
+let parkingsLoaded = false, velovLoaded = false, parcsRelaisLoaded = false;
+const busMarkers = new Map(), velovMarkerMap = new Map(), parkingMarkerMap = new Map(), parcsRelaisMarkerMap = new Map();
 let currentLineFilter = null, busLineFilter = null;
 let stopsOnMap = [];
 const layerVisibility = { bus: true, stops: true, velov: true, parking: true };
 
+// ===== TOGGLE DES COUCHES =====
 function toggleLayer(layerName) {
     layerVisibility[layerName] = !layerVisibility[layerName];
     const btn = document.querySelector(`[data-layer="${layerName}"]`);
@@ -1320,7 +1314,6 @@ async function updateBus() {
 
             const line = bus.line;
             const color = bus.color || getLineColor(line);
-            const isTram = line.startsWith('T') || line.startsWith('RX');
 
             let modeFile = 'Mode_Bus.svg';
             if (line.startsWith('BR')) modeFile = 'Mode_BR.svg';
@@ -1432,14 +1425,9 @@ function buildParkingPopup(p, tr, titre = 'Parking', iconEmoji = '🅿️') {
 async function loadParkings() {
     if (parkingsLoaded) return;
     try {
-        const [parkingsData, trData] = await Promise.all([
-            apiFetch('api/parkings'),
-            apiFetch('api/parkings-tr').catch(() => ({ values: [] }))
-        ]);
+        const parkingsData = await apiFetch('api/parkings');
         if (parkingsData.is_loading) { setTimeout(loadParkings, 10000); return; }
-        
-        const trById = {}; (trData.values || []).forEach(p => { if (p.id) trById[p.id] = p; });
-        allParkings = parkingsData.map(p => ({ ...p, _tr: trById[p.id] || null }));
+        allParkings = Array.isArray(parkingsData) ? parkingsData : [];
         parkingsLoaded = true;
         updateVisibleParkings();
     } catch(e) { setTimeout(loadParkings, 10000); }
@@ -1462,17 +1450,17 @@ function updateVisibleParkings() {
     visible.forEach(p => {
         const key = `${p.lat},${p.lon}`; seen.add(key);
         if (parkingMarkerMap.has(key)) return;
-        const dispoInfo = getDispoColor(p._tr?.nb_tot_place_dispo ?? 0, p.capacite || 1);
+        const dispoInfo = getDispoColor(p._nb_dispo ?? 0, p.capacite || 1);
         const m = L.marker([parseFloat(p.lat), parseFloat(p.lon)], {
             pane: 'parkingPane',
             icon: L.divIcon({
                 html: `<div style="position:relative;width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                    <img src="Park.svg" style="width:28px;height:28px;" onerror="this.outerHTML='<span style=font-size:20px>🅿️</span>'">
+                    <span style="font-size:22px;display:flex;align-items:center;justify-content:center;width:28px;height:28px;background:rgba(13,15,24,0.9);border-radius:6px;">🅿️</span>
                     <div style="position:absolute;bottom:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:${dispoInfo?.color || '#0099cc'};border:2px solid rgba(13,15,24,0.9);"></div>
                 </div>`,
                 className: '', iconSize: [28, 28], iconAnchor: [14, 14]
             })
-        }).bindPopup(buildParkingPopup(p, p._tr, 'Parking', '🅿️'), { maxWidth:240, className:'tcl-popup' }).addTo(parkingLayer);
+        }).bindPopup(buildParkingPopup(p, null, 'Parking', '🅿️'), { maxWidth:240, className:'tcl-popup' }).addTo(parkingLayer);
         parkingMarkerMap.set(key, m);
     });
     for (const [k, m] of parkingMarkerMap) { if (!seen.has(k)) { parkingLayer.removeLayer(m); parkingMarkerMap.delete(k); } }
@@ -1511,7 +1499,7 @@ function updateVisibleParkAndRideLots() {
             pane: 'parkingPane',
             icon: L.divIcon({
                 html: `<div style="position:relative;width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                    <img src="P+R.svg" style="width:28px;height:28px;" onerror="this.outerHTML='<span style=font-size:20px>🅿️</span>'">
+                    <span style="font-size:22px;display:flex;align-items:center;justify-content:center;width:28px;height:28px;background:rgba(13,15,24,0.9);border-radius:6px;">🅿️</span>
                     <div style="position:absolute;bottom:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:${dispoInfo?.color || '#0099cc'};border:2px solid rgba(13,15,24,0.9);"></div>
                 </div>`,
                 className: '', iconSize: [28, 28], iconAnchor: [14, 14]
