@@ -2,1791 +2,199 @@
 <html lang="fr">
 <head>
     <title>TCL Localisation</title>
-    <link rel="icon" href="icon.svg" type="image/svg+xml">
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
     <meta charset="utf-8" />
     <meta name="color-scheme" content="dark">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <meta name="theme-color" content="#0d0f18">
-    
+
+    <!-- Leaflet (carte) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- Tabler Icons -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
-    
-    <style>
-        :root {
-            --accent: #e2001a;
-            --accent-glow: rgba(226, 0, 26, 0.4);
-            --text-primary: #edf0f8;
-            --text-secondary: #8a90a8;
-            --text-muted: #4a4f6a;
-            
-            --glass-bg: rgba(13, 15, 24, 0.65);
-            --glass-bg-heavy: rgba(13, 15, 24, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.08);
-            --glass-border-highlight: rgba(255, 255, 255, 0.15);
-            --glass-blur: blur(24px) saturate(180%);
-            
-            --radius-sm: 10px;
-            --radius-md: 16px;
-            --radius-lg: 24px;
-            --panel-height: 50vh;
-        }
 
-        * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    <!-- Styles personnalisés -->
+    <link rel="stylesheet" href="css/styles.css">
 
-        body, html {
-            height: 100%; width: 100%;
-            background: #08090f;
-            color: var(--text-primary);
-            overflow: hidden;
-            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-        }
-
-        body::before {
-            content: '';
-            position: fixed;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: radial-gradient(circle at 50% 50%, rgba(226, 0, 26, 0.03) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(0, 210, 255, 0.03) 0%, transparent 40%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .app-container {
-            position: fixed;
-            inset: 0;
-            display: flex;
-            flex-direction: column;
-            z-index: 10;
-        }
-
-        .app-header {
-            height: 60px;
-            background: var(--glass-bg-heavy);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border-bottom: 1px solid var(--glass-border);
-            box-shadow: 0 4px 24px rgba(0,0,0,0.4), inset 0 1px 0 var(--glass-border-highlight);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 16px;
-            z-index: 1002;
-            flex-shrink: 0;
-        }
-
-        .logo-badge { display: flex; align-items: center; gap: 10px; }
-        .logo-badge img { height: 24px; width: auto; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3)); }
-        
-        .system-status-dot {
-            width: 8px; height: 8px; border-radius: 50%;
-            background: #f1c40f;
-            box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
-            transition: all 0.3s ease;
-        }
-        .system-status-dot.ready {
-            background: #4dff88;
-            box-shadow: 0 0 8px rgba(77, 255, 136, 0.5);
-        }
-
-        .header-tabs {
-            display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none;
-            mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
-            -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
-            padding: 0 4px;
-        }
-        .header-tabs::-webkit-scrollbar { display: none; }
-
-        .header-tab {
-            display: flex; align-items: center; gap: 6px; padding: 8px 14px;
-            border-radius: var(--radius-sm); border: 1px solid transparent;
-            background: transparent; color: var(--text-secondary);
-            font-size: 13px; font-weight: 500; cursor: pointer; white-space: nowrap;
-            transition: all 0.2s ease;
-        }
-        .header-tab:hover { background: rgba(255,255,255,0.05); color: var(--text-primary); }
-        .header-tab.active {
-            background: rgba(226, 0, 26, 0.12); border-color: rgba(226, 0, 26, 0.3);
-            color: #ff4d62; box-shadow: 0 0 12px rgba(226, 0, 26, 0.15);
-        }
-        .header-tab i, .header-tab img { width: 15px; height: 15px; }
-
-        .map-container { flex: 1; position: relative; background: #08090f; min-height: 0; }
-        #map { position: absolute; inset: 0; width: 100%; height: 100%; background: #08090f; z-index: 1; }
-
-        .leaflet-container { background: #08090f !important; font-family: inherit !important; }
-        .leaflet-control-zoom, .leaflet-control-attribution { display: none !important; }
-        .leaflet-pane, .leaflet-tile, .leaflet-marker-icon, .leaflet-marker-shadow { outline: none !important; border: none !important; }
-        .leaflet-tile-container { filter: contrast(1.1) brightness(0.9); }
-
-        .leaflet-popup-content-wrapper {
-            background: var(--glass-bg-heavy) !important; backdrop-filter: var(--glass-blur) !important;
-            -webkit-backdrop-filter: var(--glass-blur) !important; color: var(--text-primary) !important;
-            border: 1px solid var(--glass-border-highlight) !important; border-radius: var(--radius-md) !important;
-            padding: 0 !important; box-shadow: 0 12px 40px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1) !important;
-        }
-        .leaflet-popup-tip { 
-            background: var(--glass-bg-heavy) !important; border: 1px solid var(--glass-border-highlight) !important;
-            border-top: none !important; border-left: none !important;
-        }
-        .leaflet-popup-content { margin: 0 !important; font-family: 'Segoe UI', system-ui, sans-serif !important; }
-        .leaflet-popup-close-button { color: var(--text-secondary) !important; padding: 8px !important; font-size: 18px !important; }
-        .leaflet-popup-close-button:hover { color: var(--text-primary) !important; background: rgba(255,255,255,0.05) !important; border-radius: 50% !important; }
-
-        .layer-control {
-            position: absolute;
-            top: 16px;
-            right: 16px;
-            z-index: 1000;
-            background: var(--glass-bg-heavy);
-            backdrop-filter: var(--glass-blur);
-            -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border-highlight);
-            border-radius: var(--radius-md);
-            padding: 8px;
-            display: flex;
-            flex-direction: column;
-            gap: 6px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5);
-        }
-        .layer-toggle {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding: 6px 10px;
-            background: rgba(255,255,255,0.04);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--radius-sm);
-            cursor: pointer;
-            transition: all 0.15s;
-            font-size: 12px;
-            color: var(--text-secondary);
-            user-select: none;
-        }
-        .layer-toggle:hover {
-            background: rgba(255,255,255,0.08);
-            color: var(--text-primary);
-        }
-        .layer-toggle.active {
-            background: rgba(226, 0, 26, 0.12);
-            border-color: rgba(226, 0, 26, 0.3);
-            color: #ff4d62;
-        }
-        .layer-toggle-icon {
-            width: 16px;
-            height: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        #bus-filter-banner, #stop-filter-banner {
-            display: none; position: absolute; top: 16px; left: 50%; transform: translateX(-50%);
-            z-index: 1001; background: rgba(13, 15, 24, 0.8); backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px); border: 1px solid rgba(0, 210, 255, 0.2);
-            border-radius: 100px; padding: 8px 16px; align-items: center; gap: 12px;
-            font-size: 12px; white-space: nowrap;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-        #bus-filter-banner.visible, #stop-filter-banner.visible { display: flex; }
-        #bus-filter-label, #stop-filter-label { color: #00d2ff; display: flex; align-items: center; gap: 6px; font-weight: 500; }
-        
-        .filter-clear-btn {
-            cursor: pointer; color: var(--text-secondary); background: rgba(255,255,255,0.06);
-            border: 1px solid var(--glass-border); border-radius: 20px; padding: 4px 10px;
-            font-size: 11px; font-family: inherit; transition: all 0.15s;
-            display: flex; align-items: center; gap: 4px;
-        }
-        .filter-clear-btn:hover { background: rgba(255,255,255,0.12); color: var(--text-primary); }
-
-        #info-panel {
-            position: fixed; top: 70px; right: 16px; bottom: 16px; width: 380px;
-            z-index: 1000; display: flex; flex-direction: column; pointer-events: none;
-            transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
-        }
-        #info-panel.collapsed { transform: translateX(calc(100% + 32px)); }
-        #info-panel > * { pointer-events: all; }
-
-        .panel-toggle {
-            position: absolute; left: -44px; top: 24px;
-            background: var(--glass-bg-heavy); backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border-highlight); border-right: none;
-            color: var(--text-secondary); width: 44px; height: 44px; cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-            border-radius: var(--radius-sm) 0 0 var(--radius-sm); transition: all 0.2s;
-            box-shadow: -4px 4px 12px rgba(0,0,0,0.3);
-        }
-        .panel-toggle:hover { color: var(--accent); background: rgba(226, 0, 26, 0.1); }
-        #info-panel.collapsed .panel-toggle span { transform: rotate(180deg); }
-
-        .tab-content {
-            flex: 1; overflow-y: auto; background: var(--glass-bg-heavy);
-            backdrop-filter: var(--glass-blur); -webkit-backdrop-filter: var(--glass-blur);
-            border: 1px solid var(--glass-border-highlight); border-radius: var(--radius-md);
-            box-shadow: 0 12px 40px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
-            display: flex; flex-direction: column; overflow: hidden;
-        }
-
-        @media (max-width: 768px), (orientation: portrait) {
-            #info-panel {
-                top: auto; right: 0; left: 0; bottom: 0; width: 100%; height: var(--panel-height);
-                padding-bottom: env(safe-area-inset-bottom, 0px);
-                transform: translateY(calc(100% - 56px));
-            }
-            #info-panel.collapsed { transform: translateY(calc(100% - 56px)); }
-            #info-panel:not(.collapsed) { transform: translateY(0); }
-            
-            .panel-toggle {
-                left: 50%; top: -48px; transform: translateX(-50%);
-                border-radius: var(--radius-sm) var(--radius-sm) 0 0;
-                border: 1px solid var(--glass-border-highlight); border-bottom: none;
-                width: 56px; height: 48px; box-shadow: 0 -4px 12px rgba(0,0,0,0.3);
-            }
-            .panel-toggle::before {
-                content: ''; position: absolute; top: 12px; left: 50%; transform: translateX(-50%);
-                width: 32px; height: 4px; background: rgba(255,255,255,0.2); border-radius: 4px;
-            }
-            .panel-toggle span { display: none; }
-
-            .tab-content {
-                border-radius: var(--radius-lg) var(--radius-lg) 0 0; border-bottom: none;
-                box-shadow: 0 -8px 32px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
-            }
-            #bus-filter-banner, #stop-filter-banner { top: 70px; }
-            .app-header { padding: 0 12px; height: 56px; padding-top: env(safe-area-inset-top, 0px); }
-            .layer-control { top: 70px; right: 8px; }
-        }
-
-        .tab-pane { display: none; flex-direction: column; flex: 1; height: 100%; position: relative; }
-        .tab-pane.active { display: flex; }
-
-        .tab-header {
-            padding: 14px 16px; border-bottom: 1px solid var(--glass-border);
-            font-size: 11px; font-weight: 700; text-transform: uppercase;
-            letter-spacing: 0.1em; color: var(--text-muted); flex-shrink: 0;
-            background: rgba(0,0,0,0.2);
-            display: flex; justify-content: space-between; align-items: center;
-        }
-
-        .info-list { 
-            flex: 1; overflow-y: auto; scrollbar-width: thin; scrollbar-color: rgba(255,255,255,0.1) transparent; 
-        }
-        .info-list::-webkit-scrollbar { width: 4px; }
-        .info-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.15); border-radius: 4px; }
-
-        .info-item { border-bottom: 1px solid var(--glass-border); transition: background 0.15s; }
-        .info-item:last-child { border-bottom: none; }
-        .info-item:active { background: rgba(255,255,255,0.03); }
-
-        .info-summary { display: flex; align-items: center; gap: 12px; padding: 12px 16px; cursor: pointer; }
-        .info-line-badge {
-            flex-shrink: 0; width: 38px; height: 38px; border-radius: var(--radius-sm);
-            background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: inset 0 1px 0 rgba(255,255,255,0.05);
-        }
-        .info-summary-text { flex: 1; overflow: hidden; }
-        .info-titre { font-size: 13px; font-weight: 600; color: var(--text-primary); margin-bottom: 2px; }
-        .info-type { font-size: 11px; color: var(--text-muted); }
-        .info-chevron { color: var(--text-muted); font-size: 10px; flex-shrink: 0; transition: transform 0.25s cubic-bezier(0.32, 0.72, 0, 1); }
-        .info-item.expanded .info-chevron { transform: rotate(180deg); color: var(--accent); }
-
-        .info-detail {
-            display: none; padding: 0 16px 16px 66px;
-            font-size: 12px; color: var(--text-secondary); line-height: 1.7;
-            background: rgba(0,0,0,0.15); border-top: 1px solid var(--glass-border);
-            animation: slideDown 0.25s ease-out;
-        }
-        .info-item.expanded .info-detail { display: block; }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: translateY(0); } }
-
-        .info-empty { padding: 40px 16px; text-align: center; color: var(--text-muted); font-size: 13px; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-
-        .search-bar {
-            background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--glass-border);
-            padding: 12px; display: flex; gap: 8px; flex-shrink: 0;
-        }
-        .search-bar input {
-            flex: 1; background: rgba(255,255,255,0.04); border: 1px solid var(--glass-border);
-            color: var(--text-primary); padding: 10px 14px; border-radius: var(--radius-sm);
-            font-size: 13px; font-family: inherit; transition: all 0.2s;
-        }
-        .search-bar input:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,0.06); box-shadow: 0 0 0 3px rgba(226,0,26,0.1); }
-        .search-bar input::placeholder { color: var(--text-muted); }
-        .search-bar button {
-            background: var(--accent); border: none; color: #fff; padding: 10px 16px;
-            border-radius: var(--radius-sm); cursor: pointer; font-weight: 600; font-size: 13px;
-            transition: all 0.2s;
-        }
-        .search-bar button:hover { background: #ff1a35; box-shadow: 0 4px 12px var(--accent-glow); }
-        .search-bar label { display: flex; align-items: center; gap: 8px; flex: 1; }
-
-        .filter-bar {
-            padding: 10px 12px; background: rgba(0,0,0,0.2); border-bottom: 1px solid var(--glass-border);
-            display: flex; flex-wrap: wrap; gap: 6px; flex-shrink: 0;
-        }
-        .filter-bar label {
-            display: flex; align-items: center; gap: 5px; cursor: pointer; padding: 5px 10px;
-            border-radius: 100px; border: 1px solid var(--glass-border);
-            background: rgba(255,255,255,0.03); color: var(--text-secondary);
-            font-size: 11px; font-weight: 500; transition: all 0.15s;
-        }
-        .filter-bar label:hover { background: rgba(255,255,255,0.08); color: var(--text-primary); }
-        .filter-bar label:has(input:checked) {
-            background: rgba(226, 0, 26, 0.1); border-color: rgba(226, 0, 26, 0.3); color: #ff4d62;
-        }
-        .filter-bar input { display: none; }
-
-        .line-group { margin-top: 8px; }
-        .line-group-header {
-            padding: 8px 16px; font-weight: 700; font-size: 11px; letter-spacing: 0.05em;
-            border-left: 3px solid currentColor; background: rgba(0,0,0,0.2);
-            display: flex; align-items: center; gap: 8px;
-        }
-        .line-items { display: flex; flex-wrap: wrap; padding: 10px 12px; gap: 8px; }
-        .line-item {
-            padding: 6px 10px; cursor: pointer; background: rgba(255,255,255,0.04);
-            border: 1px solid var(--glass-border); border-radius: var(--radius-sm); transition: all 0.15s;
-        }
-        .line-item:hover { transform: translateY(-1px); background: rgba(255,255,255,0.08); border-color: var(--glass-border-highlight); }
-        .line-item img { height: 22px; width: auto; }
-
-        .stop-lines { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
-        .search-highlight { background: rgba(226, 0, 26, 0.3); color: #fff; border-radius: 3px; padding: 0 3px; font-weight: 600; }
-        .stop-commune { font-size: 11px; color: rgba(255,184,77,0.8); margin-top: 2px; }
-        .stop-pmr-badge {
-            display: inline-flex; align-items: center; gap: 3px;
-            background: rgba(77,255,136,0.1); color: #4dff88;
-            border: 1px solid rgba(77,255,136,0.2);
-            font-size: 10px; padding: 2px 6px; border-radius: 100px; margin-left: 6px;
-        }
-
-        .credits-content { padding: 20px; line-height: 1.8; color: var(--text-secondary); font-size: 13px; }
-        .credits-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(226,0,26,0.3); transition: all 0.2s; }
-        .credits-content a:hover { color: #ff4d62; border-color: #ff4d62; }
-        .credits-section { margin-bottom: 24px; }
-        .credits-section h3 { color: var(--text-primary); margin-bottom: 10px; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
-
-        .svg-ic { filter: brightness(0) invert(1); vertical-align: -2px; }
-        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
-        
-        .stop-map-marker {
-            background: rgba(13, 15, 24, 0.85);
-            border: 1.5px solid rgba(255, 255, 255, 0.25);
-            border-radius: 50%;
-            width: 12px;
-            height: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.5);
-        }
-        .stop-map-marker.highlighted {
-            background: var(--accent);
-            border-color: #fff;
-            box-shadow: 0 0 12px var(--accent-glow);
-        }
-    </style>
+    <!-- Spinner de chargement -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Chargement des données...</p>
+    </div>
 </head>
 <body>
-
-<div class="app-container">
-    <div class="app-header">
-        <div class="logo-badge">
-            <img src="logo.svg" onerror="this.outerHTML='<img src=\'SVG_Icons/lignes.svg\' class=\'svg-ic\' style=\'width:24px;height:24px;\'>'">
-            <div id="system-status-dot" class="system-status-dot" title="Initialisation des données en cours..."></div>
-        </div>
-        <nav class="header-tabs" role="tablist">
-            <button class="header-tab active" data-tab="traffic"><img src="SVG_Icons/trafic.svg" class="svg-ic"> <span>Trafic</span></button>
-            <button class="header-tab" data-tab="accessibility"><img src="SVG_Icons/PMR.svg" class="svg-ic"> <span>PMR</span></button>
-            <button class="header-tab" data-tab="stops"><img src="SVG_Icons/arrêt.svg" class="svg-ic"> <span>Arrêts</span></button>
-            <button class="header-tab" data-tab="lines"><img src="SVG_Icons/lignes.svg" class="svg-ic"> <span>Lignes</span></button>
-            <button class="header-tab" data-tab="velov"><img src="SVG_Icons/velo.svg" class="svg-ic"> <span>Vélo'v</span></button>
-            <button class="header-tab" data-tab="credits"><img src="SVG_Icons/id.svg" class="svg-ic"> <span>Infos</span></button>
-        </nav>
-    </div>
-    
-    <div class="map-container">
-        <div id="map"></div>
-        <div class="layer-control">
-            <div class="layer-toggle active" data-layer="bus" onclick="toggleLayer('bus')">
-                <div class="layer-toggle-icon"><img src="SVG_Icons/bus.svg" class="svg-ic" style="width:14px;height:14px;"></div>
-                <span>Véhicules</span>
+    <div class="app-container">
+        <!-- En-tête -->
+        <header class="app-header">
+            <div class="logo-badge">
+                <img src="assets/logo.svg" onerror="this.src='assets/SVG_Icons/lignes.svg'; this.classList.add('svg-ic');">
+                <div id="system-status-dot" class="system-status-dot" title="Initialisation..."></div>
             </div>
-            <div class="layer-toggle active" data-layer="stops" onclick="toggleLayer('stops')">
-                <div class="layer-toggle-icon"><img src="SVG_Icons/arrêt.svg" class="svg-ic" style="width:14px;height:14px;"></div>
-                <span>Arrêts</span>
-            </div>
-            <div class="layer-toggle active" data-layer="velov" onclick="toggleLayer('velov')">
-                <div class="layer-toggle-icon"><img src="SVG_Icons/velo.svg" class="svg-ic" style="width:14px;height:14px;"></div>
-                <span>Vélo'v</span>
-            </div>
-            <div class="layer-toggle active" data-layer="parking" onclick="toggleLayer('parking')">
-                <div class="layer-toggle-icon">🅿️</div>
-                <span>Parkings</span>
-            </div>
-        </div>
-        <div id="bus-filter-banner">
-            <span id="bus-filter-label">Véhicules filtrés</span>
-            <button class="filter-clear-btn" onclick="clearAllFilters()">
-                <img src="SVG_Icons/refusé.svg" class="svg-ic" style="width:12px;height:12px;"> Retirer
-            </button>
-        </div>
-    </div>
-</div>
+            <nav class="header-tabs" role="tablist">
+                <button class="header-tab active" data-tab="traffic" onclick="switchToTab('traffic')">
+                    <img src="assets/SVG_Icons/trafic.svg" class="svg-ic"> <span>Trafic</span>
+                </button>
+                <button class="header-tab" data-tab="accessibility" onclick="switchToTab('accessibility')">
+                    <img src="assets/SVG_Icons/PMR.svg" class="svg-ic"> <span>PMR</span>
+                </button>
+                <button class="header-tab" data-tab="stops" onclick="switchToTab('stops')">
+                    <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic"> <span>Arrêts</span>
+                </button>
+                <button class="header-tab" data-tab="lines" onclick="switchToTab('lines')">
+                    <img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> <span>Lignes</span>
+                </button>
+                <button class="header-tab" data-tab="velov" onclick="switchToTab('velov')">
+                    <img src="assets/SVG_Icons/velo.svg" class="svg-ic"> <span>Vélo'v</span>
+                </button>
+                <button class="header-tab" data-tab="credits" onclick="switchToTab('credits')">
+                    <img src="assets/SVG_Icons/id.svg" class="svg-ic"> <span>Infos</span>
+                </button>
+            </nav>
+        </header>
 
-<div id="info-panel">
-    <div class="panel-toggle" onclick="togglePanel()"><span>❯</span></div>
-    <div class="tab-content">
-
-        <div id="traffic-pane" class="tab-pane active">
-            <div class="tab-header">Perturbations en cours</div>
-            <div id="traffic-list" class="info-list"><div class="info-empty"><img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:20px;height:20px;opacity:0.5;"> Chargement...</div></div>
-        </div>
-
-        <div id="accessibility-pane" class="tab-pane">
-            <div class="tab-header">Alertes accessibilité</div>
-            <div id="accessibility-list" class="info-list"><div class="info-empty"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:20px;height:20px;opacity:0.5;"> Chargement...</div></div>
-        </div>
-
-        <div id="stops-pane" class="tab-pane">
-            <div class="search-bar">
-                <label>
-                    <img src="SVG_Icons/loupe.svg" class="svg-ic" style="width:16px;height:16px;opacity:0.6;">
-                    <input type="text" id="stop-search" placeholder="Nom d'arrêt, commune..." oninput="filterStops()">
-                </label>
+        <!-- Carte -->
+        <div class="map-container">
+            <div id="map"></div>
+            <div class="layer-control">
+                <div class="layer-toggle active" data-layer="bus" onclick="toggleLayer('bus')">
+                    <div class="layer-toggle-icon"><img src="assets/SVG_Icons/bus.svg" class="svg-ic"></div>
+                    <span>Bus</span>
+                </div>
+                <div class="layer-toggle active" data-layer="stops" onclick="toggleLayer('stops')">
+                    <div class="layer-toggle-icon"><img src="assets/SVG_Icons/arrêt.svg" class="svg-ic"></div>
+                    <span>Arrêts</span>
+                </div>
+                <div class="layer-toggle active" data-layer="velov" onclick="toggleLayer('velov')">
+                    <div class="layer-toggle-icon"><img src="assets/SVG_Icons/velo.svg" class="svg-ic"></div>
+                    <span>Vélo'v</span>
+                </div>
+                <div class="layer-toggle active" data-layer="parking" onclick="toggleLayer('parking')">
+                    <div class="layer-toggle-icon">🅿️</div>
+                    <span>Parkings</span>
+                </div>
             </div>
-            <div id="stop-filter-banner">
-                <span id="stop-filter-label">Filtre actif</span>
+            <div id="bus-filter-banner" class="filter-banner">
+                <span id="bus-filter-label">Véhicules filtrés</span>
                 <button class="filter-clear-btn" onclick="clearAllFilters()">
-                    <img src="SVG_Icons/refusé.svg" class="svg-ic" style="width:12px;height:12px;"> Retirer
+                    <img src="assets/SVG_Icons/refusé.svg" class="svg-ic"> Retirer
                 </button>
             </div>
-            <div class="tab-header">
-                <span>Tous les arrêts</span>
-                <span id="search-stats" style="font-size:10px;color:var(--text-muted);">0/0</span>
-            </div>
-            <div id="stops-list" class="info-list"><div class="info-empty">Chargement...</div></div>
-        </div>
-
-        <div id="lines-pane" class="tab-pane">
-            <div class="filter-bar">
-                <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="SVG_Icons/metro.svg" class="svg-ic" style="width:14px;height:14px;"> Métro</label>
-                <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="SVG_Icons/tramway.svg" class="svg-ic" style="width:14px;height:14px;"> Tram</label>
-                <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="SVG_Icons/trolleybus.svg" class="svg-ic" style="width:14px;height:14px;"> TramBus</label>
-                <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="SVG_Icons/funicular.svg" class="svg-ic" style="width:14px;height:14px;"> Funiculaire</label>
-                <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="SVG_Icons/navigone.svg" class="svg-ic" style="width:14px;height:14px;"> Navigône</label>
-                <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="SVG_Icons/chrono.svg" class="svg-ic" style="width:14px;height:14px;"> Chrono</label>
-                <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="SVG_Icons/bus.svg" class="svg-ic" style="width:14px;height:14px;"> Bus</label>
-                <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="SVG_Icons/navette.svg" class="svg-ic" style="width:14px;height:14px;"> Navette</label>
-                <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="SVG_Icons/pleine_lune.svg" class="svg-ic" style="width:14px;height:14px;"> Pleine Lune</label>
-                <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="SVG_Icons/JD.svg" class="svg-ic" style="width:14px;height:14px;"> Junior Direct</label>
-            </div>
-            <div class="tab-header">Toutes les lignes</div>
-            <div id="lines-list" class="info-list"><div class="info-empty">Chargement...</div></div>
-        </div>
-
-        <div id="velov-pane" class="tab-pane">
-            <div class="search-bar">
-                <label>
-                    <img src="SVG_Icons/loupe.svg" class="svg-ic" style="width:16px;height:16px;opacity:0.6;">
-                    <input type="text" id="velov-search" placeholder="Adresse, nom ou numéro..." oninput="filterVelovStations()">
-                </label>
-            </div>
-            <div class="tab-header">
-                <span>Stations Vélo'v</span>
-                <span id="velov-stats" style="font-size:10px;color:var(--text-muted);">0/0</span>
-            </div>
-            <div id="velov-list" class="info-list"><div class="info-empty">Chargement...</div></div>
-        </div>
-
-        <div id="credits-pane" class="tab-pane">
-            <div class="tab-header">À propos</div>
-            <div class="credits-content">
-                <div class="credits-section">
-                    <h3><img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:16px;height:16px;"> TCL Localisation</h3>
-                    <p>Application de localisation en temps réel des transports en commun lyonnais. Interface optimisée avec effet Liquid Glass.</p>
-                </div>
-                <div class="credits-section">
-                    <h3><i class="ti ti-database" style="color:var(--accent);"></i> Sources de données</h3>
-                    <p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a> et API TCL.</p>
-                </div>
-                <div class="credits-section">
-                    <h3><i class="ti ti-map" style="color:var(--accent);"></i> Cartographie</h3>
-                    <p>© <a href="https://www.openstreetmap.org" target="_blank">OpenStreetMap</a> contributors © <a href="https://carto.com/" target="_blank">CARTO</a></p>
-                </div>
-                <div class="credits-section">
-                    <h3><i class="ti ti-code" style="color:var(--accent);"></i> Développement</h3>
-                    <p>Matt TCL, NDR, S1ba<br><span style="font-size:11px;opacity:0.7;">Version BETA – v1 officielle prévue pour Septembre 2026</span></p>
-                </div>
+            <div id="stop-filter-banner" class="filter-banner">
+                <span id="stop-filter-label">Filtre actif</span>
+                <button class="filter-clear-btn" onclick="clearAllFilters()">
+                    <img src="assets/SVG_Icons/refusé.svg" class="svg-ic"> Retirer
+                </button>
             </div>
         </div>
-
     </div>
-</div>
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-// ===== CONFIG =====
-const API = window.location.hostname.includes('hf.space') ? '' : 'https://matttcl-tcl-localisation.hf.space/';
-const imgCache = new Map();
-
-// ===== API FETCH AVEC BACKOFF ANTI-429 =====
-let _fetchBackoff = 1000;
-const API_FETCH_TIMEOUT = 15000;
-
-async function apiFetch(path, attempt = 1) {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), API_FETCH_TIMEOUT);
-    
-    try {
-        const res = await fetch(API + path, { 
-            signal: controller.signal,
-            headers: { 'Accept': 'application/json' }
-        });
-        clearTimeout(timeoutId);
-        
-        if (res.status === 429) {
-            const wait = Math.min(_fetchBackoff * attempt * 2, 30000);
-            console.warn(`⏳ 429 rate limit sur ${path}, attente ${wait/1000}s...`);
-            await new Promise(r => setTimeout(r, wait));
-            if (attempt < 3) return apiFetch(path, attempt + 1);
-            return { is_loading: true };
-        }
-        
-        if (res.status === 503) return { is_loading: true };
-        
-        _fetchBackoff = 1000;
-        
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return await res.json();
-        
-    } catch (e) {
-        clearTimeout(timeoutId);
-        _fetchBackoff = Math.min(_fetchBackoff * 2, 30000);
-        if (attempt < 2) {
-            await new Promise(r => setTimeout(r, _fetchBackoff));
-            return apiFetch(path, attempt + 1);
-        }
-        throw e;
-    }
-}
-
-// ===== COULEURS : SOURCE UNIQUE =====
-const LINE_COLORS_MASTER = {
-    'A':'#e50069','B':'#0075bf','C':'#ec6608','D':'#cf7eae',
-    'T1':'#004f9f','T2':'#6ba230','T3':'#00a3a6','T4':'#662483','T5':'#ec6608','T6':'#f191a3','T7':'#992358',
-    'F1':'#6da432','F2':'#006f9e',
-    'C1':'#004f9f','C2':'#e50069','C3':'#6ba230','C4':'#c57e65','C5':'#ec6608','C6':'#83c491',
-    'C7':'#6e8997','C8':'#662483','C9':'#c88817','C10':'#cf7eae','C11':'#6ba230','C12':'#0099bc',
-    'C13':'#c20344','C14':'#f191a3','C15':'#d3d800','C16':'#c57e65','C17':'#3f4e55','C18':'#00a3a6',
-    'C19':'#e50069','C20':'#836c77','C21':'#0099bc','C22':'#bca3ce','C23':'#009e3d','C24':'#00336a',
-    'C25':'#fdc300','C26':'#2699d6','C27':'#6ba230',
-    'C20EX':'#f59c00','C22EX':'#80682e','C20E':'#f59c00',
-    'TB11':'#fdc300','TB12':'#80682e',
-    'NAVI1':'#00a3a6'
-};
-const LINE_TYPE_COLORS = {
-    metro:'#E2001A', tram:'#662483', tb:'#fdc300', funiculaire:'#6da432',
-    navgone:'#00A3A6', chrono:'#2699d6', bus:'#6e8997', navette:'#EC6608',
-    pl:'#992358', jd:'#17297B', other:'#888'
-};
-
-function getLineColor(code) {
-    if (!code) return LINE_TYPE_COLORS.other;
-    const u = String(code).trim();
-    if (LINE_COLORS_MASTER[u]) return LINE_COLORS_MASTER[u];
-    if (LINE_COLORS_MASTER[u.toUpperCase()]) return LINE_COLORS_MASTER[u.toUpperCase()];
-    return LINE_TYPE_COLORS[getLineType(u)] || LINE_TYPE_COLORS.other;
-}
-
-function getLineType(line) {
-    const u = line.toUpperCase();
-    if (/^[ABCD]$/.test(u)) return 'metro';
-    if (/^NAVI|^7601/.test(u)) return 'navgone';
-    if (u === '203' || u === '204') return 'chrono';
-    if (/^T\d/.test(u) || /^RX/.test(u)) return 'tram';
-    if (/^TB/.test(u)) return 'tb';
-    if (/^F[12]$/.test(u)) return 'funiculaire';
-    if (/^C/.test(u)) return 'chrono';
-    if (/^N\d*/.test(u) || /^BGS\d*/.test(u)) return 'navette';
-    if (/^PL/.test(u)) return 'pl';
-    if (/^JD/.test(u)) return 'jd';
-    if (/^BR/.test(u)) return 'bus';
-    return 'bus';
-}
-
-function shouldLoadJDSvg(lineNum) {
-    const s = String(lineNum);
-    if (!s.startsWith('JD')) return true;
-    const num = parseInt(s.replace('JD',''), 10);
-    return !isNaN(num) && num >= 300;
-}
-
-function lineImgHtml(lineNum, height = '20px') {
-    const src = `Lignes/${lineNum}.svg`;
-    const fallbackStyle = `background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:2px 6px;border-radius:6px;font-size:11px;font-weight:600;color:#eee;display:inline-flex;align-items:center;justify-content:center;height:${height};min-width:24px;`;
-    const color = getLineColor(lineNum);
-
-    if (!shouldLoadJDSvg(lineNum)) {
-        return `<span style="${fallbackStyle}color:${color};">${lineNum}</span>`;
-    }
-
-    const state = imgCache.get(src);
-    if (state === 'ok') return `<img src="${src}" style="height:${height};width:auto;display:inline-block;vertical-align:middle;">`;
-    if (state === 'error') return `<span style="${fallbackStyle}color:${color};">${lineNum}</span>`;
-    
-    return `<img src="${src}" data-line="${lineNum}" style="height:${height};width:auto;display:inline-block;vertical-align:middle;" loading="lazy"
-        onload="imgCache.set(this.src,'ok')"
-        onerror="imgCache.set(this.src,'error');var s=document.createElement('span');s.textContent=this.dataset.line;s.style.cssText='${fallbackStyle}color:${color};';this.replaceWith(s)">`;
-}
-
-function getDispoColor(value, total) {
-    if (value === null || total === null) return null;
-    const path = 'SVG_Icons/';
-    const style = 'style="width:14px;height:14px;vertical-align:-2px;filter:brightness(0) invert(1);"';
-    
-    if (value === 0 && total === 0) return { color: '#4B0082', rgb: '75,0,130', label: `<img src="${path}refusé.svg" ${style}> Fermé`, textColor: '#9b59b6' };
-    if (value === 0) return { color: '#ff4d4d', rgb: '255,77,77', label: `<img src="${path}refusé.svg" ${style}> Complet`, textColor: '#ff4d4d' };
-    
-    const pct = total > 0 ? (value / total) * 100 : 0;
-    if (pct <= 25) return { color: '#ffb84d', rgb: '255,184,77', label: `<img src="${path}trafic.svg" ${style}> Faible`, textColor: '#ffb84d' };
-    if (pct <= 50) return { color: '#f1c40f', rgb: '241,196,15', label: `<img src="${path}validé.svg" ${style}> Moyen`, textColor: '#f1c40f' };
-    if (pct <= 75) return { color: '#00d2ff', rgb: '0,210,255', label: `<img src="${path}validé.svg" ${style}> Correct`, textColor: '#00d2ff' };
-    return { color: '#4dff88', rgb: '77,255,136', label: `<img src="${path}validé.svg" ${style}> Disponible`, textColor: '#4dff88' };
-}
-
-function getVelovDispoColor(bikes, stands, total) {
-    if (bikes === 0 && stands === 0) return { color: '#4B0082', rgb: '75,0,130', label: 'Fermée', textColor: '#9b59b6' };
-    return getDispoColor(bikes, total || (bikes + stands));
-}
-
-// ===== CARTE =====
-const map = L.map('map', { zoomControl: false, attributionControl: false, renderer: L.canvas() }).setView([45.757, 4.832], 13);
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(map);
-
-// Panes personnalisés pour z-index (ordre : tracés < parkings < vélov < arrêts < véhicules)
-map.createPane('tracePane');
-map.getPane('tracePane').style.zIndex = 390;
-
-map.createPane('parkingPane');
-map.getPane('parkingPane').style.zIndex = 410;
-
-map.createPane('velovPane');
-map.getPane('velovPane').style.zIndex = 420;
-
-map.createPane('stopPane');
-map.getPane('stopPane').style.zIndex = 430;
-
-map.createPane('vehiclePane');
-map.getPane('vehiclePane').style.zIndex = 440;
-
-const parkingLayer = L.layerGroup().addTo(map);
-const parcsRelaisLayer = L.layerGroup().addTo(map);
-const lineTraceLayer = L.layerGroup().addTo(map);
-const velovLayer = L.layerGroup().addTo(map);
-const busLayer = L.layerGroup().addTo(map);
-const agenceLayer = L.layerGroup().addTo(map);
-const stopMapLayer = L.layerGroup().addTo(map);
-
-let allStops = [], stopsMapping = {}, allLines = [];
-let allVelovStations = [], allParkings = [], allParcsRelais = [];
-let currentStopMarker = null, currentVelovMarker = null;
-let parkingsLoaded = false, velovLoaded = false, parcsRelaisLoaded = false;
-const busMarkers = new Map(), velovMarkerMap = new Map(), parkingMarkerMap = new Map(), parcsRelaisMarkerMap = new Map();
-let currentLineFilter = null, busLineFilter = null;
-let stopsOnMap = [];
-const layerVisibility = { bus: true, stops: true, velov: true, parking: true };
-
-// ===== TOGGLE DES COUCHES =====
-function toggleLayer(layerName) {
-    layerVisibility[layerName] = !layerVisibility[layerName];
-    const btn = document.querySelector(`[data-layer="${layerName}"]`);
-    if (btn) btn.classList.toggle('active', layerVisibility[layerName]);
-
-    if (layerName === 'bus') {
-        if (layerVisibility.bus) {
-            map.addLayer(busLayer);
-            applyBusLineFilter();
-        } else {
-            map.removeLayer(busLayer);
-        }
-    }
-    if (layerName === 'stops') {
-        if (layerVisibility.stops) {
-            map.addLayer(stopMapLayer);
-            renderVisibleStops();
-        } else {
-            map.removeLayer(stopMapLayer);
-            stopMapLayer.clearLayers();
-        }
-    }
-    if (layerName === 'velov') {
-        if (layerVisibility.velov) {
-            map.addLayer(velovLayer);
-            updateVisibleVelov();
-        } else {
-            map.removeLayer(velovLayer);
-            velovLayer.clearLayers();
-            velovMarkerMap.clear();
-        }
-    }
-    if (layerName === 'parking') {
-        if (layerVisibility.parking) {
-            map.addLayer(parkingLayer);
-            map.addLayer(parcsRelaisLayer);
-            updateVisibleParkings();
-            updateVisibleParkAndRideLots();
-        } else {
-            map.removeLayer(parkingLayer);
-            map.removeLayer(parcsRelaisLayer);
-            parkingLayer.clearLayers();
-            parcsRelaisLayer.clearLayers();
-            parkingMarkerMap.clear();
-            parcsRelaisMarkerMap.clear();
-        }
-    }
-}
-
-const togglePanel = () => { document.getElementById('info-panel').classList.toggle('collapsed'); setTimeout(() => map.invalidateSize(), 300); };
-const toggleInfoItem = (el) => el.closest('.info-item').classList.toggle('expanded');
-
-window.addEventListener('resize', () => setTimeout(() => map.invalidateSize(), 250));
-if (window.screen?.orientation) window.screen.orientation.addEventListener('change', () => setTimeout(() => map.invalidateSize(), 350));
-
-function switchToTab(name) {
-    document.querySelectorAll('.header-tab').forEach(b => b.classList.toggle('active', b.dataset.tab === name));
-    document.querySelectorAll('.tab-pane').forEach(p => p.classList.remove('active'));
-    document.getElementById(`${name}-pane`).classList.add('active');
-    if (name === 'velov' && !velovLoaded) { velovLoaded = true; loadVelovList(); }
-}
-document.querySelectorAll('.header-tab').forEach(b => b.addEventListener('click', () => switchToTab(b.dataset.tab)));
-
-const lineMapping = {
-    'C3':'C3','C11':'C27','C7':'36','C15E':'32','C19':'41','C20E':'C20EX','C22E':'C22EX',
-    '2':'102','3':'103','5':'105','6':'106','6E':'106EX','7':'107','8':'108','9':'109',
-    '10':'110','10E':'110EX','11':'111','12':'112','14':'114','15':'115','15E':'99EX',
-    '16':'116','17':'117','18':'118','19':'119','20':'120','21':'121','22':'123','23':'123',
-    '24':'124','25':'125','26':'126','27':'127','30':'230','32':'232','47':'248',
-    '52E':'52EX','89D':'89EX','98E':'98EX','Zi1':'145','Zi2':'146','Zi3':'147','Zi4':'148',
-    'Zi5':'149','Zi8':'150','GE2':'130','GE4':'131','GE6':'132','N20':'N185','N80':'N180',
-    'N81':'N181','N82':'N182','N83':'N183','N84':'N184','N100':'N186','S1':'133','S2':'138',
-    'S3':'139','S4A':'104A','S4B':'104B','S5':'140','S6':'141','S7':'142','S8':'143',
-    'S9':'144','S10':'134','S11':'135','S14':'136','S15':'137',
-    'NAVI1':'7601'
-};
-const getNewLineNumber = l => lineMapping[l] || l;
-
-function getLineTypePriority(type) {
-    const priorities = {
-        metro: 1, tram: 2, tb: 3, navgone: 4, funiculaire: 5,
-        chrono: 6, bus: 7, navette: 8, pl: 9, jd: 10, other: 11
-    };
-    return priorities[type] || 999;
-}
-
-function sortLinesByType(a, b) {
-    const typeA = getLineType(a);
-    const typeB = getLineType(b);
-    const priorityA = getLineTypePriority(typeA);
-    const priorityB = getLineTypePriority(typeB);
-    
-    if (priorityA !== priorityB) return priorityA - priorityB;
-    
-    const numA = parseInt(String(a).replace(/\D/g, '')) || 9999;
-    const numB = parseInt(String(b).replace(/\D/g, '')) || 9999;
-    if (numA !== numB) return numA - numB;
-    
-    return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
-}
-
-function extractLines(desserte) {
-    if (!desserte) return [];
-    const lines = [...new Set(desserte.split(',').map(x => getNewLineNumber(x.trim().split(':')[0].trim())))];
-    return lines.sort(sortLinesByType);
-}
-
-function renderLineSvgs(lines) {
-    if (!lines?.length) return '<span style="color:var(--text-muted);font-size:11px;">Aucune ligne</span>';
-    return lines.map(l => lineImgHtml(getNewLineNumber(l), '20px')).join('');
-}
-
-function highlightText(text, term) {
-    if (!term || !text) return text || '';
-    return text.replace(new RegExp(`(${term.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')})`, 'gi'), '<span class="search-highlight">$1</span>');
-}
-
-function getOriginalCodes(targetMapped) {
-    const codes = new Set([targetMapped]);
-    for (const [orig, mapped] of Object.entries(lineMapping)) {
-        if (mapped === targetMapped) codes.add(orig);
-    }
-    return codes;
-}
-
-function stopServesLine(desserte, targetMapped) {
-    if (!desserte) return false;
-    const codes = getOriginalCodes(targetMapped);
-    return desserte.split(',').some(entry => {
-        const code = entry.trim().split(':')[0].trim();
-        return codes.has(code) || codes.has(getNewLineNumber(code));
-    });
-}
-
-function getLinesForStop(stop) {
-    return extractLines(stop.desserte);
-}
-
-function renderStopsOnMap() {
-    stopMapLayer.clearLayers();
-    stopsOnMap = [];
-    
-    const grouped = new Map();
-    for (const s of allStops) {
-        if (!s.lat || !s.lon) continue;
-        const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
-        if (isNaN(lat) || isNaN(lon)) continue;
-        const key = (s.nom || '').toLowerCase();
-        if (!grouped.has(key)) grouped.set(key, []);
-        grouped.get(key).push({ ...s, lat, lon });
-    }
-    
-    for (const [key, stops] of grouped) {
-        const clusters = [];
-        for (const s of stops) {
-            let merged = false;
-            for (const c of clusters) {
-                if (haversineMeters(s.lat, s.lon, c.lat, c.lon) < 30) {
-                    c.stops.push(s);
-                    merged = true;
-                    break;
-                }
-            }
-            if (!merged) clusters.push({ lat: s.lat, lon: s.lon, stops: [s] });
-        }
-        
-        for (const c of clusters) {
-            const main = c.stops[0];
-            stopsOnMap.push({ lat: c.lat, lon: c.lon, nom: main.nom, stops: c.stops });
-        }
-    }
-    
-    renderVisibleStops();
-}
-
-function renderVisibleStops() {
-    if (!layerVisibility.stops) {
-        stopMapLayer.clearLayers();
-        return;
-    }
-    
-    const zoom = map.getZoom();
-    if (zoom < 13) {
-        stopMapLayer.clearLayers();
-        return;
-    }
-    
-    const bounds = map.getBounds();
-    const seen = new Map();
-    const visible = stopsOnMap.filter(s => bounds.contains([s.lat, s.lon])).slice(0, 500);
-    
-    for (const s of visible) {
-        const key = `${s.lat},${s.lon}`;
-        if (seen.has(key)) continue;
-        
-        const isHighlighted = currentLineFilter && s.stops.some(st => stopServesLine(st.desserte, currentLineFilter));
-        
-        const marker = L.marker([s.lat, s.lon], {
-            pane: 'stopPane',
-            icon: L.divIcon({
-                className: '',
-                html: `<div class="stop-map-marker ${isHighlighted ? 'highlighted' : ''}" title="${s.nom}"></div>`,
-                iconSize: [14, 14], iconAnchor: [7, 7]
-            })
-        }).addTo(stopMapLayer);
-        
-        marker.on('click', async () => {
-            await openStopGroupPopup(s);
-        });
-        
-        seen.set(key, marker);
-    }
-}
-
-async function openStopGroupPopup(stopGroup) {
-    const main = stopGroup.stops[0];
-    const lines = getLinesForStop(main);
-    
-    const safeId = main.id || ('grp_' + stopGroup.lat + '_' + stopGroup.lon);
-    const popupEl = document.createElement('div');
-    popupEl.style.cssText = 'width:260px;font-family:inherit;';
-    
-    popupEl.innerHTML = `
-        <div style="background:var(--glass-bg-heavy);border:1px solid var(--glass-border-highlight);border-radius:16px;overflow:hidden;">
-            <div style="padding:12px 14px;border-bottom:1px solid var(--glass-border);">
-                <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:6px;">
-                    <img src="SVG_Icons/arrêt.svg" class="svg-ic" style="width:16px;height:16px;">${main.nom}
-                </div>
-                <div style="font-size:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
-                    ${main.commune ? `<span style="color:#ffb84d;">${main.commune}</span>` : ''}
-                    ${main.zone ? `<span style="background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:4px;padding:1px 6px;font-size:10px;">Zone ${main.zone}</span>` : ''}
-                    ${stopGroup.stops.length > 1 ? `<span style="color:var(--text-muted);font-size:10px;">+ ${stopGroup.stops.length - 1} arrêt(s) à proximité</span>` : ''}
-                </div>
-                <div style="margin-top:8px;"><strong style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Lignes :</strong></div>
-                <div class="stop-lines" style="margin-top:4px;">${renderLineSvgs(lines)}</div>
-            </div>
-            <div id="deps-${safeId}" style="padding:10px 14px 12px;">
-                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">Prochains passages</div>
-                <div style="font-size:11px;color:var(--text-muted);text-align:center;padding:4px 0;">Chargement...</div>
-            </div>
-        </div>`;
-    
-    if (currentStopMarker) { map.removeLayer(currentStopMarker); currentStopMarker = null; }
-    
-    currentStopMarker = L.marker([stopGroup.lat, stopGroup.lon], {
-        icon: L.divIcon({
-            className: 'my-custom-marker',
-            html: '<div style="background:var(--accent);width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 12px var(--accent-glow);"></div>',
-            iconSize: [16,16], iconAnchor: [8,8]
-        })
-    }).bindPopup(popupEl, { maxWidth: 280, className: 'tcl-popup', closeButton: true }).addTo(map);
-    
-    currentStopMarker.on('popupclose', _stopDepInterval);
-    map.setView([stopGroup.lat, stopGroup.lon], Math.max(map.getZoom(), 16));
-    currentStopMarker.openPopup();
-    
-    if (main.id) loadNextDepartures(main.id, `deps-${safeId}`, stopGroup.lat, stopGroup.lon);
-}
-
-async function applyLineFilter(line) {
-    currentLineFilter = line;
-    busLineFilter = line;
-    document.getElementById('stop-filter-label').innerHTML = `Arrêts : &nbsp;${lineImgHtml(line, '18px')}`;
-    document.getElementById('stop-filter-banner').classList.add('visible');
-    document.getElementById('bus-filter-label').innerHTML = `Véhicules : &nbsp;${lineImgHtml(line, '18px')}`;
-    document.getElementById('bus-filter-banner').classList.add('visible');
-    applyBusLineFilter();
-    renderVisibleStops();
-    await showLineTrace(line);
-}
-
-window.clearAllFilters = function() {
-    currentLineFilter = null;
-    busLineFilter = null;
-    document.getElementById('stop-filter-banner').classList.remove('visible');
-    document.getElementById('bus-filter-banner').classList.remove('visible');
-    for (const [, e] of busMarkers) {
-        if (!busLayer.hasLayer(e.marker)) busLayer.addLayer(e.marker);
-    }
-    document.getElementById('stop-search').value = '';
-    renderStopList('');
-    lineTraceLayer.clearLayers();
-    renderVisibleStops();
-};
-
-function applyBusLineFilter() {
-    for (const [, e] of busMarkers) {
-        const lineRemapped = getNewLineNumber(e.line);
-        const keep = !busLineFilter || lineRemapped === busLineFilter || e.line === busLineFilter;
-        if (keep) { if (!busLayer.hasLayer(e.marker)) busLayer.addLayer(e.marker); }
-        else { if (busLayer.hasLayer(e.marker)) busLayer.removeLayer(e.marker); }
-    }
-}
-
-let stopSearchTimer = null;
-window.filterStops = () => {
-    currentLineFilter = null;
-    document.getElementById('stop-filter-banner').classList.remove('visible');
-    lineTraceLayer.clearLayers();
-    renderVisibleStops();
-    clearTimeout(stopSearchTimer);
-    stopSearchTimer = setTimeout(() => renderStopList(document.getElementById('stop-search').value.toLowerCase().trim()), 200);
-};
-
-function renderStopList(term = '') {
-    let stops = [...allStops].sort((a, b) => (a.nom||'').localeCompare(b.nom||''));
-    if (currentLineFilter) {
-        stops = stops.filter(s => stopServesLine(s.desserte, currentLineFilter));
-    } else if (term) {
-        stops = stops.filter(s => (s.nom||'').toLowerCase().includes(term) || (s.commune||'').toLowerCase().includes(term) || (s.desserte||'').toLowerCase().includes(term));
-    }
-
-    document.getElementById('search-stats').textContent = `${stops.length}/${allStops.length}`;
-    if (!stops.length) {
-        document.getElementById('stops-list').innerHTML = `<div class="info-empty"><img src="SVG_Icons/loupe.svg" class="svg-ic" style="width:20px;height:20px;opacity:0.5;"> Aucun arrêt trouvé</div>`;
-        return;
-    }
-
-    const chunk = stops.slice(0, 300);
-    const html = chunk.map(s => {
-        const lines = extractLines(s.desserte);
-        const icon = s.desserte?.match(/T[1-7]/) ? 'tramway.svg' : (s.desserte?.match(/^[ABCD]$/) ? 'metro.svg' : 'bus.svg');
-        return `<div class="info-item" data-lat="${s.lat}" data-lon="${s.lon}" data-id="${s.id||''}" data-nom="${(s.nom||'').replace(/"/g,'&quot;')}" data-commune="${(s.commune||'').replace(/"/g,'&quot;')}" data-zone="${s.zone||''}">
-            <div class="info-summary" onclick="selectStopOnMap(this)">
-                <div class="info-line-badge"><img src="SVG_Icons/${icon}" class="svg-ic" style="width:20px;height:20px;"></div>
-                <div class="info-summary-text">
-                    <div class="info-titre">${highlightText(s.nom||'Arrêt', term)}${s.pmr?'<span class="stop-pmr-badge"><img src="SVG_Icons/PMR.svg" style="width:10px;height:10px;filter:brightness(0) invert(1);"> PMR</span>':''}</div>
-                    <div class="stop-commune">${highlightText(s.commune||'', term)} • Zone ${s.zone||'N/A'}</div>
-                    <div class="stop-lines">${renderLineSvgs(lines)}</div>
-                </div>
-                <span class="info-chevron">▼</span>
-            </div>
-            <div class="info-detail">
-                <strong>📍 Adresse :</strong> ${s.adresse||'Non renseignée'}<br>
-                <strong>🚌 Lignes :</strong> ${s.desserte||'Aucune'}<br>
-                <strong>♿ PMR :</strong> ${s.pmr ? '✅ Accessible' : '❌ Non accessible'}<br>
-                <strong>🏙️ Commune :</strong> ${s.commune||''}
-            </div>
-        </div>`;
-    }).join('');
-
-    document.getElementById('stops-list').innerHTML = html + (stops.length > 300 ? `<div class="info-empty">+${stops.length-300} arrêts (affinez la recherche)</div>` : '');
-}
-
-function fmtDepAt(isoStr, now) {
-    if (!isoStr) return '—';
-    const d = new Date(isoStr);
-    const diffSec = Math.floor((d.getTime() - now) / 1000);
-    const hhmm = d.toLocaleTimeString('fr-FR', { hour: '2-digit', minute: '2-digit' });
-    if (diffSec <= 30) return `<span style="color:#4dff88;font-weight:700;">à quai</span> <span style="color:var(--text-muted);font-size:10px;">(${hhmm})</span>`;
-    const diffMin = Math.floor(diffSec / 60);
-    const remSec = diffSec % 60;
-    if (diffMin < 60) {
-        const secStr = remSec > 0 ? `<span style="color:var(--text-muted);font-size:10px;"> ${remSec}s</span>` : '';
-        return `<span style="color:var(--text-primary);font-weight:700;">${diffMin} min</span>${secStr} <span style="color:var(--text-muted);font-size:10px;">(${hhmm})</span>`;
-    }
-    return `<span style="color:var(--text-secondary)">${hhmm}</span>`;
-}
-
-let _depInterval = null;
-function _stopDepInterval() { if (_depInterval) { clearInterval(_depInterval); _depInterval = null; } }
-function _startDepInterval(containerId) {
-    _stopDepInterval();
-    _depInterval = setInterval(() => {
-        const container = document.getElementById(containerId);
-        if (!container) { _stopDepInterval(); return; }
-        const now = Date.now();
-        container.querySelectorAll('[data-dep-ts]').forEach(cell => {
-            const ts = parseFloat(cell.dataset.depTs);
-            if (!ts) return;
-            if (now - ts * 1000 > 30000) { cell.closest('[data-dep-row]')?.remove(); return; }
-            cell.innerHTML = fmtDepAt(cell.dataset.depIso, now);
-        });
-    }, 1000);
-}
-
-function haversineMeters(lat1, lon1, lat2, lon2) {
-    const R = 6371000;
-    const dLat = (lat2 - lat1) * Math.PI / 180;
-    const dLon = (lon2 - lon1) * Math.PI / 180;
-    const a = Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
-    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-}
-
-async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
-    if (!stopId) return;
-    await new Promise(r => setTimeout(r, 0));
-    const el = document.getElementById(containerId);
-    if (!el) return;
-    _stopDepInterval();
-    const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">Prochains passages</div>';
-    try {
-        const data = await apiFetch(`api/next-departures/${stopId}`);
-        if (data.is_loading) {
-            el.innerHTML = header + '<div style="font-size:11px;color:#f1c40f;text-align:center;padding:8px 0;">⏳ Initialisation des données en cours...</div>';
-            setTimeout(() => loadNextDepartures(stopId, containerId, stopLat, stopLon), 10000);
-            return;
-        }
-
-        const nowSec = Date.now() / 1000;
-        const deps = (data.departures || []).filter(d => d.ts > nowSec - 30);
-        if (!deps.length) {
-            el.innerHTML = header + '<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0;">Aucun passage prévu</div>';
-            return;
-        }
-        const nowMs = Date.now();
-        const rows = deps.slice(0, 5).map((dep, i) => {
-            const lineRemapped = getNewLineNumber(dep.line);
-            let timeDisplay = fmtDepAt(dep.expected || dep.aimed, nowMs);
-            let typeLabel = dep.type === 'E' ? '<span style="font-size:9px;color:#4dff88;margin-left:4px;">⚡ TR</span>' : '<span style="font-size:9px;color:var(--text-muted);margin-left:4px;">⏱ Th.</span>';
-
-            return `<div data-dep-row="${i}" style="padding:6px 0;border-bottom:1px solid var(--glass-border);">
-                <div style="display:flex;align-items:center;gap:10px;">
-                    <div style="flex-shrink:0;">${lineImgHtml(lineRemapped, '20px')}</div>
-                    <div style="flex:1;min-width:0;">
-                        <div style="font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">→ ${dep.dest_name || dep.dest_id || '—'}${typeLabel}</div>
+    <!-- Panneau latéral -->
+    <div id="info-panel">
+        <div class="panel-toggle" onclick="togglePanel()"><span>❯</span></div>
+        <div class="tab-content">
+            <!-- Onglet Trafic -->
+            <div id="traffic-pane" class="tab-pane active">
+                <div class="tab-header">Perturbations en cours</div>
+                <div id="traffic-list" class="info-list">
+                    <div class="info-empty">
+                        <img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> Chargement...
                     </div>
-                    <div data-dep-ts="${dep.ts}" data-dep-iso="${dep.expected || dep.aimed}" style="font-size:12px;text-align:right;flex-shrink:0;">${timeDisplay}</div>
                 </div>
-            </div>`;
-        }).join('');
-        el.innerHTML = header + rows;
-        _startDepInterval(containerId);
-    } catch(e) {
-        el.innerHTML = header + '<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0;">Indisponible</div>';
-    }
-}
-
-window.selectStopOnMap = async function(el) {
-    const item = el.closest('.info-item');
-    if (!item) return;
-    const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
-    if (isNaN(lat) || isNaN(lon)) return;
-    
-    let group = stopsOnMap.find(s => haversineMeters(s.lat, s.lon, lat, lon) < 30 && s.nom === item.dataset.nom);
-    if (!group) group = { lat, lon, nom: item.dataset.nom, stops: [{ id: item.dataset.id, lat, lon, nom: item.dataset.nom, commune: item.dataset.commune, zone: item.dataset.zone }] };
-    
-    await openStopGroupPopup(group);
-};
-
-async function showLineTrace(lineCode) {
-    lineTraceLayer.clearLayers();
-    const traceColor = getLineColor(lineCode);
-    const lineStops = allStops.filter(s => stopServesLine(s.desserte, lineCode));
-    const bounds = [];
-
-    try {
-        const resp = await fetch(API + 'api/line-trace/' + encodeURIComponent(lineCode));
-        if (resp.ok) {
-            const traceData = await resp.json();
-            const segs = traceData.segs || [];
-            
-            if (segs.length > 0) {
-                segs.forEach(seg => {
-                    if (seg.length < 2) return;
-                    L.polyline(seg.map(([lon, lat]) => [lat, lon]), {
-                        pane: 'tracePane',
-                        color: traceColor, weight: 4, opacity: 0.85, lineJoin: 'round', lineCap: 'round'
-                    }).addTo(lineTraceLayer);
-                });
-            }
-        }
-    } catch(e) {
-        console.warn('Erreur tracé:', e);
-    }
-
-    lineStops.forEach(s => {
-        if (!s.lat || !s.lon) return;
-        const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
-        if (isNaN(lat) || isNaN(lon)) return;
-        const cm = L.circleMarker([lat, lon], { 
-            pane: 'tracePane',
-            radius: 5, fillColor: traceColor, color: '#fff', weight: 2, fillOpacity: 1 
-        }).addTo(lineTraceLayer);
-        cm.on('click', async () => {
-            let group = stopsOnMap.find(st => haversineMeters(st.lat, st.lon, lat, lon) < 30 && st.nom === s.nom);
-            if (!group) group = { lat, lon, nom: s.nom, stops: [s] };
-            await openStopGroupPopup(group);
-        });
-        bounds.push([lat, lon]);
-    });
-    if (bounds.length > 0) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-}
-
-function extractAllLines() {
-    const set = new Set();
-    allStops.forEach(s => {
-        if (s.desserte) s.desserte.split(',').forEach(x => set.add(getNewLineNumber(x.trim().split(':')[0].trim())));
-    });
-    allLines = [...set].sort(sortLinesByType);
-    filterLines();
-}
-
-const TYPE_META = {
-    metro: { icon:'<img src="SVG_Icons/metro.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Métro', color:'#E2001A' },
-    tram: { icon:'<img src="SVG_Icons/tramway.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Tramway', color:'#662483' },
-    tb: { icon:'<img src="SVG_Icons/trolleybus.svg" class="svg-ic" style="width:14px;height:14px;">', name:'TramBus', color:'#fdc300' },
-    funiculaire: { icon:'<img src="SVG_Icons/funicular.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Funiculaire', color:'#6da432' },
-    navgone: { icon:'<img src="SVG_Icons/navigone.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Navigône', color:'#00A3A6' },
-    chrono: { icon:'<img src="SVG_Icons/chrono.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Chrono', color:'#2699d6' },
-    bus: { icon:'<img src="SVG_Icons/bus.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Bus', color:'#6e8997' },
-    navette: { icon:'<img src="SVG_Icons/navette.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Navette', color:'#EC6608' },
-    pl: { icon:'<img src="SVG_Icons/pleine_lune.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Pleine Lune', color:'#992358' },
-    jd: { icon:'<img src="SVG_Icons/JD.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Junior Direct', color:'#17297B' },
-    other: { icon:'<img src="SVG_Icons/lignes.svg" class="svg-ic" style="width:14px;height:14px;">', name:'Autres', color:'#888' }
-};
-    
-window.filterLines = () => {
-    const ck = id => document.getElementById(`filter-${id}`)?.checked;
-    const filters = { metro:ck('metro'), tram:ck('tram'), tb:ck('tb'), funiculaire:ck('funicular'), navgone:ck('navgone'), chrono:ck('chrono'), bus:ck('bus'), navette:ck('navette'), pl:ck('pl'), jd:ck('jd') };
-    let html = '';
-    for (const [type, meta] of Object.entries(TYPE_META)) {
-        if (!filters[type] && type !== 'other') continue;
-        const group = allLines.filter(l => getLineType(l) === type).sort(sortLinesByType);
-        if (!group.length) continue;
-        html += `<div class="line-group">
-            <div class="line-group-header" style="color:${meta.color};border-left-color:${meta.color};">
-                ${meta.icon} ${meta.name} <span style="opacity:0.6;font-weight:400;">(${group.length})</span>
             </div>
-            <div class="line-items">
-                ${group.map(l => `<div class="line-item" onclick="searchLineInStops('${l}')">${lineImgHtml(l,'24px')}</div>`).join('')}
-            </div>
-        </div>`;
-    }
-    document.getElementById('lines-list').innerHTML = html || `<div class="info-empty">Aucune ligne</div>`;
-};
 
-window.searchLineInStops = async function(line) {
-    switchToTab('stops');
-    document.getElementById('stop-search').value = '';
-    await applyLineFilter(line);
-    renderStopList('');
-    const panel = document.getElementById('info-panel');
-    if (panel.classList.contains('collapsed')) { panel.classList.remove('collapsed'); setTimeout(() => map.invalidateSize(), 300); }
-};
-
-window.filterLineFromPopup = async function(line) {
-    switchToTab('stops');
-    document.getElementById('stop-search').value = '';
-    await applyLineFilter(getNewLineNumber(line));
-    renderStopList('');
-    const panel = document.getElementById('info-panel');
-    if (panel.classList.contains('collapsed')) { panel.classList.remove('collapsed'); setTimeout(() => map.invalidateSize(), 300); }
-};
-
-async function loadStopsMapping() {
-    try {
-        const data = await apiFetch('api/stops');
-        if (data.is_loading) { setTimeout(loadStopsMapping, 10000); return; }
-        (data.values||[]).forEach(s => {
-            if (s.id && s.nom) stopsMapping[s.id] = s.nom;
-            if (s.code_station && s.nom) stopsMapping[s.code_station] = s.nom;
-        });
-    } catch(e) { setTimeout(loadStopsMapping, 10000); }
-}
-
-const getStopName = code => {
-    if (!code) return null;
-    const clean = code.includes(':') ? code.split(':').pop() : code;
-    return stopsMapping[clean] || stopsMapping[code] || null;
-};
-
-async function updateStopsData() {
-    try {
-        const data = await apiFetch('api/stops');
-        if (data.is_loading) { setTimeout(updateStopsData, 10000); return; }
-        allStops = data.values || [];
-        extractAllLines();
-        renderStopList('');
-        renderStopsOnMap();
-    } catch(e) {
-        document.getElementById('stops-list').innerHTML = `<div class="info-empty">Erreur de chargement (réessai...)</div>`;
-        setTimeout(updateStopsData, 10000);
-    }
-}
-
-function busHash(b) { return `${b.lat},${b.lon},${b.bearing},${b.delay},${b.dest_code}`; }
-function getVehicleType(bus) {
-    const id = parseInt(bus.id);
-    if (isNaN(id)) return 'Véhicule TCL';
-    if (id===111) return 'Le Gône'; if (id===112) return 'La Fenotte'; if (id===113) return 'Le Canut';
-    if (id>=801 && id<873) return 'Alstom Citadis 302'; if (id>=874 && id<937) return 'Alstom Citadis 402';
-    if (id>=101 && id<106) return 'Stadler Tango';
-    if ((id>=1001&&id<1030)||(id>=1201&&id<1218)||(id>=1301&&id<1333)||(id>=1401&&id<1417)||(id>=2301&&id<2328)) return 'Iveco Urbanway 18';
-    if ((id>=2401&&id<2458)||(id>=2501&&id<2524)||(id>=2701&&id<2750)||(id>=3000&&id<3065)) return 'Iveco Urbanway 12';
-    if ((id>=2001&&id<2034)||(id>=2801&&id<2835)) return 'Hess LighTram 19 DC';
-    return 'Véhicule TCL';
-}
-
-async function updateBus() {
-    try {
-        const buses = await apiFetch('api/buses');
-        if (buses.is_loading) { setTimeout(updateBus, 10000); return; }
-        const seen = new Set();
-        for (const bus of buses) {
-            const lat = parseFloat(bus.lat), lon = parseFloat(bus.lon);
-            if (isNaN(lat) || isNaN(lon)) continue;
-            seen.add(bus.id);
-            const h = busHash(bus);
-            const existing = busMarkers.get(bus.id);
-            
-            if (existing) {
-                const popupOpen = existing.marker.isPopupOpen();
-                if (popupOpen) {
-                    existing.marker.setLatLng([lat, lon]);
-                    existing.hash = h;
-                    continue;
-                }
-                if (existing.hash === h) continue;
-                busLayer.removeLayer(existing.marker);
-                busMarkers.delete(bus.id);
-            }
-
-            const line = bus.line;
-            const color = bus.color || getLineColor(line);
-
-            let modeFile = 'Mode_Bus.svg';
-            if (line.startsWith('BR')) modeFile = 'Mode_BR.svg';
-            else if (line === 'C7' || line === 'C19') modeFile = 'Mode_Bus.svg';
-            else if (line.startsWith('C')) modeFile = 'Mode_C.svg';
-            else if (line.startsWith('TB')) modeFile = 'Mode_TB.svg';
-            else if (line.startsWith('RX')) modeFile = 'RX.svg';
-            else if (line.startsWith('T')) modeFile = 'Mode_T.svg';
-            else if (line.startsWith('7601') || line.toUpperCase().startsWith('NAVI')) modeFile = 'Mode_NAVI.svg';
-
-            const dest = getStopName(bus.dest_code) || bus.dest_name || '';
-            const delayOk = bus.delay === '0s';
-            const lineRemapped = getNewLineNumber(line);
-            const svgSize = 38, cx = svgSize/2, cy = svgSize/2, r = 14;
-
-            const bearing = parseFloat(bus.bearing);
-            const hasValidBearing = Number.isFinite(bearing) && Math.abs(bearing) >= 0.5 && Math.abs(bearing) < 360;
-
-            const arrowPath = (() => {
-                if (!hasValidBearing) return "";
-                const angle = bearing * Math.PI / 180, L = 26, W = 12;
-                const tipX = cx + Math.sin(angle) * L, tipY = cy - Math.cos(angle) * L;
-                const leftX = cx + Math.sin(angle + Math.PI / 2) * W, leftY = cy - Math.cos(angle + Math.PI / 2) * W;
-                const rightX = cx + Math.sin(angle - Math.PI / 2) * W, rightY = cy - Math.cos(angle - Math.PI / 2) * W;
-                return `<polygon points="${tipX},${tipY} ${leftX},${leftY} ${rightX},${rightY}" fill="${color}" opacity="0.95"/>`;
-            })();
-
-            const iconHtml = `<svg xmlns="http://www.w3.org/2000/svg" width="${svgSize}" height="${svgSize}" viewBox="0 0 ${svgSize} ${svgSize}" style="overflow:visible;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                ${arrowPath}
-                <rect x="${cx-r}" y="${cy-r}" width="${r*2}" height="${r*2}" rx="8" fill="rgba(13,15,24,0.9)" stroke="${color}" stroke-width="2"/>
-                <image href="Lignes/${modeFile}" x="${cx-9}" y="${cy-9}" width="18" height="18"/>
-            </svg>`;
-
-            const marker = L.marker([lat, lon], { 
-                pane: 'vehiclePane',
-                icon: L.divIcon({ html: iconHtml, className: '', iconSize: [svgSize, svgSize], iconAnchor: [svgSize/2, svgSize/2] }) 
-            });
-            const busSnap = { ...bus, line, color, dest, delayOk, modeFile, lineRemapped };
-            
-            marker.bindPopup(() => {
-                return `<div style="width:260px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
-                    <div style="position:relative;height:80px;background:linear-gradient(135deg,${busSnap.color}33 0%,#08090f 55%,${busSnap.color}22 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
-                        <div style="position:absolute;inset:0;background:linear-gradient(135deg,${busSnap.color}33 0%,transparent 55%,${busSnap.color}22 100%);pointer-events:none;"></div>
-                        <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,var(--glass-bg-heavy));pointer-events:none;"></div>
-                        <div onclick="filterLineFromPopup('${busSnap.line}')" title="Filtrer la ligne ${busSnap.line}" style="position:absolute;bottom:12px;left:12px;background:rgba(13,15,24,0.75);border:1px solid ${busSnap.color}66;border-radius:12px;padding:6px;cursor:pointer;backdrop-filter:blur(12px);box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)';this.style.borderColor='${busSnap.color}'" onmouseout="this.style.transform='scale(1)';this.style.borderColor='${busSnap.color}66'">
-                            ${lineImgHtml(busSnap.line, '30px')}
-                        </div>
+            <!-- Onglet Accessibilité -->
+            <div id="accessibility-pane" class="tab-pane">
+                <div class="tab-header">Alertes accessibilité</div>
+                <div id="accessibility-list" class="info-list">
+                    <div class="info-empty">
+                        <img src="assets/SVG_Icons/PMR.svg" class="svg-ic"> Chargement...
                     </div>
-                    <div style="padding:12px 14px;border-bottom:1px solid var(--glass-border);">
-                        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                            <div style="display:flex;align-items:center;gap:8px;">
-                                <div style="width:6px;height:6px;border-radius:50%;background:${busSnap.color};flex-shrink:0;"></div>
-                                <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;">Ligne ${busSnap.line}</span>
-                            </div>
-                            <span style="font-size:10px;padding:3px 8px;border-radius:20px;${busSnap.delayOk?'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);':'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">${busSnap.delayOk?"À l'heure":busSnap.delay}</span>
-                        </div>
-                        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${busSnap.dest}</div>
+                </div>
+            </div>
+
+            <!-- Onglet Arrêts -->
+            <div id="stops-pane" class="tab-pane">
+                <div class="search-bar">
+                    <label>
+                        <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
+                        <input type="text" id="stop-search" placeholder="Nom d'arrêt, commune..." oninput="filterStops()">
+                    </label>
+                </div>
+                <div class="tab-header">
+                    <span>Tous les arrêts</span>
+                    <span id="search-stats" style="font-size:10px;color:var(--text-muted);">0/0</span>
+                </div>
+                <div id="stops-list" class="info-list">
+                    <div class="info-empty">Chargement...</div>
+                </div>
+            </div>
+
+            <!-- Onglet Lignes -->
+            <div id="lines-pane" class="tab-pane">
+                <div class="filter-bar">
+                    <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="assets/SVG_Icons/metro.svg" class="svg-ic"> Métro</label>
+                    <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="assets/SVG_Icons/tramway.svg" class="svg-ic"> Tram</label>
+                    <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="assets/SVG_Icons/trolleybus.svg" class="svg-ic"> TramBus</label>
+                    <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="assets/SVG_Icons/funicular.svg" class="svg-ic"> Funiculaire</label>
+                    <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navigone.svg" class="svg-ic"> Navigône</label>
+                    <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="assets/SVG_Icons/chrono.svg" class="svg-ic"> Chrono</label>
+                    <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="assets/SVG_Icons/bus.svg" class="svg-ic"> Bus</label>
+                    <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navette.svg" class="svg-ic"> Navette</label>
+                    <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="assets/SVG_Icons/pleine_lune.svg" class="svg-ic"> Pleine Lune</label>
+                    <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="assets/SVG_Icons/JD.svg" class="svg-ic"> Junior Direct</label>
+                </div>
+                <div class="tab-header">Toutes les lignes</div>
+                <div id="lines-list" class="info-list">
+                    <div class="info-empty">Chargement...</div>
+                </div>
+            </div>
+
+            <!-- Onglet Vélo'v -->
+            <div id="velov-pane" class="tab-pane">
+                <div class="search-bar">
+                    <label>
+                        <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
+                        <input type="text" id="velov-search" placeholder="Adresse, nom ou numéro..." oninput="filterVelovStations()">
+                    </label>
+                </div>
+                <div class="tab-header">
+                    <span>Stations Vélo'v</span>
+                    <span id="velov-stats" style="font-size:10px;color:var(--text-muted);">0/0</span>
+                </div>
+                <div id="velov-list" class="info-list">
+                    <div class="info-empty">Chargement...</div>
+                </div>
+            </div>
+
+            <!-- Onglet Infos -->
+            <div id="credits-pane" class="tab-pane">
+                <div class="tab-header">À propos</div>
+                <div class="credits-content">
+                    <div class="credits-section">
+                        <h3><img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> TCL Localisation</h3>
+                        <p>Application de localisation en temps réel des transports en commun lyonnais.</p>
                     </div>
-                    <div style="padding:10px 14px;">
-                        <div style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;"><img src="SVG_Icons/bus.svg" class="svg-ic" style="width:12px;height:12px;">${getVehicleType(busSnap)}</div>
-                        <div style="font-size:10px;color:var(--text-muted);font-family:monospace;margin-top:4px;display:flex;align-items:center;gap:6px;"><img src="SVG_Icons/id.svg" class="svg-ic" style="width:11px;height:11px;">${busSnap.id}</div>
+                    <div class="credits-section">
+                        <h3><i class="ti ti-database"></i> Sources de données</h3>
+                        <p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a> et API TCL.</p>
                     </div>
-                </div>`;
-            }, { maxWidth:270, className:'tcl-popup' });
-
-            const showNow = !busLineFilter || lineRemapped === busLineFilter || line === busLineFilter;
-            if (showNow) marker.addTo(busLayer);
-            busMarkers.set(bus.id, { marker, hash: h, line });
-        }
-
-        for (const [id, e] of busMarkers) {
-            if (!seen.has(id)) { 
-                if (!e.marker.isPopupOpen()) {
-                    busLayer.removeLayer(e.marker); 
-                    busMarkers.delete(id); 
-                }
-            }
-        }
-        applyBusLineFilter();
-    } catch(e) { setTimeout(updateBus, 10000); }
-}
-
-function buildParkingPopup(p, tr, titre = 'Parking', iconEmoji = '🅿️') {
-    const dispo = p._nb_dispo ?? p.nb_place_dispo ?? tr?.nb_tot_place_dispo ?? null;
-    const cap = p.capacite ?? p.nb_place_tot ?? null;
-    
-    let dispoSection = '';
-    if (dispo !== null && cap !== null) {
-        const dispoInfo = getDispoColor(dispo, cap);
-        dispoSection = `<div style="display:flex;gap:8px;margin-top:10px;">
-            <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
-                <div style="font-size:18px;font-weight:700;color:${dispoInfo.textColor};">${dispo}</div>
-                <div style="font-size:10px;color:var(--text-muted);">libres</div>
-            </div>
-            <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
-                <div style="font-size:18px;font-weight:700;color:var(--text-secondary);">${cap}</div>
-                <div style="font-size:10px;color:var(--text-muted);">total</div>
-            </div>
-        </div>`;
-    }
-    
-    return `<div style="width:220px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
-        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${iconEmoji} ${p.nom}</div>
-        <div style="font-size:11px;color:var(--text-secondary);">${p.horaires || 'Horaires non disponibles'}</div>
-        ${dispoSection}
-    </div>`;
-}
-
-async function loadParkings() {
-    if (parkingsLoaded) return;
-    try {
-        const parkingsData = await apiFetch('api/parkings');
-        if (parkingsData.is_loading) { setTimeout(loadParkings, 10000); return; }
-        allParkings = Array.isArray(parkingsData) ? parkingsData : [];
-        parkingsLoaded = true;
-        updateVisibleParkings();
-    } catch(e) { setTimeout(loadParkings, 10000); }
-}
-
-function updateVisibleParkings() {
-    if (!layerVisibility.parking) {
-        parkingLayer.clearLayers();
-        parkingMarkerMap.clear();
-        return;
-    }
-    if (!parkingsLoaded) { loadParkings(); return; }
-    if (map.getZoom() < 12) { parkingMarkerMap.forEach(m => parkingLayer.removeLayer(m)); parkingMarkerMap.clear(); return; }
-    const bounds = map.getBounds();
-    const visible = allParkings.filter(p => {
-        const lat = parseFloat(p.lat), lon = parseFloat(p.lon);
-        return !isNaN(lat) && !isNaN(lon) && bounds.contains([lat, lon]);
-    });
-    const seen = new Set();
-    visible.forEach(p => {
-        const key = `${p.lat},${p.lon}`; seen.add(key);
-        if (parkingMarkerMap.has(key)) return;
-        const dispoInfo = getDispoColor(p._nb_dispo ?? 0, p.capacite || 1);
-        const m = L.marker([parseFloat(p.lat), parseFloat(p.lon)], {
-            pane: 'parkingPane',
-            icon: L.divIcon({
-                html: `<div style="position:relative;width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                    <span style="font-size:22px;display:flex;align-items:center;justify-content:center;width:28px;height:28px;background:rgba(13,15,24,0.9);border-radius:6px;">🅿️</span>
-                    <div style="position:absolute;bottom:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:${dispoInfo?.color || '#0099cc'};border:2px solid rgba(13,15,24,0.9);"></div>
-                </div>`,
-                className: '', iconSize: [28, 28], iconAnchor: [14, 14]
-            })
-        }).bindPopup(buildParkingPopup(p, null, 'Parking', '🅿️'), { maxWidth:240, className:'tcl-popup' }).addTo(parkingLayer);
-        parkingMarkerMap.set(key, m);
-    });
-    for (const [k, m] of parkingMarkerMap) { if (!seen.has(k)) { parkingLayer.removeLayer(m); parkingMarkerMap.delete(k); } }
-}
-
-async function loadParkAndRideLots() {
-    if (parcsRelaisLoaded) return;
-    try {
-        const data = await apiFetch('api/park-and-ride');
-        if (data.is_loading) { setTimeout(loadParkAndRideLots, 10000); return; }
-        allParcsRelais = Array.isArray(data) ? data : [];
-        parcsRelaisLoaded = true;
-        updateVisibleParkAndRideLots();
-    } catch(e) { setTimeout(loadParkAndRideLots, 10000); }
-}
-
-function updateVisibleParkAndRideLots() {
-    if (!layerVisibility.parking) {
-        parcsRelaisLayer.clearLayers();
-        parcsRelaisMarkerMap.clear();
-        return;
-    }
-    if (!parcsRelaisLoaded) { loadParkAndRideLots(); return; }
-    if (map.getZoom() < 11) { parcsRelaisMarkerMap.forEach(m => parcsRelaisLayer.removeLayer(m)); parcsRelaisMarkerMap.clear(); return; }
-    const bounds = map.getBounds();
-    const visible = allParcsRelais.filter(p => {
-        const lat = parseFloat(p.lat), lon = parseFloat(p.lon);
-        return !isNaN(lat) && !isNaN(lon) && bounds.contains([lat, lon]);
-    });
-    const seen = new Set();
-    visible.forEach(p => {
-        const key = `${p.lat},${p.lon}`; seen.add(key);
-        if (parcsRelaisMarkerMap.has(key)) return;
-        const dispoInfo = getDispoColor(p._nb_dispo ?? 0, p.capacite || 1);
-        const m = L.marker([parseFloat(p.lat), parseFloat(p.lon)], {
-            pane: 'parkingPane',
-            icon: L.divIcon({
-                html: `<div style="position:relative;width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                    <span style="font-size:22px;display:flex;align-items:center;justify-content:center;width:28px;height:28px;background:rgba(13,15,24,0.9);border-radius:6px;">🅿️</span>
-                    <div style="position:absolute;bottom:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:${dispoInfo?.color || '#0099cc'};border:2px solid rgba(13,15,24,0.9);"></div>
-                </div>`,
-                className: '', iconSize: [28, 28], iconAnchor: [14, 14]
-            })
-        }).bindPopup(buildParkingPopup(p, null, 'Parc Relais TCL', '🅿️'), { maxWidth:240, className:'tcl-popup' }).addTo(parcsRelaisLayer);
-        parcsRelaisMarkerMap.set(key, m);
-    });
-    for (const [k, m] of parcsRelaisMarkerMap) { if (!seen.has(k)) { parcsRelaisLayer.removeLayer(m); parcsRelaisMarkerMap.delete(k); } }
-}
-
-function buildVelovPopup(s) {
-    const bikes = s.available_bikes || 0, stands = s.available_bike_stands || 0, total = s.bike_stands || (bikes + stands) || 0;
-    const dispoInfo = getVelovDispoColor(bikes, stands, total);
-    const ms = s.main_stands?.availabilities || {};
-    return `<div style="width:210px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
-        <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
-            <img src="SVG_Icons/velo.svg" class="svg-ic" style="width:14px;height:14px;"> ${s.name}
-        </div>
-        <div style="display:flex;gap:8px;">
-            <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
-                <div style="font-size:20px;font-weight:700;color:${dispoInfo.textColor};">${bikes}</div>
-                <div style="font-size:10px;color:var(--text-muted);">vélos</div>
-            </div>
-            <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
-                <div style="font-size:20px;font-weight:700;color:var(--text-secondary);">${stands}</div>
-                <div style="font-size:10px;color:var(--text-muted);">places</div>
+                    <div class="credits-section">
+                        <h3><i class="ti ti-code"></i> Développement</h3>
+                        <p>Matt TCL, NDR, S1ba<br><span style="font-size:11px;opacity:0.7;">Version BETA – v1.0</span></p>
+                    </div>
+                </div>
             </div>
         </div>
-        ${(ms.electricalBikes > 0 || ms.mechanicalBikes > 0) ? `<div style="display:flex;gap:6px;margin-top:10px;">
-            ${ms.electricalBikes>0?`<span style="font-size:10px;color:#00d2ff;background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.2);border-radius:6px;padding:3px 8px;">⚡ ${ms.electricalBikes} élec</span>`:''}
-            ${ms.mechanicalBikes>0?`<span style="font-size:10px;color:var(--text-secondary);background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:6px;padding:3px 8px;">🔧 ${ms.mechanicalBikes} méca</span>`:''}
-        </div>` : ''}
-    </div>`;
-}
+    </div>
 
-async function updateVelov() {
-    try {
-        const data = await apiFetch('api/velov');
-        if (data.is_loading) { setTimeout(updateVelov, 10000); return; }
-        allVelovStations = data.values || [];
-        updateVisibleVelov();
-    } catch(e) { setTimeout(updateVelov, 10000); }
-}
+    <!-- Notifications -->
+    <div id="notification-container" class="notification-container"></div>
 
-function updateVisibleVelov() {
-    if (!layerVisibility.velov) {
-        velovLayer.clearLayers();
-        velovMarkerMap.clear();
-        return;
-    }
-    if (map.getZoom() < 13) { velovMarkerMap.forEach(m => velovLayer.removeLayer(m)); velovMarkerMap.clear(); return; }
-    const bounds = map.getBounds();
-    const visible = allVelovStations.filter(s => {
-        const lat = parseFloat(s.lat), lng = parseFloat(s.lng);
-        return !isNaN(lat) && !isNaN(lng) && bounds.contains([lat, lng]);
-    }).slice(0, 250);
-    const seen = new Set();
-    visible.forEach(s => {
-        const key = `${s.lat},${s.lng}`; seen.add(key);
-        if (velovMarkerMap.has(key)) return;
-        const bikes = s.available_bikes || 0, stands = s.available_bike_stands || 0, total = s.bike_stands || (bikes + stands) || 0;
-        const dispoInfo = getVelovDispoColor(bikes, stands, total);
-        const m = L.circleMarker([parseFloat(s.lat), parseFloat(s.lng)], {
-            pane: 'velovPane',
-            radius: 7, fillColor: dispoInfo.color, color: 'rgba(13,15,24,0.8)', weight: 2, opacity: 1, fillOpacity: 0.9
-        }).bindPopup(buildVelovPopup(s), { maxWidth: 230, className: 'tcl-popup' }).addTo(velovLayer);
-        velovMarkerMap.set(key, m);
-    });
-    for (const [k, m] of velovMarkerMap) { if (!seen.has(k)) { velovLayer.removeLayer(m); velovMarkerMap.delete(k); } }
-}
-
-async function loadVelovList() {
-    try {
-        const data = await apiFetch('api/velov');
-        if (data.is_loading) { setTimeout(loadVelovList, 10000); return; }
-        allVelovStations = data.values || [];
-        renderVelovList('');
-    } catch(e) { setTimeout(loadVelovList, 10000); }
-}
-
-let velovSearchTimer = null;
-window.filterVelovStations = () => {
-    clearTimeout(velovSearchTimer);
-    velovSearchTimer = setTimeout(() => renderVelovList(document.getElementById('velov-search').value.toLowerCase().trim()), 200);
-};
-
-function renderVelovList(term) {
-    let stations = [...allVelovStations];
-    if (term) stations = stations.filter(s => (s.name||'').toLowerCase().includes(term) || (s.address||'').toLowerCase().includes(term) || String(s.number||'').includes(term));
-    stations.sort((a, b) => (a.name||'').localeCompare(b.name||''));
-    document.getElementById('velov-stats').textContent = `${stations.length}/${allVelovStations.length}`;
-    if (!stations.length) { document.getElementById('velov-list').innerHTML = `<div class="info-empty">Aucune station trouvée</div>`; return; }
-
-    const shown = stations.slice(0, 300);
-    const html = shown.map(s => {
-        const bikes = s.available_bikes || 0, stands = s.available_bike_stands || 0, total = s.bike_stands || (bikes + stands) || 0;
-        const dispoInfo = getVelovDispoColor(bikes, stands, total);
-        const ms = s.main_stands?.availabilities || {};
-        return `<div class="info-item" data-lat="${s.lat||''}" data-lon="${s.lng||''}" data-name="${(s.name||'').replace(/"/g,'&quot;')}" data-idx="${allVelovStations.indexOf(s)}">
-            <div class="info-summary" onclick="selectVelovOnMap(this)">
-                <div class="info-line-badge" style="background:rgba(${dispoInfo.rgb},0.12);border:1px solid rgba(${dispoInfo.rgb},0.25);"><img src="SVG_Icons/velo.svg" class="svg-ic" style="width:18px;height:18px;"></div>
-                <div class="info-summary-text">
-                    <div class="info-titre">${highlightText(s.name||'Station', term)} <span style="font-size:10px;color:${dispoInfo.textColor};font-weight:500;">${dispoInfo.label}</span></div>
-                    <div class="stop-commune">${highlightText(s.address||'', term)}</div>
-                    <div style="display:flex;gap:12px;margin-top:6px;font-size:11px;color:var(--text-secondary);">
-                        <span>🚲 ${bikes}</span><span>🅿️ ${stands}</span><span>📊 ${total}</span>
-                    </div>
-                </div>
-                <span class="info-chevron">▼</span>
-            </div>
-            <div class="info-detail">
-                <strong>📍 Adresse :</strong> ${s.address||'N/A'}<br>
-                <strong>🏙️ Commune :</strong> ${s.commune||'N/A'}<br>
-                <strong>⚡ Élec :</strong> ${ms.electricalBikes || 0} · <strong>🔧 Méca :</strong> ${ms.mechanicalBikes || 0}<br>
-                <strong>💳 Paiement :</strong> ${s.banking?'CB acceptée':'Sans CB'}<br>
-                <strong>🟢 Statut :</strong> ${s.status==='OPEN'?'Ouverte':'Fermée'}
-            </div>
-        </div>`;
-    }).join('');
-    document.getElementById('velov-list').innerHTML = html + (stations.length > 300 ? `<div class="info-empty">+${stations.length-300} stations (affinez)</div>` : '');
-}
-
-window.selectVelovOnMap = function(el) {
-    const item = el.closest('.info-item');
-    if (!item) return;
-    const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
-    if (isNaN(lat) || isNaN(lon)) return;
-    if (currentVelovMarker) { map.removeLayer(currentVelovMarker); currentVelovMarker = null; }
-    const station = allVelovStations[parseInt(item.dataset.idx)] || { name: item.dataset.name, lat, lng: lon, available_bikes: 0, available_bike_stands: 0 };
-    const dispoInfo = getVelovDispoColor(station.available_bikes || 0, station.available_bike_stands || 0, station.bike_stands || 0);
-    
-    currentVelovMarker = L.circleMarker([lat, lon], {
-        pane: 'velovPane',
-        radius: 10, fillColor: dispoInfo.color, color: '#fff', weight: 2.5, opacity: 1, fillOpacity: 1
-    }).bindPopup(buildVelovPopup(station), { maxWidth: 230, className: 'tcl-popup' }).addTo(map);
-    
-    map.setView([lat, lon], 16);
-    currentVelovMarker.openPopup();
-    setTimeout(() => { if (currentVelovMarker) { map.removeLayer(currentVelovMarker); currentVelovMarker = null; } }, 8000);
-};
-
-async function updateTraffic() {
-    try {
-        const data = await apiFetch('api/traffic');
-        if (data.is_loading) { setTimeout(updateTraffic, 10000); return; }
-        const items = data.values || [];
-        const list = document.getElementById('traffic-list');
-        if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/validé.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune perturbation</div>`; return; }
-
-        const grouped = new Map();
-        items.forEach(a => {
-            const key = [a.titre, a.message, a.type, a.cause].join('|');
-            if (!grouped.has(key)) grouped.set(key, { ...a, lines: new Set() });
-            const g = grouped.get(key);
-            [a.ligne_cli, a.ligne_com].forEach(l => l?.split(',').forEach(x => { const t = x.trim(); if (t) g.lines.add(t); }));
-        });
-
-        list.innerHTML = [...grouped.values()].map(a => {
-            const isP = a.type?.toLowerCase().includes('perturbation');
-            const isT = a.cause?.toLowerCase().includes('travaux');
-            const icon = 'trafic.svg';
-            const filterP = isP ? 'invert(36%) sepia(74%) saturate(3000%) hue-rotate(340deg) brightness(95%)' : (isT ? 'invert(72%) sepia(46%) saturate(800%) hue-rotate(1deg) brightness(105%)' : 'invert(67%) sepia(82%) saturate(2000%) hue-rotate(160deg)');
-            const bg = isP ? 'rgba(255,77,77,0.12)' : (isT ? 'rgba(255,184,77,0.12)' : 'rgba(0,210,255,0.12)');
-            const bdr = isP ? 'rgba(255,77,77,0.3)' : (isT ? 'rgba(255,184,77,0.3)' : 'rgba(0,210,255,0.3)');
-            return `<div class="info-item">
-                <div class="info-summary" onclick="toggleInfoItem(this)">
-                    <div class="info-line-badge" style="background:${bg};border:1px solid ${bdr};"><img src="SVG_Icons/${icon}" style="width:18px;height:18px;filter:${filterP};"></div>
-                    <div class="info-summary-text">
-                        <div class="info-titre">${a.titre||'Info trafic'}</div>
-                        <div class="stop-lines" style="margin-top:6px;">${[...a.lines].map(l => lineImgHtml(l, '24px')).join('')}</div>
-                        <div class="info-type">${a.mode||'TCL'} • ${a.type||'Information'}</div>
-                    </div>
-                    <span class="info-chevron">▼</span>
-                </div>
-                <div class="info-detail">${a.message||'Aucun détail'}</div>
-            </div>`;
-        }).join('');
-    } catch(e) { setTimeout(updateTraffic, 10000); }
-}
-
-async function updateAccessibility() {
-    try {
-        const data = await apiFetch('api/accessibility');
-        if (data.is_loading) { setTimeout(updateAccessibility, 10000); return; }
-        const items = data.values || [];
-        const list = document.getElementById('accessibility-list');
-        if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune alerte</div>`; return; }
-
-        list.innerHTML = items.map(a => {
-            const bg = a.cause==='Panne' ? 'rgba(255,77,77,0.12)' : 'rgba(255,184,77,0.12)';
-            const bdr = a.cause==='Panne' ? 'rgba(255,77,77,0.3)' : 'rgba(255,184,77,0.3)';
-            const debut = a.debut_indispo ? new Date(a.debut_indispo).toLocaleDateString('fr-FR') : '';
-            const fin = a.fin_indispo ? new Date(a.fin_indispo).toLocaleDateString('fr-FR') : '';
-            return `<div class="info-item">
-                <div class="info-summary" onclick="toggleInfoItem(this)">
-                    <div class="info-line-badge" style="background:${bg};border:1px solid ${bdr};"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:18px;height:18px;"></div>
-                    <div class="info-summary-text">
-                        <div class="info-titre">${a.type_equipement||'Équipement'} – ${a.nom_station||''}</div>
-                        <div class="info-type">${a.cause||''}</div>
-                    </div>
-                    <span class="info-chevron">▼</span>
-                </div>
-                <div class="info-detail">${a.equipement||''}<br>📅 ${debut} → ${fin}</div>
-            </div>`;
-        }).join('');
-    } catch(e) { setTimeout(updateAccessibility, 10000); }
-}
-
-async function loadAgencies() {
-    try {
-        const data = await apiFetch('api/agencies');
-        if (data.is_loading) { setTimeout(loadAgencies, 10000); return; }
-        const allAgences = (data || []).filter(a => a.lat && a.lon);
-        allAgences.forEach(a => {
-            const adresse = [a.numero, (a.typevoie||'').charAt(0).toUpperCase() + (a.typevoie||'').slice(1).toLowerCase(), (a.adr||'').toUpperCase()].filter(Boolean).join(' ');
-            const facea = a.facea === true ? '✅ Oui' : (a.facea === false ? '❌ Non' : '—');
-            const popup = `<div style="width:230px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
-                <div style="background:linear-gradient(135deg,rgba(226,0,26,0.2),rgba(226,0,26,0.05));padding:14px;border-bottom:1px solid var(--glass-border);">
-                    <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px var(--accent-glow);"><img src="Agence.svg" class="svg-ic" style="width:18px;height:18px;"></div>
-                        <div>
-                            <div style="font-size:14px;font-weight:700;color:var(--text-primary);line-height:1.2;">${a.nom}</div>
-                            <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Agence commerciale TCL</div>
-                        </div>
-                    </div>
-                </div>
-                <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-secondary);">
-                    <div style="display:flex;align-items:flex-start;gap:8px;"><span style="flex-shrink:0;">📍</span><div><div style="color:var(--text-primary);">${adresse}</div><div style="font-size:11px;">${a.codepostal || ''}</div></div></div>
-                    <div style="display:flex;align-items:center;gap:8px;"><span>🪟</span><span>Face à face : <span style="color:var(--text-primary);">${facea}</span></span></div>
-                    <div style="display:flex;align-items:flex-start;gap:8px;"><span>🕒</span><span>${a.horaires || 'Non renseignés'}</span></div>
-                </div>
-            </div>`;
-            L.marker([a.lat, a.lon], {
-                icon: L.divIcon({
-                    html: `<div style="width:36px;height:36px;background:linear-gradient(135deg, #ff4d4d, #e2001a);border-radius:10px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px var(--accent-glow);"><img src="Agence.svg" style="width:18px;height:18px;filter:brightness(0) invert(1);"></div>`,
-                    className: '', iconSize: [36, 36], iconAnchor: [18, 18]
-                })
-            }).bindPopup(popup, { maxWidth: 250, className: 'tcl-popup' }).addTo(agenceLayer);
-        });
-    } catch(e) { setTimeout(loadAgencies, 10000); }
-}
-
-async function checkSystemStatus() {
-    try {
-        const res = await fetch(API);
-        const data = await res.json();
-        const dot = document.getElementById('system-status-dot');
-        if (data.data_loaded && data.data_loaded.stops) {
-            dot.classList.add('ready');
-            dot.title = "Toutes les données sont chargées et prêtes";
-        } else {
-            dot.classList.remove('ready');
-            dot.title = "Initialisation des données en cours...";
-        }
-    } catch(e) { /* keep yellow */ }
-}
-
-// ===== INIT =====
-async function init() {
-    await loadStopsMapping();
-    await Promise.all([
-        updateBus(), loadParkings(), loadParkAndRideLots(), updateVelov(), updateTraffic(), updateAccessibility(), updateStopsData(), loadAgencies()
-    ]);
-    setTimeout(checkSystemStatus, 3000);
-}
-init();
-
-// ===== REFRESH (espacé pour éviter le 429 HF) =====
-setInterval(updateBus, 30_000);
-setInterval(updateVelov, 120_000);
-setInterval(updateTraffic, 120_000);
-setInterval(updateAccessibility, 120_000);
-setInterval(updateStopsData, 600_000);
-setInterval(checkSystemStatus, 30_000);
-
-let moveTimer = null;
-map.on('moveend zoomend', () => {
-    clearTimeout(moveTimer);
-    moveTimer = setTimeout(() => {
-        updateVisibleVelov();
-        updateVisibleParkings();
-        updateVisibleParkAndRideLots();
-        renderVisibleStops();
-    }, 200);
-}, { passive: true });
-
-setTimeout(() => map.invalidateSize(), 300);
-</script>
+    <!-- Scripts -->
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
