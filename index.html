@@ -526,10 +526,51 @@
 </div>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-<script>
-// ===== CONFIG =====
+<script>// ===== CONFIG =====
 const API = window.location.hostname.includes('hf.space') ? '' : 'https://matttcl-tcl-localisation.hf.space/';
 const imgCache = new Map();
+
+// ===== API FETCH AVEC BACKOFF ANTI-429 =====
+let _fetchBackoff = 1000;
+const API_FETCH_TIMEOUT = 15000;
+
+async function apiFetch(path, attempt = 1) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_FETCH_TIMEOUT);
+    
+    try {
+        const res = await fetch(API + path, { 
+            signal: controller.signal,
+            headers: { 'Accept': 'application/json' }
+        });
+        clearTimeout(timeoutId);
+        
+        // 429 = rate limit HuggingFace
+        if (res.status === 429) {
+            const wait = Math.min(_fetchBackoff * attempt * 2, 30000);
+            console.warn(`⏳ 429 rate limit sur ${path}, attente ${wait/1000}s...`);
+            await new Promise(r => setTimeout(r, wait));
+            if (attempt < 3) return apiFetch(path, attempt + 1);
+            return { is_loading: true };
+        }
+        
+        if (res.status === 503) return { is_loading: true };
+        
+        _fetchBackoff = 1000;
+        
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+        
+    } catch (e) {
+        clearTimeout(timeoutId);
+        _fetchBackoff = Math.min(_fetchBackoff * 2, 30000);
+        if (attempt < 2) {
+            await new Promise(r => setTimeout(r, _fetchBackoff));
+            return apiFetch(path, attempt + 1);
+        }
+        throw e;
+    }
+}
 
 // ===== COULEURS : SOURCE UNIQUE =====
 const LINE_COLORS_MASTER = {
@@ -620,24 +661,40 @@ function getVelovDispoColor(bikes, stands, total) {
     return getDispoColor(bikes, total || (bikes + stands));
 }
 
+// ===== CARTE =====
 const map = L.map('map', { zoomControl: false, attributionControl: false, renderer: L.canvas() }).setView([45.757, 4.832], 13);
 L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 20 }).addTo(map);
 
-// Couches avec z-index explicite
+// Panes personnalisés pour z-index
+if (!map.getPane('tracePane')) {
+    map.createPane('tracePane');
+    map.getPane('tracePane').style.zIndex = 390;
+}
+if (!map.getPane('parkingPane')) {
+    map.createPane('parkingPane');
+    map.getPane('parkingPane').style.zIndex = 410;
+}
+if (!map.getPane('velovPane')) {
+    map.createPane('velovPane');
+    map.getPane('velovPane').style.zIndex = 420;
+}
+if (!map.getPane('stopPane')) {
+    map.createPane('stopPane');
+    map.getPane('stopPane').style.zIndex = 430;
+}
+if (!map.getPane('vehiclePane')) {
+    map.createPane('vehiclePane');
+    map.getPane('vehiclePane').style.zIndex = 440;
+}
+
 const parkingMetroLayer = L.layerGroup().addTo(map);
 const parkingLayer = L.layerGroup().addTo(map);
-parkingLayer.setZIndex(100);
 const parcsRelaisLayer = L.layerGroup().addTo(map);
-parcsRelaisLayer.setZIndex(100);
 const lineTraceLayer = L.layerGroup().addTo(map);
-lineTraceLayer.setZIndex(150);
 const velovLayer = L.layerGroup().addTo(map);
-velovLayer.setZIndex(200);
 const busLayer = L.layerGroup().addTo(map);
-busLayer.setZIndex(400);
 const agenceLayer = L.layerGroup().addTo(map);
 const stopMapLayer = L.layerGroup().addTo(map);
-stopMapLayer.setZIndex(300);
 
 let allStops = [], stopsMapping = {}, allLines = [];
 let allVelovStations = [], allParkings = [], allParkingsMetro = [], allParcsRelais = [];
@@ -651,24 +708,48 @@ const layerVisibility = { bus: true, stops: true, velov: true, parking: true };
 function toggleLayer(layerName) {
     layerVisibility[layerName] = !layerVisibility[layerName];
     const btn = document.querySelector(`[data-layer="${layerName}"]`);
-    btn.classList.toggle('active', layerVisibility[layerName]);
-    
+    if (btn) btn.classList.toggle('active', layerVisibility[layerName]);
+
     if (layerName === 'bus') {
-        if (layerVisibility.bus) map.addLayer(busLayer);
-        else map.removeLayer(busLayer);
-    } else if (layerName === 'stops') {
-        if (layerVisibility.stops) map.addLayer(stopMapLayer);
-        else map.removeLayer(stopMapLayer);
-    } else if (layerName === 'velov') {
-        if (layerVisibility.velov) map.addLayer(velovLayer);
-        else map.removeLayer(velovLayer);
-    } else if (layerName === 'parking') {
+        if (layerVisibility.bus) {
+            map.addLayer(busLayer);
+            applyBusLineFilter();
+        } else {
+            map.removeLayer(busLayer);
+        }
+    }
+    if (layerName === 'stops') {
+        if (layerVisibility.stops) {
+            map.addLayer(stopMapLayer);
+            renderVisibleStops();
+        } else {
+            map.removeLayer(stopMapLayer);
+            stopMapLayer.clearLayers();
+        }
+    }
+    if (layerName === 'velov') {
+        if (layerVisibility.velov) {
+            map.addLayer(velovLayer);
+            updateVisibleVelov();
+        } else {
+            map.removeLayer(velovLayer);
+            velovLayer.clearLayers();
+            velovMarkerMap.clear();
+        }
+    }
+    if (layerName === 'parking') {
         if (layerVisibility.parking) {
             map.addLayer(parkingLayer);
             map.addLayer(parcsRelaisLayer);
+            updateVisibleParkings();
+            updateVisibleParkAndRideLots();
         } else {
             map.removeLayer(parkingLayer);
             map.removeLayer(parcsRelaisLayer);
+            parkingLayer.clearLayers();
+            parcsRelaisLayer.clearLayers();
+            parkingMarkerMap.clear();
+            parcsRelaisMarkerMap.clear();
         }
     }
 }
@@ -704,17 +785,8 @@ const getNewLineNumber = l => lineMapping[l] || l;
 
 function getLineTypePriority(type) {
     const priorities = {
-        metro: 1,
-        tram: 2,
-        tb: 3,
-        navgone: 4,
-        funiculaire: 5,
-        chrono: 6,
-        bus: 7,
-        navette: 8,
-        pl: 9,
-        jd: 10,
-        other: 11
+        metro: 1, tram: 2, tb: 3, navgone: 4, funiculaire: 5,
+        chrono: 6, bus: 7, navette: 8, pl: 9, jd: 10, other: 11
     };
     return priorities[type] || 999;
 }
@@ -727,7 +799,6 @@ function sortLinesByType(a, b) {
     
     if (priorityA !== priorityB) return priorityA - priorityB;
     
-    // Tri alphabétique/numérique dans le même type
     const numA = parseInt(String(a).replace(/\D/g, '')) || 9999;
     const numB = parseInt(String(b).replace(/\D/g, '')) || 9999;
     if (numA !== numB) return numA - numB;
@@ -810,7 +881,10 @@ function renderStopsOnMap() {
 }
 
 function renderVisibleStops() {
-    if (!layerVisibility.stops) return;
+    if (!layerVisibility.stops) {
+        stopMapLayer.clearLayers();
+        return;
+    }
     
     const zoom = map.getZoom();
     if (zoom < 13) {
@@ -820,7 +894,6 @@ function renderVisibleStops() {
     
     const bounds = map.getBounds();
     const seen = new Map();
-    
     const visible = stopsOnMap.filter(s => bounds.contains([s.lat, s.lon])).slice(0, 500);
     
     for (const s of visible) {
@@ -830,6 +903,7 @@ function renderVisibleStops() {
         const isHighlighted = currentLineFilter && s.stops.some(st => stopServesLine(st.desserte, currentLineFilter));
         
         const marker = L.marker([s.lat, s.lon], {
+            pane: 'stopPane',
             icon: L.divIcon({
                 className: '',
                 html: `<div class="stop-map-marker ${isHighlighted ? 'highlighted' : ''}" title="${s.nom}"></div>`,
@@ -1026,7 +1100,7 @@ async function loadNextDepartures(stopId, containerId, stopLat, stopLon) {
         const data = await apiFetch(`api/next-departures/${stopId}`);
         if (data.is_loading) {
             el.innerHTML = header + '<div style="font-size:11px;color:#f1c40f;text-align:center;padding:8px 0;">⏳ Initialisation des données en cours...</div>';
-            setTimeout(() => loadNextDepartures(stopId, containerId, stopLat, stopLon), 2000);
+            setTimeout(() => loadNextDepartures(stopId, containerId, stopLat, stopLon), 10000);
             return;
         }
 
@@ -1087,14 +1161,11 @@ async function showLineTrace(lineCode) {
                 segs.forEach(seg => {
                     if (seg.length < 2) return;
                     L.polyline(seg.map(([lon, lat]) => [lat, lon]), {
+                        pane: 'tracePane',
                         color: traceColor, weight: 4, opacity: 0.85, lineJoin: 'round', lineCap: 'round'
                     }).addTo(lineTraceLayer);
                 });
-            } else {
-                console.warn(`Pas de tracé disponible pour la ligne ${lineCode}`);
             }
-        } else {
-            console.warn(`Erreur HTTP ${resp.status} lors de la récupération du tracé`);
         }
     } catch(e) {
         console.warn('Erreur tracé:', e);
@@ -1104,7 +1175,10 @@ async function showLineTrace(lineCode) {
         if (!s.lat || !s.lon) return;
         const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
         if (isNaN(lat) || isNaN(lon)) return;
-        const cm = L.circleMarker([lat, lon], { radius: 5, fillColor: traceColor, color: '#fff', weight: 2, fillOpacity: 1 }).addTo(lineTraceLayer);
+        const cm = L.circleMarker([lat, lon], { 
+            pane: 'tracePane',
+            radius: 5, fillColor: traceColor, color: '#fff', weight: 2, fillOpacity: 1 
+        }).addTo(lineTraceLayer);
         cm.on('click', async () => {
             let group = stopsOnMap.find(st => haversineMeters(st.lat, st.lon, lat, lon) < 30 && st.nom === s.nom);
             if (!group) group = { lat, lon, nom: s.nom, stops: [s] };
@@ -1176,22 +1250,15 @@ window.filterLineFromPopup = async function(line) {
     if (panel.classList.contains('collapsed')) { panel.classList.remove('collapsed'); setTimeout(() => map.invalidateSize(), 300); }
 };
 
-async function apiFetch(path) {
-    const res = await fetch(API + path);
-    if (res.status === 503) return { is_loading: true };
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    return res.json();
-}
-
 async function loadStopsMapping() {
     try {
         const data = await apiFetch('api/stops');
-        if (data.is_loading) { setTimeout(loadStopsMapping, 2000); return; }
+        if (data.is_loading) { setTimeout(loadStopsMapping, 10000); return; }
         (data.values||[]).forEach(s => {
             if (s.id && s.nom) stopsMapping[s.id] = s.nom;
             if (s.code_station && s.nom) stopsMapping[s.code_station] = s.nom;
         });
-    } catch(e) { setTimeout(loadStopsMapping, 3000); }
+    } catch(e) { setTimeout(loadStopsMapping, 10000); }
 }
 
 const getStopName = code => {
@@ -1203,14 +1270,14 @@ const getStopName = code => {
 async function updateStopsData() {
     try {
         const data = await apiFetch('api/stops');
-        if (data.is_loading) { setTimeout(updateStopsData, 2000); return; }
+        if (data.is_loading) { setTimeout(updateStopsData, 10000); return; }
         allStops = data.values || [];
         extractAllLines();
         renderStopList('');
         renderStopsOnMap();
     } catch(e) {
         document.getElementById('stops-list').innerHTML = `<div class="info-empty">Erreur de chargement (réessai...)</div>`;
-        setTimeout(updateStopsData, 3000);
+        setTimeout(updateStopsData, 10000);
     }
 }
 
@@ -1230,7 +1297,7 @@ function getVehicleType(bus) {
 async function updateBus() {
     try {
         const buses = await apiFetch('api/buses');
-        if (buses.is_loading) { setTimeout(updateBus, 2000); return; }
+        if (buses.is_loading) { setTimeout(updateBus, 10000); return; }
         const seen = new Set();
         for (const bus of buses) {
             const lat = parseFloat(bus.lat), lon = parseFloat(bus.lon);
@@ -1287,7 +1354,10 @@ async function updateBus() {
                 <image href="Lignes/${modeFile}" x="${cx-9}" y="${cy-9}" width="18" height="18"/>
             </svg>`;
 
-            const marker = L.marker([lat, lon], { icon: L.divIcon({ html: iconHtml, className: '', iconSize: [svgSize, svgSize], iconAnchor: [svgSize/2, svgSize/2] }) });
+            const marker = L.marker([lat, lon], { 
+                pane: 'vehiclePane',
+                icon: L.divIcon({ html: iconHtml, className: '', iconSize: [svgSize, svgSize], iconAnchor: [svgSize/2, svgSize/2] }) 
+            });
             const busSnap = { ...bus, line, color, dest, delayOk, modeFile, lineRemapped };
             
             marker.bindPopup(() => {
@@ -1330,7 +1400,7 @@ async function updateBus() {
             }
         }
         applyBusLineFilter();
-    } catch(e) { setTimeout(updateBus, 3000); }
+    } catch(e) { setTimeout(updateBus, 10000); }
 }
 
 function buildParkingPopup(p, tr, titre = 'Parking', iconEmoji = '🅿️') {
@@ -1366,17 +1436,21 @@ async function loadParkings() {
             apiFetch('api/parkings'),
             apiFetch('api/parkings-tr').catch(() => ({ values: [] }))
         ]);
-        if (parkingsData.is_loading) { setTimeout(loadParkings, 2000); return; }
+        if (parkingsData.is_loading) { setTimeout(loadParkings, 10000); return; }
         
         const trById = {}; (trData.values || []).forEach(p => { if (p.id) trById[p.id] = p; });
         allParkings = parkingsData.map(p => ({ ...p, _tr: trById[p.id] || null }));
         parkingsLoaded = true;
         updateVisibleParkings();
-    } catch(e) { setTimeout(loadParkings, 3000); }
+    } catch(e) { setTimeout(loadParkings, 10000); }
 }
 
 function updateVisibleParkings() {
-    if (!layerVisibility.parking) return;
+    if (!layerVisibility.parking) {
+        parkingLayer.clearLayers();
+        parkingMarkerMap.clear();
+        return;
+    }
     if (!parkingsLoaded) { loadParkings(); return; }
     if (map.getZoom() < 12) { parkingMarkerMap.forEach(m => parkingLayer.removeLayer(m)); parkingMarkerMap.clear(); return; }
     const bounds = map.getBounds();
@@ -1390,6 +1464,7 @@ function updateVisibleParkings() {
         if (parkingMarkerMap.has(key)) return;
         const dispoInfo = getDispoColor(p._tr?.nb_tot_place_dispo ?? 0, p.capacite || 1);
         const m = L.marker([parseFloat(p.lat), parseFloat(p.lon)], {
+            pane: 'parkingPane',
             icon: L.divIcon({
                 html: `<div style="position:relative;width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
                     <img src="Park.svg" style="width:28px;height:28px;" onerror="this.outerHTML='<span style=font-size:20px>🅿️</span>'">
@@ -1407,15 +1482,19 @@ async function loadParkAndRideLots() {
     if (parcsRelaisLoaded) return;
     try {
         const data = await apiFetch('api/park-and-ride');
-        if (data.is_loading) { setTimeout(loadParkAndRideLots, 2000); return; }
+        if (data.is_loading) { setTimeout(loadParkAndRideLots, 10000); return; }
         allParcsRelais = Array.isArray(data) ? data : [];
         parcsRelaisLoaded = true;
         updateVisibleParkAndRideLots();
-    } catch(e) { setTimeout(loadParkAndRideLots, 3000); }
+    } catch(e) { setTimeout(loadParkAndRideLots, 10000); }
 }
 
 function updateVisibleParkAndRideLots() {
-    if (!layerVisibility.parking) return;
+    if (!layerVisibility.parking) {
+        parcsRelaisLayer.clearLayers();
+        parcsRelaisMarkerMap.clear();
+        return;
+    }
     if (!parcsRelaisLoaded) { loadParkAndRideLots(); return; }
     if (map.getZoom() < 11) { parcsRelaisMarkerMap.forEach(m => parcsRelaisLayer.removeLayer(m)); parcsRelaisMarkerMap.clear(); return; }
     const bounds = map.getBounds();
@@ -1429,6 +1508,7 @@ function updateVisibleParkAndRideLots() {
         if (parcsRelaisMarkerMap.has(key)) return;
         const dispoInfo = getDispoColor(p._nb_dispo ?? 0, p.capacite || 1);
         const m = L.marker([parseFloat(p.lat), parseFloat(p.lon)], {
+            pane: 'parkingPane',
             icon: L.divIcon({
                 html: `<div style="position:relative;width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
                     <img src="P+R.svg" style="width:28px;height:28px;" onerror="this.outerHTML='<span style=font-size:20px>🅿️</span>'">
@@ -1443,361 +1523,9 @@ function updateVisibleParkAndRideLots() {
 }
 
 function buildVelovPopup(s) {
-    const bikes = s.available_bikes || 0, stands = s.available
-    // ===== CORRECTIF DE SUPERPOSITION DES COUCHES =====
-// Ordre voulu : Parkings < Vélo'v < Arrêts < Véhicules
-if (!map.getPane('tracePane')) {
-    map.createPane('tracePane');
-    map.getPane('tracePane').style.zIndex = 390;
-    map.getPane('tracePane').style.pointerEvents = 'auto';
-}
-if (!map.getPane('parkingPane')) {
-    map.createPane('parkingPane');
-    map.getPane('parkingPane').style.zIndex = 410;
-}
-if (!map.getPane('velovPane')) {
-    map.createPane('velovPane');
-    map.getPane('velovPane').style.zIndex = 420;
-}
-if (!map.getPane('stopPane')) {
-    map.createPane('stopPane');
-    map.getPane('stopPane').style.zIndex = 430;
-}
-if (!map.getPane('vehiclePane')) {
-    map.createPane('vehiclePane');
-    map.getPane('vehiclePane').style.zIndex = 440;
-}}
-
-// ===== Toggle des couches =====
-function toggleLayer(layerName) {
-    layerVisibility[layerName] = !layerVisibility[layerName];
-    const btn = document.querySelector(`[data-layer="${layerName}"]`);
-    if (btn) btn.classList.toggle('active', layerVisibility[layerName]);
-
-    if (layerName === 'bus') {
-        if (layerVisibility.bus) {
-            map.addLayer(busLayer);
-            applyBusLineFilter();
-        } else {
-            map.removeLayer(busLayer);
-        }
-    }
-
-    if (layerName === 'stops') {
-        if (layerVisibility.stops) {
-            map.addLayer(stopMapLayer);
-            renderVisibleStops();
-        } else {
-            map.removeLayer(stopMapLayer);
-            stopMapLayer.clearLayers();
-        }
-    }
-
-    if (layerName === 'velov') {
-        if (layerVisibility.velov) {
-            map.addLayer(velovLayer);
-            updateVisibleVelov();
-        } else {
-            map.removeLayer(velovLayer);
-            velovLayer.clearLayers();
-            velovMarkerMap.clear();
-        }
-    }
-
-    if (layerName === 'parking') {
-        if (layerVisibility.parking) {
-            map.addLayer(parkingLayer);
-            map.addLayer(parcsRelaisLayer);
-            updateVisibleParkings();
-            updateVisibleParkAndRideLots();
-        } else {
-            map.removeLayer(parkingLayer);
-            map.removeLayer(parcsRelaisLayer);
-            parkingLayer.clearLayers();
-            parcsRelaisLayer.clearLayers();
-            parkingMarkerMap.clear();
-            parcsRelaisMarkerMap.clear();
-        }
-    }
-}
-
-// ===== Redéfinition des rendus avec les bons panes =====
-function renderVisibleStops() {
-    if (!layerVisibility.stops) {
-        stopMapLayer.clearLayers();
-        return;
-    }
-
-    const zoom = map.getZoom();
-    if (zoom < 13) {
-        stopMapLayer.clearLayers();
-        return;
-    }
-
-    const bounds = map.getBounds();
-    const seen = new Map();
-    const visible = stopsOnMap.filter(s => bounds.contains([s.lat, s.lon])).slice(0, 500);
-
-    for (const s of visible) {
-        const key = `${s.lat},${s.lon}`;
-        if (seen.has(key)) continue;
-
-        const isHighlighted = currentLineFilter && s.stops.some(st => stopServesLine(st.desserte, currentLineFilter));
-
-        const marker = L.marker([s.lat, s.lon], {
-            pane: 'stopPane',
-            icon: L.divIcon({
-                className: '',
-                html: `<div class="stop-map-marker ${isHighlighted ? 'highlighted' : ''}" title="${s.nom}"></div>`,
-                iconSize: [14, 14],
-                iconAnchor: [7, 7]
-            })
-        }).addTo(stopMapLayer);
-
-        marker.on('click', async () => {
-            await openStopGroupPopup(s);
-        });
-
-        seen.set(key, marker);
-    }
-}
-
-async function showLineTrace(lineCode) {
-    lineTraceLayer.clearLayers();
-    const traceColor = getLineColor(lineCode);
-    const lineStops = allStops.filter(s => stopServesLine(s.desserte, lineCode));
-    const bounds = [];
-
-    try {
-        const resp = await fetch(API + 'api/line-trace/' + encodeURIComponent(lineCode));
-        if (resp.ok) {
-            const traceData = await resp.json();
-            const segs = traceData.segs || [];
-
-            if (segs.length > 0) {
-                segs.forEach(seg => {
-                    if (seg.length < 2) return;
-                    L.polyline(seg.map(([lon, lat]) => [lat, lon]), {
-                        pane: 'tracePane',
-                        color: traceColor,
-                        weight: 4,
-                        opacity: 0.85,
-                        lineJoin: 'round',
-                        lineCap: 'round'
-                    }).addTo(lineTraceLayer);
-                });
-            } else {
-                console.warn(`Aucun tracé reçu pour la ligne ${lineCode}`);
-            }
-        } else {
-            console.warn(`Erreur HTTP ${resp.status} pour le tracé de ${lineCode}`);
-        }
-    } catch (e) {
-        console.warn('Erreur tracé :', e);
-    }
-
-    lineStops.forEach(s => {
-        if (!s.lat || !s.lon) return;
-        const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
-        if (isNaN(lat) || isNaN(lon)) return;
-
-        const cm = L.circleMarker([lat, lon], {
-            pane: 'tracePane',
-            radius: 5,
-            fillColor: traceColor,
-            color: '#fff',
-            weight: 2,
-            fillOpacity: 1
-        }).addTo(lineTraceLayer);
-
-        cm.on('click', async () => {
-            let group = stopsOnMap.find(st => haversineMeters(st.lat, st.lon, lat, lon) < 30 && st.nom === s.nom);
-            if (!group) group = { lat, lon, nom: s.nom, stops: [s] };
-            await openStopGroupPopup(group);
-        });
-
-        bounds.push([lat, lon]);
-    });
-
-    if (bounds.length > 0) {
-        map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
-    }
-}
-
-function updateVisibleParkings() {
-    if (!layerVisibility.parking) {
-        parkingLayer.clearLayers();
-        parkingMarkerMap.clear();
-        return;
-    }
-
-    if (!parkingsLoaded) {
-        loadParkings();
-        return;
-    }
-
-    if (map.getZoom() < 12) {
-        parkingMarkerMap.forEach(m => parkingLayer.removeLayer(m));
-        parkingMarkerMap.clear();
-        return;
-    }
-
-    const bounds = map.getBounds();
-    const visible = allParkings.filter(p => {
-        const lat = parseFloat(p.lat), lon = parseFloat(p.lon);
-        return !isNaN(lat) && !isNaN(lon) && bounds.contains([lat, lon]);
-    });
-
-    const seen = new Set();
-
-    visible.forEach(p => {
-        const key = `${p.lat},${p.lon}`;
-        seen.add(key);
-        if (parkingMarkerMap.has(key)) return;
-
-        const dispoInfo = getDispoColor(p._tr?.nb_tot_place_dispo ?? 0, p.capacite || 1);
-
-        const m = L.marker([parseFloat(p.lat), parseFloat(p.lon)], {
-            pane: 'parkingPane',
-            icon: L.divIcon({
-                html: `<div style="position:relative;width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                    <img src="Park.svg" style="width:28px;height:28px;" onerror="this.outerHTML='<span style=font-size:20px>🅿️</span>'">
-                    <div style="position:absolute;bottom:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:${dispoInfo?.color || '#0099cc'};border:2px solid rgba(13,15,24,0.9);"></div>
-                </div>`,
-                className: '',
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
-            })
-        }).bindPopup(buildParkingPopup(p, p._tr, 'Parking', '🅿️'), { maxWidth: 240, className: 'tcl-popup' }).addTo(parkingLayer);
-
-        parkingMarkerMap.set(key, m);
-    });
-
-    for (const [k, m] of parkingMarkerMap) {
-        if (!seen.has(k)) {
-            parkingLayer.removeLayer(m);
-            parkingMarkerMap.delete(k);
-        }
-    }
-}
-
-function updateVisibleParkAndRideLots() {
-    if (!layerVisibility.parking) {
-        parcsRelaisLayer.clearLayers();
-        parcsRelaisMarkerMap.clear();
-        return;
-    }
-
-    if (!parcsRelaisLoaded) {
-        loadParkAndRideLots();
-        return;
-    }
-
-    if (map.getZoom() < 11) {
-        parcsRelaisMarkerMap.forEach(m => parcsRelaisLayer.removeLayer(m));
-        parcsRelaisMarkerMap.clear();
-        return;
-    }
-
-    const bounds = map.getBounds();
-    const visible = allParcsRelais.filter(p => {
-        const lat = parseFloat(p.lat), lon = parseFloat(p.lon);
-        return !isNaN(lat) && !isNaN(lon) && bounds.contains([lat, lon]);
-    });
-
-    const seen = new Set();
-
-    visible.forEach(p => {
-        const key = `${p.lat},${p.lon}`;
-        seen.add(key);
-        if (parcsRelaisMarkerMap.has(key)) return;
-
-        const dispoInfo = getDispoColor(p._nb_dispo ?? 0, p.capacite || 1);
-
-        const m = L.marker([parseFloat(p.lat), parseFloat(p.lon)], {
-            pane: 'parkingPane',
-            icon: L.divIcon({
-                html: `<div style="position:relative;width:28px;height:28px;filter:drop-shadow(0 2px 4px rgba(0,0,0,0.5));">
-                    <img src="P+R.svg" style="width:28px;height:28px;" onerror="this.outerHTML='<span style=font-size:20px>🅿️</span>'">
-                    <div style="position:absolute;bottom:-2px;right:-2px;width:10px;height:10px;border-radius:50%;background:${dispoInfo?.color || '#0099cc'};border:2px solid rgba(13,15,24,0.9);"></div>
-                </div>`,
-                className: '',
-                iconSize: [28, 28],
-                iconAnchor: [14, 14]
-            })
-        }).bindPopup(buildParkingPopup(p, null, 'Parc Relais TCL', '🅿️'), { maxWidth: 240, className: 'tcl-popup' }).addTo(parcsRelaisLayer);
-
-        parcsRelaisMarkerMap.set(key, m);
-    });
-
-    for (const [k, m] of parcsRelaisMarkerMap) {
-        if (!seen.has(k)) {
-            parcsRelaisLayer.removeLayer(m);
-            parcsRelaisMarkerMap.delete(k);
-        }
-    }
-}
-
-function updateVisibleVelov() {
-    if (!layerVisibility.velov) {
-        velovLayer.clearLayers();
-        velovMarkerMap.clear();
-        return;
-    }
-
-    if (map.getZoom() < 13) {
-        velovMarkerMap.forEach(m => velovLayer.removeLayer(m));
-        velovMarkerMap.clear();
-        return;
-    }
-
-    const bounds = map.getBounds();
-    const visible = allVelovStations.filter(s => {
-        const lat = parseFloat(s.lat), lng = parseFloat(s.lng);
-        return !isNaN(lat) && !isNaN(lng) && bounds.contains([lat, lng]);
-    }).slice(0, 250);
-
-    const seen = new Set();
-
-    visible.forEach(s => {
-        const key = `${s.lat},${s.lng}`;
-        seen.add(key);
-        if (velovMarkerMap.has(key)) return;
-
-        const bikes = s.available_bikes || 0;
-        const stands = s.available_bike_stands || 0;
-        const total = s.bike_stands || (bikes + stands) || 0;
-        const dispoInfo = getVelovDispoColor(bikes, stands, total);
-
-        const m = L.circleMarker([parseFloat(s.lat), parseFloat(s.lng)], {
-            pane: 'velovPane',
-            radius: 7,
-            fillColor: dispoInfo.color,
-            color: 'rgba(13,15,24,0.8)',
-            weight: 2,
-            opacity: 1,
-            fillOpacity: 0.9
-        }).bindPopup(buildVelovPopup(s), { maxWidth: 230, className: 'tcl-popup' }).addTo(velovLayer);
-
-        velovMarkerMap.set(key, m);
-    });
-
-    for (const [k, m] of velovMarkerMap) {
-        if (!seen.has(k)) {
-            velovLayer.removeLayer(m);
-            velovMarkerMap.delete(k);
-        }
-    }
-}
-
-// ===== SUITE DU CODE MANQUANT =====
-function buildVelovPopup(s) {
-    const bikes = s.available_bikes || 0;
-    const stands = s.available_bike_stands || 0;
-    const total = s.bike_stands || (bikes + stands) || 0;
+    const bikes = s.available_bikes || 0, stands = s.available_bike_stands || 0, total = s.bike_stands || (bikes + stands) || 0;
     const dispoInfo = getVelovDispoColor(bikes, stands, total);
     const ms = s.main_stands?.availabilities || {};
-
     return `<div style="width:210px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
         <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
             <img src="SVG_Icons/velo.svg" class="svg-ic" style="width:14px;height:14px;"> ${s.name}
@@ -1813,8 +1541,8 @@ function buildVelovPopup(s) {
             </div>
         </div>
         ${(ms.electricalBikes > 0 || ms.mechanicalBikes > 0) ? `<div style="display:flex;gap:6px;margin-top:10px;">
-            ${ms.electricalBikes > 0 ? `<span style="font-size:10px;color:#00d2ff;background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.2);border-radius:6px;padding:3px 8px;">⚡ ${ms.electricalBikes} élec</span>` : ''}
-            ${ms.mechanicalBikes > 0 ? `<span style="font-size:10px;color:var(--text-secondary);background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:6px;padding:3px 8px;">🔧 ${ms.mechanicalBikes} méca</span>` : ''}
+            ${ms.electricalBikes>0?`<span style="font-size:10px;color:#00d2ff;background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.2);border-radius:6px;padding:3px 8px;">⚡ ${ms.electricalBikes} élec</span>`:''}
+            ${ms.mechanicalBikes>0?`<span style="font-size:10px;color:var(--text-secondary);background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:6px;padding:3px 8px;">🔧 ${ms.mechanicalBikes} méca</span>`:''}
         </div>` : ''}
     </div>`;
 }
@@ -1822,77 +1550,72 @@ function buildVelovPopup(s) {
 async function updateVelov() {
     try {
         const data = await apiFetch('api/velov');
-        if (data.is_loading) {
-            setTimeout(updateVelov, 2000);
-            return;
-        }
+        if (data.is_loading) { setTimeout(updateVelov, 10000); return; }
         allVelovStations = data.values || [];
         updateVisibleVelov();
-    } catch (e) {
-        setTimeout(updateVelov, 3000);
+    } catch(e) { setTimeout(updateVelov, 10000); }
+}
+
+function updateVisibleVelov() {
+    if (!layerVisibility.velov) {
+        velovLayer.clearLayers();
+        velovMarkerMap.clear();
+        return;
     }
+    if (map.getZoom() < 13) { velovMarkerMap.forEach(m => velovLayer.removeLayer(m)); velovMarkerMap.clear(); return; }
+    const bounds = map.getBounds();
+    const visible = allVelovStations.filter(s => {
+        const lat = parseFloat(s.lat), lng = parseFloat(s.lng);
+        return !isNaN(lat) && !isNaN(lng) && bounds.contains([lat, lng]);
+    }).slice(0, 250);
+    const seen = new Set();
+    visible.forEach(s => {
+        const key = `${s.lat},${s.lng}`; seen.add(key);
+        if (velovMarkerMap.has(key)) return;
+        const bikes = s.available_bikes || 0, stands = s.available_bike_stands || 0, total = s.bike_stands || (bikes + stands) || 0;
+        const dispoInfo = getVelovDispoColor(bikes, stands, total);
+        const m = L.circleMarker([parseFloat(s.lat), parseFloat(s.lng)], {
+            pane: 'velovPane',
+            radius: 7, fillColor: dispoInfo.color, color: 'rgba(13,15,24,0.8)', weight: 2, opacity: 1, fillOpacity: 0.9
+        }).bindPopup(buildVelovPopup(s), { maxWidth: 230, className: 'tcl-popup' }).addTo(velovLayer);
+        velovMarkerMap.set(key, m);
+    });
+    for (const [k, m] of velovMarkerMap) { if (!seen.has(k)) { velovLayer.removeLayer(m); velovMarkerMap.delete(k); } }
 }
 
 async function loadVelovList() {
     try {
         const data = await apiFetch('api/velov');
-        if (data.is_loading) {
-            setTimeout(loadVelovList, 2000);
-            return;
-        }
+        if (data.is_loading) { setTimeout(loadVelovList, 10000); return; }
         allVelovStations = data.values || [];
         renderVelovList('');
-    } catch (e) {
-        setTimeout(loadVelovList, 3000);
-    }
+    } catch(e) { setTimeout(loadVelovList, 10000); }
 }
 
 let velovSearchTimer = null;
 window.filterVelovStations = () => {
     clearTimeout(velovSearchTimer);
-    velovSearchTimer = setTimeout(() => {
-        renderVelovList(document.getElementById('velov-search').value.toLowerCase().trim());
-    }, 200);
+    velovSearchTimer = setTimeout(() => renderVelovList(document.getElementById('velov-search').value.toLowerCase().trim()), 200);
 };
 
 function renderVelovList(term) {
     let stations = [...allVelovStations];
-
-    if (term) {
-        stations = stations.filter(s =>
-            (s.name || '').toLowerCase().includes(term) ||
-            (s.address || '').toLowerCase().includes(term) ||
-            String(s.number || '').includes(term)
-        );
-    }
-
-    stations.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+    if (term) stations = stations.filter(s => (s.name||'').toLowerCase().includes(term) || (s.address||'').toLowerCase().includes(term) || String(s.number||'').includes(term));
+    stations.sort((a, b) => (a.name||'').localeCompare(b.name||''));
     document.getElementById('velov-stats').textContent = `${stations.length}/${allVelovStations.length}`;
-
-    if (!stations.length) {
-        document.getElementById('velov-list').innerHTML = `<div class="info-empty">Aucune station trouvée</div>`;
-        return;
-    }
+    if (!stations.length) { document.getElementById('velov-list').innerHTML = `<div class="info-empty">Aucune station trouvée</div>`; return; }
 
     const shown = stations.slice(0, 300);
     const html = shown.map(s => {
-        const bikes = s.available_bikes || 0;
-        const stands = s.available_bike_stands || 0;
-        const total = s.bike_stands || (bikes + stands) || 0;
+        const bikes = s.available_bikes || 0, stands = s.available_bike_stands || 0, total = s.bike_stands || (bikes + stands) || 0;
         const dispoInfo = getVelovDispoColor(bikes, stands, total);
         const ms = s.main_stands?.availabilities || {};
-
-        return `<div class="info-item" data-lat="${s.lat || ''}" data-lon="${s.lng || ''}" data-name="${(s.name || '').replace(/"/g, '&quot;')}" data-idx="${allVelovStations.indexOf(s)}">
+        return `<div class="info-item" data-lat="${s.lat||''}" data-lon="${s.lng||''}" data-name="${(s.name||'').replace(/"/g,'&quot;')}" data-idx="${allVelovStations.indexOf(s)}">
             <div class="info-summary" onclick="selectVelovOnMap(this)">
-                <div class="info-line-badge" style="background:rgba(${dispoInfo.rgb},0.12);border:1px solid rgba(${dispoInfo.rgb},0.25);">
-                    <img src="SVG_Icons/velo.svg" class="svg-ic" style="width:18px;height:18px;">
-                </div>
+                <div class="info-line-badge" style="background:rgba(${dispoInfo.rgb},0.12);border:1px solid rgba(${dispoInfo.rgb},0.25);"><img src="SVG_Icons/velo.svg" class="svg-ic" style="width:18px;height:18px;"></div>
                 <div class="info-summary-text">
-                    <div class="info-titre">
-                        ${highlightText(s.name || 'Station', term)}
-                        <span style="font-size:10px;color:${dispoInfo.textColor};font-weight:500;">${dispoInfo.label}</span>
-                    </div>
-                    <div class="stop-commune">${highlightText(s.address || '', term)}</div>
+                    <div class="info-titre">${highlightText(s.name||'Station', term)} <span style="font-size:10px;color:${dispoInfo.textColor};font-weight:500;">${dispoInfo.label}</span></div>
+                    <div class="stop-commune">${highlightText(s.address||'', term)}</div>
                     <div style="display:flex;gap:12px;margin-top:6px;font-size:11px;color:var(--text-secondary);">
                         <span>🚲 ${bikes}</span><span>🅿️ ${stands}</span><span>📊 ${total}</span>
                     </div>
@@ -1900,190 +1623,115 @@ function renderVelovList(term) {
                 <span class="info-chevron">▼</span>
             </div>
             <div class="info-detail">
-                <strong>📍 Adresse :</strong> ${s.address || 'N/A'}<br>
-                <strong>🏙️ Commune :</strong> ${s.commune || 'N/A'}<br>
+                <strong>📍 Adresse :</strong> ${s.address||'N/A'}<br>
+                <strong>🏙️ Commune :</strong> ${s.commune||'N/A'}<br>
                 <strong>⚡ Élec :</strong> ${ms.electricalBikes || 0} · <strong>🔧 Méca :</strong> ${ms.mechanicalBikes || 0}<br>
-                <strong>💳 Paiement :</strong> ${s.banking ? 'CB acceptée' : 'Sans CB'}<br>
-                <strong>🟢 Statut :</strong> ${s.status === 'OPEN' ? 'Ouverte' : 'Fermée'}
+                <strong>💳 Paiement :</strong> ${s.banking?'CB acceptée':'Sans CB'}<br>
+                <strong>🟢 Statut :</strong> ${s.status==='OPEN'?'Ouverte':'Fermée'}
             </div>
         </div>`;
     }).join('');
-
-    document.getElementById('velov-list').innerHTML = html + (stations.length > 300 ? `<div class="info-empty">+${stations.length - 300} stations (affinez)</div>` : '');
+    document.getElementById('velov-list').innerHTML = html + (stations.length > 300 ? `<div class="info-empty">+${stations.length-300} stations (affinez)</div>` : '');
 }
 
-window.selectVelovOnMap = function (el) {
+window.selectVelovOnMap = function(el) {
     const item = el.closest('.info-item');
     if (!item) return;
-
     const lat = parseFloat(item.dataset.lat), lon = parseFloat(item.dataset.lon);
     if (isNaN(lat) || isNaN(lon)) return;
-
-    if (currentVelovMarker) {
-        map.removeLayer(currentVelovMarker);
-        currentVelovMarker = null;
-    }
-
-    const station = allVelovStations[parseInt(item.dataset.idx)] || {
-        name: item.dataset.name,
-        lat,
-        lng: lon,
-        available_bikes: 0,
-        available_bike_stands: 0
-    };
-
-    const dispoInfo = getVelovDispoColor(
-        station.available_bikes || 0,
-        station.available_bike_stands || 0,
-        station.bike_stands || 0
-    );
-
+    if (currentVelovMarker) { map.removeLayer(currentVelovMarker); currentVelovMarker = null; }
+    const station = allVelovStations[parseInt(item.dataset.idx)] || { name: item.dataset.name, lat, lng: lon, available_bikes: 0, available_bike_stands: 0 };
+    const dispoInfo = getVelovDispoColor(station.available_bikes || 0, station.available_bike_stands || 0, station.bike_stands || 0);
+    
     currentVelovMarker = L.circleMarker([lat, lon], {
         pane: 'velovPane',
-        radius: 10,
-        fillColor: dispoInfo.color,
-        color: '#fff',
-        weight: 2.5,
-        opacity: 1,
-        fillOpacity: 1
+        radius: 10, fillColor: dispoInfo.color, color: '#fff', weight: 2.5, opacity: 1, fillOpacity: 1
     }).bindPopup(buildVelovPopup(station), { maxWidth: 230, className: 'tcl-popup' }).addTo(map);
-
+    
     map.setView([lat, lon], 16);
     currentVelovMarker.openPopup();
-
-    setTimeout(() => {
-        if (currentVelovMarker) {
-            map.removeLayer(currentVelovMarker);
-            currentVelovMarker = null;
-        }
-    }, 8000);
+    setTimeout(() => { if (currentVelovMarker) { map.removeLayer(currentVelovMarker); currentVelovMarker = null; } }, 8000);
 };
 
 async function updateTraffic() {
     try {
         const data = await apiFetch('api/traffic');
-        if (data.is_loading) {
-            setTimeout(updateTraffic, 2000);
-            return;
-        }
-
+        if (data.is_loading) { setTimeout(updateTraffic, 10000); return; }
         const items = data.values || [];
         const list = document.getElementById('traffic-list');
-
-        if (!items.length) {
-            list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/validé.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune perturbation</div>`;
-            return;
-        }
+        if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/validé.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune perturbation</div>`; return; }
 
         const grouped = new Map();
         items.forEach(a => {
             const key = [a.titre, a.message, a.type, a.cause].join('|');
             if (!grouped.has(key)) grouped.set(key, { ...a, lines: new Set() });
             const g = grouped.get(key);
-            [a.ligne_cli, a.ligne_com].forEach(l => l?.split(',').forEach(x => {
-                const t = x.trim();
-                if (t) g.lines.add(t);
-            }));
+            [a.ligne_cli, a.ligne_com].forEach(l => l?.split(',').forEach(x => { const t = x.trim(); if (t) g.lines.add(t); }));
         });
 
         list.innerHTML = [...grouped.values()].map(a => {
             const isP = a.type?.toLowerCase().includes('perturbation');
             const isT = a.cause?.toLowerCase().includes('travaux');
             const icon = 'trafic.svg';
-            const filterP = isP
-                ? 'invert(36%) sepia(74%) saturate(3000%) hue-rotate(340deg) brightness(95%)'
-                : (isT
-                    ? 'invert(72%) sepia(46%) saturate(800%) hue-rotate(1deg) brightness(105%)'
-                    : 'invert(67%) sepia(82%) saturate(2000%) hue-rotate(160deg)');
+            const filterP = isP ? 'invert(36%) sepia(74%) saturate(3000%) hue-rotate(340deg) brightness(95%)' : (isT ? 'invert(72%) sepia(46%) saturate(800%) hue-rotate(1deg) brightness(105%)' : 'invert(67%) sepia(82%) saturate(2000%) hue-rotate(160deg)');
             const bg = isP ? 'rgba(255,77,77,0.12)' : (isT ? 'rgba(255,184,77,0.12)' : 'rgba(0,210,255,0.12)');
             const bdr = isP ? 'rgba(255,77,77,0.3)' : (isT ? 'rgba(255,184,77,0.3)' : 'rgba(0,210,255,0.3)');
-
             return `<div class="info-item">
                 <div class="info-summary" onclick="toggleInfoItem(this)">
-                    <div class="info-line-badge" style="background:${bg};border:1px solid ${bdr};">
-                        <img src="SVG_Icons/${icon}" style="width:18px;height:18px;filter:${filterP};">
-                    </div>
+                    <div class="info-line-badge" style="background:${bg};border:1px solid ${bdr};"><img src="SVG_Icons/${icon}" style="width:18px;height:18px;filter:${filterP};"></div>
                     <div class="info-summary-text">
-                        <div class="info-titre">${a.titre || 'Info trafic'}</div>
+                        <div class="info-titre">${a.titre||'Info trafic'}</div>
                         <div class="stop-lines" style="margin-top:6px;">${[...a.lines].map(l => lineImgHtml(l, '24px')).join('')}</div>
-                        <div class="info-type">${a.mode || 'TCL'} • ${a.type || 'Information'}</div>
+                        <div class="info-type">${a.mode||'TCL'} • ${a.type||'Information'}</div>
                     </div>
                     <span class="info-chevron">▼</span>
                 </div>
-                <div class="info-detail">${a.message || 'Aucun détail'}</div>
+                <div class="info-detail">${a.message||'Aucun détail'}</div>
             </div>`;
         }).join('');
-    } catch (e) {
-        setTimeout(updateTraffic, 3000);
-    }
+    } catch(e) { setTimeout(updateTraffic, 10000); }
 }
 
 async function updateAccessibility() {
     try {
         const data = await apiFetch('api/accessibility');
-        if (data.is_loading) {
-            setTimeout(updateAccessibility, 2000);
-            return;
-        }
-
+        if (data.is_loading) { setTimeout(updateAccessibility, 10000); return; }
         const items = data.values || [];
         const list = document.getElementById('accessibility-list');
-
-        if (!items.length) {
-            list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune alerte</div>`;
-            return;
-        }
+        if (!items.length) { list.innerHTML = `<div class="info-empty"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);"> Aucune alerte</div>`; return; }
 
         list.innerHTML = items.map(a => {
-            const bg = a.cause === 'Panne' ? 'rgba(255,77,77,0.12)' : 'rgba(255,184,77,0.12)';
-            const bdr = a.cause === 'Panne' ? 'rgba(255,77,77,0.3)' : 'rgba(255,184,77,0.3)';
+            const bg = a.cause==='Panne' ? 'rgba(255,77,77,0.12)' : 'rgba(255,184,77,0.12)';
+            const bdr = a.cause==='Panne' ? 'rgba(255,77,77,0.3)' : 'rgba(255,184,77,0.3)';
             const debut = a.debut_indispo ? new Date(a.debut_indispo).toLocaleDateString('fr-FR') : '';
             const fin = a.fin_indispo ? new Date(a.fin_indispo).toLocaleDateString('fr-FR') : '';
-
             return `<div class="info-item">
                 <div class="info-summary" onclick="toggleInfoItem(this)">
-                    <div class="info-line-badge" style="background:${bg};border:1px solid ${bdr};">
-                        <img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:18px;height:18px;">
-                    </div>
+                    <div class="info-line-badge" style="background:${bg};border:1px solid ${bdr};"><img src="SVG_Icons/PMR.svg" class="svg-ic" style="width:18px;height:18px;"></div>
                     <div class="info-summary-text">
-                        <div class="info-titre">${a.type_equipement || 'Équipement'} – ${a.nom_station || ''}</div>
-                        <div class="info-type">${a.cause || ''}</div>
+                        <div class="info-titre">${a.type_equipement||'Équipement'} – ${a.nom_station||''}</div>
+                        <div class="info-type">${a.cause||''}</div>
                     </div>
                     <span class="info-chevron">▼</span>
                 </div>
-                <div class="info-detail">${a.equipement || ''}<br>📅 ${debut} → ${fin}</div>
+                <div class="info-detail">${a.equipement||''}<br>📅 ${debut} → ${fin}</div>
             </div>`;
         }).join('');
-    } catch (e) {
-        setTimeout(updateAccessibility, 3000);
-    }
+    } catch(e) { setTimeout(updateAccessibility, 10000); }
 }
 
 async function loadAgencies() {
     try {
         const data = await apiFetch('api/agencies');
-        if (data.is_loading) {
-            setTimeout(loadAgencies, 2000);
-            return;
-        }
-
+        if (data.is_loading) { setTimeout(loadAgencies, 10000); return; }
         const allAgences = (data || []).filter(a => a.lat && a.lon);
-
         allAgences.forEach(a => {
-            const adresse = [
-                a.numero,
-                (a.typevoie || '').charAt(0).toUpperCase() + (a.typevoie || '').slice(1).toLowerCase(),
-                (a.adr || '').toUpperCase()
-            ].filter(Boolean).join(' ');
-
+            const adresse = [a.numero, (a.typevoie||'').charAt(0).toUpperCase() + (a.typevoie||'').slice(1).toLowerCase(), (a.adr||'').toUpperCase()].filter(Boolean).join(' ');
             const facea = a.facea === true ? '✅ Oui' : (a.facea === false ? '❌ Non' : '—');
-
             const popup = `<div style="width:230px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
                 <div style="background:linear-gradient(135deg,rgba(226,0,26,0.2),rgba(226,0,26,0.05));padding:14px;border-bottom:1px solid var(--glass-border);">
                     <div style="display:flex;align-items:center;gap:10px;">
-                        <div style="width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px var(--accent-glow);">
-                            <img src="Agence.svg" class="svg-ic" style="width:18px;height:18px;">
-                        </div>
+                        <div style="width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px var(--accent-glow);"><img src="Agence.svg" class="svg-ic" style="width:18px;height:18px;"></div>
                         <div>
                             <div style="font-size:14px;font-weight:700;color:var(--text-primary);line-height:1.2;">${a.nom}</div>
                             <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Agence commerciale TCL</div>
@@ -2096,19 +1744,14 @@ async function loadAgencies() {
                     <div style="display:flex;align-items:flex-start;gap:8px;"><span>🕒</span><span>${a.horaires || 'Non renseignés'}</span></div>
                 </div>
             </div>`;
-
             L.marker([a.lat, a.lon], {
                 icon: L.divIcon({
                     html: `<div style="width:36px;height:36px;background:linear-gradient(135deg, #ff4d4d, #e2001a);border-radius:10px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px var(--accent-glow);"><img src="Agence.svg" style="width:18px;height:18px;filter:brightness(0) invert(1);"></div>`,
-                    className: '',
-                    iconSize: [36, 36],
-                    iconAnchor: [18, 18]
+                    className: '', iconSize: [36, 36], iconAnchor: [18, 18]
                 })
             }).bindPopup(popup, { maxWidth: 250, className: 'tcl-popup' }).addTo(agenceLayer);
         });
-    } catch (e) {
-        setTimeout(loadAgencies, 3000);
-    }
+    } catch(e) { setTimeout(loadAgencies, 10000); }
 }
 
 async function checkSystemStatus() {
@@ -2116,7 +1759,6 @@ async function checkSystemStatus() {
         const res = await fetch(API);
         const data = await res.json();
         const dot = document.getElementById('system-status-dot');
-
         if (data.data_loaded && data.data_loaded.stops) {
             dot.classList.add('ready');
             dot.title = "Toutes les données sont chargées et prêtes";
@@ -2124,35 +1766,26 @@ async function checkSystemStatus() {
             dot.classList.remove('ready');
             dot.title = "Initialisation des données en cours...";
         }
-    } catch (e) {
-        // statut jaune conservé
-    }
+    } catch(e) { /* keep yellow */ }
 }
 
 // ===== INIT =====
 async function init() {
     await loadStopsMapping();
     await Promise.all([
-        updateBus(),
-        loadParkings(),
-        loadParkAndRideLots(),
-        updateVelov(),
-        updateTraffic(),
-        updateAccessibility(),
-        updateStopsData(),
-        loadAgencies()
+        updateBus(), loadParkings(), loadParkAndRideLots(), updateVelov(), updateTraffic(), updateAccessibility(), updateStopsData(), loadAgencies()
     ]);
     setTimeout(checkSystemStatus, 3000);
 }
 init();
 
-// ===== REFRESH =====
-setInterval(updateBus, 10_000);
-setInterval(updateVelov, 60_000);
-setInterval(updateTraffic, 60_000);
-setInterval(updateAccessibility, 60_000);
-setInterval(updateStopsData, 300_000);
-setInterval(checkSystemStatus, 10_000);
+// ===== REFRESH (espacé pour éviter le 429 HF) =====
+setInterval(updateBus, 30_000);
+setInterval(updateVelov, 120_000);
+setInterval(updateTraffic, 120_000);
+setInterval(updateAccessibility, 120_000);
+setInterval(updateStopsData, 600_000);
+setInterval(checkSystemStatus, 30_000);
 
 let moveTimer = null;
 map.on('moveend zoomend', () => {
