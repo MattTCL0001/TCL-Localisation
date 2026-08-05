@@ -30,7 +30,9 @@
     --error-color: #ff4d4d;
 }
 
-/* Reset et base */
+/* ============================================ */
+/* RESET ET STYLES DE BASE                      */
+/* ============================================ */
 * {
     margin: 0;
     padding: 0;
@@ -62,7 +64,9 @@ body::before {
     z-index: 0;
 }
 
-/* Conteneur principal */
+/* ============================================ */
+/* STRUCTURE PRINCIPALE                        */
+/* ============================================ */
 .app-container {
     position: fixed;
     inset: 0;
@@ -113,7 +117,9 @@ body::before {
     box-shadow: 0 0 8px rgba(77, 255, 136, 0.5);
 }
 
-/* Onglets de l'en-tête */
+/* ============================================ */
+/* ONGLETS DE L'EN-TÊTE                         */
+/* ============================================ */
 .header-tabs {
     display: flex;
     gap: 4px;
@@ -156,12 +162,120 @@ body::before {
     box-shadow: 0 0 12px rgba(226, 0, 26, 0.15);
 }
 
-.header-tab i, .header-tab img {
-    width: 15px;
-    height: 15px;
+/* ============================================ */
+/* STYLES POUR LES ICÔNES (UNIFORMISATION)       */
+/* ============================================ */
+.svg-ic {
+    width: 16px !important;
+    height: 16px !important;
+    vertical-align: middle !important;
+    filter: brightness(0) invert(1) !important;
+    margin-right: 6px !important;
+    flex-shrink: 0 !important;
 }
 
-/* Carte */
+/* Icônes dans les onglets de l'en-tête */
+.header-tab img.svg-ic {
+    width: 15px !important;
+    height: 15px !important;
+    margin-right: 6px !important;
+}
+
+/* Icônes dans les barres de recherche */
+.search-bar img.svg-ic {
+    width: 14px !important;
+    height: 14px !important;
+    opacity: 0.6;
+    margin-right: 8px !important;
+}
+
+/* Icônes dans la barre de filtres */
+.filter-bar img.svg-ic {
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 4px !important;
+}
+
+/* Icônes dans les badges (ex: badges des lignes) */
+.info-line-badge img.svg-ic {
+    width: 18px !important;
+    height: 18px !important;
+    margin: 0 !important;
+}
+
+/* Icônes dans les bannières de filtre */
+.filter-banner img.svg-ic {
+    width: 12px !important;
+    height: 12px !important;
+    margin-right: 4px !important;
+}
+
+/* Icônes dans les popups */
+.tcl-popup img.svg-ic {
+    width: 12px !important;
+    height: 12px !important;
+    margin-right: 4px !important;
+}
+
+/* Icônes dans les listes */
+.info-item img.svg-ic {
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 6px !important;
+}
+
+/* Icônes dans les en-têtes d'onglets */
+.tab-header img.svg-ic {
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 6px !important;
+}
+
+/* Icônes dans les boutons de contrôle des couches */
+.layer-toggle-icon img.svg-ic {
+    width: 14px !important;
+    height: 14px !important;
+    margin: 0 !important;
+}
+
+/* Icônes dans les crédits */
+.credits-section img.svg-ic {
+    width: 16px !important;
+    height: 16px !important;
+    margin-right: 6px !important;
+}
+
+/* Icônes dans les groupes de lignes */
+.line-group-header img.svg-ic {
+    width: 14px !important;
+    height: 14px !important;
+    margin-right: 6px !important;
+}
+
+/* Icônes dans les éléments de ligne (ex: C1, T1, etc.) */
+.line-item img {
+    height: 20px !important;
+    width: auto !important;
+    margin: 0 2px !important;
+}
+
+/* Icônes dans les badges PMR */
+.stop-pmr-badge img.svg-ic {
+    width: 10px !important;
+    height: 10px !important;
+    margin: 0 !important;
+}
+
+/* Icônes dans les logos (ex: logo TCL) */
+.logo-badge img {
+    height: 24px !important;
+    width: auto !important;
+    margin: 0 !important;
+}
+
+/* ============================================ */
+/* CARTE ET CONTRÔLES                          */
+/* ============================================ */
 .map-container {
     flex: 1;
     position: relative;
@@ -201,6 +315,7 @@ body::before {
     filter: contrast(1.1) brightness(0.9);
 }
 
+/* Style des popups Leaflet */
 .leaflet-popup-content-wrapper {
     background: var(--glass-bg-heavy) !important;
     backdrop-filter: var(--glass-blur) !important;
@@ -210,6 +325,7 @@ body::before {
     border-radius: var(--radius-md) !important;
     padding: 0 !important;
     box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    max-width: 300px !important;
 }
 
 .leaflet-popup-tip {
@@ -222,6 +338,7 @@ body::before {
 .leaflet-popup-content {
     margin: 0 !important;
     font-family: 'Segoe UI', system-ui, sans-serif !important;
+    font-size: 12px !important;
 }
 
 .leaflet-popup-close-button {
@@ -342,7 +459,9 @@ body::before {
     color: var(--text-primary);
 }
 
-/* Panneau latéral */
+/* ============================================ */
+/* PANNEAU LATÉRAL                              */
+/* ============================================ */
 #info-panel {
     position: fixed;
     top: 70px;
@@ -479,7 +598,9 @@ body::before {
     }
 }
 
-/* Onglets du panneau */
+/* ============================================ */
+/* ONGLETS DU PANNEAU                           */
+/* ============================================ */
 .tab-pane {
     display: none;
     flex-direction: column;
@@ -507,7 +628,9 @@ body::before {
     align-items: center;
 }
 
-/* Listes d'informations */
+/* ============================================ */
+/* LISTES D'INFORMATIONS                         */
+/* ============================================ */
 .info-list {
     flex: 1;
     overflow-y: auto;
@@ -531,10 +654,6 @@ body::before {
 
 .info-item:last-child {
     border-bottom: none;
-}
-
-.info-item:active {
-    background: rgba(255, 255, 255, 0.03);
 }
 
 .info-summary {
@@ -624,7 +743,9 @@ body::before {
     gap: 8px;
 }
 
-/* Barre de recherche */
+/* ============================================ */
+/* BARRE DE RECHERCHE                           */
+/* ============================================ */
 .search-bar {
     background: rgba(0, 0, 0, 0.2);
     border-bottom: 1px solid var(--glass-border);
@@ -657,23 +778,6 @@ body::before {
     color: var(--text-muted);
 }
 
-.search-bar button {
-    background: var(--accent);
-    border: none;
-    color: #fff;
-    padding: 10px 16px;
-    border-radius: var(--radius-sm);
-    cursor: pointer;
-    font-weight: 600;
-    font-size: 13px;
-    transition: all 0.2s;
-}
-
-.search-bar button:hover {
-    background: #ff1a35;
-    box-shadow: 0 4px 12px var(--accent-glow);
-}
-
 .search-bar label {
     display: flex;
     align-items: center;
@@ -681,7 +785,9 @@ body::before {
     flex: 1;
 }
 
-/* Barre de filtres */
+/* ============================================ */
+/* BARRE DE FILTRES                             */
+/* ============================================ */
 .filter-bar {
     padding: 10px 12px;
     background: rgba(0, 0, 0, 0.2);
@@ -722,7 +828,9 @@ body::before {
     display: none;
 }
 
-/* Groupes de lignes */
+/* ============================================ */
+/* GROUPES DE LIGNES                            */
+/* ============================================ */
 .line-group {
     margin-top: 8px;
 }
@@ -762,11 +870,14 @@ body::before {
 }
 
 .line-item img {
-    height: 22px;
-    width: auto;
+    height: 20px !important;
+    width: auto !important;
+    margin: 0 2px !important;
 }
 
-/* Badge PMR */
+/* ============================================ */
+/* BADGES ET ÉLÉMENTS SPÉCIFIQUES               */
+/* ============================================ */
 .stop-pmr-badge {
     display: inline-flex;
     align-items: center;
@@ -780,12 +891,17 @@ body::before {
     margin-left: 6px;
 }
 
-/* Lignes et commune dans les arrêts */
 .stop-lines {
     display: flex;
     flex-wrap: wrap;
     gap: 4px;
     margin-top: 6px;
+}
+
+.stop-lines img {
+    height: 18px !important;
+    width: auto !important;
+    margin: 0 2px !important;
 }
 
 .stop-commune {
@@ -794,7 +910,6 @@ body::before {
     margin-top: 2px;
 }
 
-/* Surlignage de la recherche */
 .search-highlight {
     background: rgba(226, 0, 26, 0.3);
     color: #fff;
@@ -803,7 +918,65 @@ body::before {
     font-weight: 600;
 }
 
-/* Contenu des crédits */
+/* ============================================ */
+/* STYLES POUR LES MARQUEURS DE LA CARTE        */
+/* ============================================ */
+.leaflet-marker-icon {
+    width: auto !important;
+    height: auto !important;
+}
+
+/* Marqueur de bus */
+.bus-marker {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Marqueur d'arrêt */
+.stop-marker {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+}
+
+/* Marqueur de parking */
+.parking-marker {
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+}
+
+/* Marqueur sélectionné (arrêt cliqué) */
+.selected-stop-marker {
+    filter: drop-shadow(0 0 10px var(--accent-glow));
+}
+
+/* Style des cercles Vélo'v */
+.leaflet-circle-marker {
+    stroke: white !important;
+    stroke-width: 1.5px !important;
+    fill-opacity: 0.8 !important;
+}
+
+/* Style des marqueurs d'arrêts (petits cercles) */
+.stop-map-marker {
+    background: rgba(13, 15, 24, 0.85);
+    border: 1.2px solid rgba(255, 255, 255, 0.25);
+    border-radius: 50%;
+    width: 10px;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    transition: all 0.2s ease;
+}
+
+.stop-map-marker.highlighted {
+    background: var(--accent);
+    border-color: #fff;
+    box-shadow: 0 0 8px var(--accent-glow);
+    transform: scale(1.2);
+}
+
+/* ============================================ */
+/* CONTENU DES CRÉDITS                          */
+/* ============================================ */
 .credits-content {
     padding: 20px;
     line-height: 1.8;
@@ -837,32 +1010,9 @@ body::before {
     gap: 8px;
 }
 
-/* Icônes SVG */
-.svg-ic {
-    filter: brightness(0) invert(1);
-    vertical-align: -2px;
-}
-
-/* Marqueur de carte pour les arrêts */
-.stop-map-marker {
-    background: rgba(13, 15, 24, 0.85);
-    border: 1.5px solid rgba(255, 255, 255, 0.25);
-    border-radius: 50%;
-    width: 12px;
-    height: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.5);
-}
-
-.stop-map-marker.highlighted {
-    background: var(--accent);
-    border-color: #fff;
-    box-shadow: 0 0 12px var(--accent-glow);
-}
-
-/* Spinner de chargement */
+/* ============================================ */
+/* SPINNER DE CHARGEMENT                       */
+/* ============================================ */
 .loading-spinner {
     position: fixed;
     top: 50%;
@@ -896,7 +1046,9 @@ body::before {
     }
 }
 
-/* Notifications */
+/* ============================================ */
+/* NOTIFICATIONS                                */
+/* ============================================ */
 .notification-container {
     position: fixed;
     top: 20px;
@@ -919,6 +1071,7 @@ body::before {
     display: flex;
     align-items: center;
     gap: 10px;
+    font-size: 12px;
 }
 
 .notification.info {
@@ -944,9 +1097,12 @@ body::before {
     }
 }
 
-/* Style des popups personnalisées */
+/* ============================================ */
+/* STYLES POUR LES POPUPS PERSONNALISÉES       */
+/* ============================================ */
 .tcl-popup {
     font-family: inherit !important;
+    font-size: 12px !important;
 }
 
 .tcl-popup .popup-header {
