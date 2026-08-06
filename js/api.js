@@ -40,6 +40,9 @@ const layerVisibility = { bus: true, stops: true, velov: true, parking: true };
 
 /**
  * Effectue une requête API avec gestion des erreurs et des timeouts.
+ * @param {string} path - Chemin de l'API.
+ * @param {number} [attempt=1] - Tentative actuelle (pour les réessais).
+ * @returns {Promise<Object>} - Données JSON ou objet d'erreur.
  */
 async function apiFetch(path, attempt = 1) {
     showSpinner();
@@ -86,7 +89,7 @@ async function apiFetch(path, attempt = 1) {
 }
 
 // ============================================
-// CHARGEMENT DES DONNÉES
+// CHARGEMENT DES DONNÉES INITIALES
 // ============================================
 
 /**
@@ -106,11 +109,34 @@ async function loadInitialData() {
             loadAgencies()
         ]);
         showNotification("Données chargées avec succès !", "success");
+        hideLoadingWhenReady(); // Masque le spinner une fois tout chargé
     } catch (e) {
         showNotification("Erreur lors du chargement initial.", "error");
         console.error("Erreur loadInitialData:", e);
+        hideLoadingWhenReady(); // Masque le spinner même en cas d'erreur
     }
 }
+
+/**
+ * Masque le spinner quand toutes les données sont chargées.
+ */
+function hideLoadingWhenReady() {
+    const allDataLoaded =
+        allStops.length > 0 &&
+        parkingsLoaded &&
+        parcsRelaisLoaded &&
+        allVelovStations.length > 0;
+
+    if (allDataLoaded) {
+        hideSpinner();
+    } else {
+        setTimeout(hideLoadingWhenReady, 1000);
+    }
+}
+
+// ============================================
+// CHARGEMENT DES ARRÊTS
+// ============================================
 
 /**
  * Charge le mappage des arrêts (id → nom).
@@ -255,13 +281,13 @@ async function updateBus() {
                 })
             });
 
-            const busSnap = { ...bus, line, color, dest, delayOk, modeFile, lineRemapped };
+            const busSnap = { ...bus, line, color, dest, delayOk, modeFile, lineRemapped, hasValidBearing, bearing };
             marker.bindPopup(() => buildBusPopup(busSnap), { maxWidth: 270, className: 'tcl-popup' });
 
             if (!busLineFilter || lineRemapped === busLineFilter || line === busLineFilter) {
                 marker.addTo(busLayer);
             }
-            busMarkers.set(bus.id, { marker, hash: h, line });
+            busMarkers.set(bus.id, { marker, hash: h, line, modeFile, hasValidBearing, bearing });
         }
 
         for (const [id, e] of busMarkers) {
@@ -279,18 +305,35 @@ async function updateBus() {
 }
 
 /**
+ * Applique le filtre de ligne aux bus.
+ */
+function applyBusLineFilter() {
+    for (const [, e] of busMarkers) {
+        const lineRemapped = getNewLineNumber(e.line);
+        const keep = !busLineFilter || lineRemapped === busLineFilter || e.line === busLineFilter;
+        if (keep && !busLayer.hasLayer(e.marker)) {
+            busLayer.addLayer(e.marker);
+        } else if (!keep && busLayer.hasLayer(e.marker)) {
+            busLayer.removeLayer(e.marker);
+        }
+    }
+}
+
+/**
  * Met à jour la taille des icônes de bus en fonction du zoom.
  */
 function updateBusIcons() {
     const zoom = map.getZoom();
-    busMarkers.forEach((value, key) => {
-        const iconSize = zoom < 14 ? 24 : 38;
+    const iconSize = zoom < 14 ? 24 : 38;
+
+    busMarkers.forEach((value) => {
         const line = value.line;
         const color = value.marker.options.icon.options.color || getLineColor(line);
         const modeFile = value.modeFile || 'Mode_Bus.svg';
+        const hasValidBearing = value.hasValidBearing || false;
+        const bearing = value.bearing || 0;
 
-        const arrowPath = value.hasValidBearing ? (() => {
-            const bearing = parseFloat(value.marker.options.bearing) || 0;
+        const arrowPath = hasValidBearing ? (() => {
             const angle = bearing * Math.PI / 180, L = iconSize * 0.7, W = iconSize * 0.3;
             const tipX = iconSize / 2 + Math.sin(angle) * L;
             const tipY = iconSize / 2 - Math.cos(angle) * L;
@@ -315,21 +358,6 @@ function updateBusIcons() {
             iconAnchor: [iconSize / 2, iconSize / 2]
         }));
     });
-}
-
-/**
- * Applique le filtre de ligne aux bus.
- */
-function applyBusLineFilter() {
-    for (const [, e] of busMarkers) {
-        const lineRemapped = getNewLineNumber(e.line);
-        const keep = !busLineFilter || lineRemapped === busLineFilter || e.line === busLineFilter;
-        if (keep && !busLayer.hasLayer(e.marker)) {
-            busLayer.addLayer(e.marker);
-        } else if (!keep && busLayer.hasLayer(e.marker)) {
-            busLayer.removeLayer(e.marker);
-        }
-    }
 }
 
 // ============================================
@@ -499,6 +527,7 @@ function updateVisibleParkAndRideLots() {
         }
     }
 }
+
 // ============================================
 // CHARGEMENT DES VÉLO'V
 // ============================================
@@ -514,7 +543,7 @@ async function updateVelov() {
             return;
         }
         allVelovStations = data.values || [];
-        velovLoaded = true; // Marque les Vélo'v comme chargés
+        velovLoaded = true;
         updateVisibleVelov();
         console.log("✅ Vélo'v mis à jour");
     } catch (e) {
@@ -576,6 +605,43 @@ function updateVisibleVelov() {
             velovLayer.removeLayer(m);
             velovMarkerMap.delete(k);
         }
+    }
+}
+
+// ============================================
+// CHARGEMENT DES AGENCES
+// ============================================
+
+/**
+ * Charge les agences TCL.
+ */
+async function loadAgencies() {
+    try {
+        const data = await apiFetch('api/agencies');
+        if (data.is_loading) {
+            setTimeout(loadAgencies, 10000);
+            return;
+        }
+        const allAgences = (data || []).filter(a => a.lat && a.lon);
+        allAgences.forEach(a => {
+            const adresse = [a.numero, (a.typevoie || '').charAt(0).toUpperCase() + (a.typevoie || '').slice(1).toLowerCase(), (a.adr || '').toUpperCase()].filter(Boolean).join(' ');
+            const facea = a.facea === true ? '✅ Oui' : (a.facea === false ? '❌ Non' : '—');
+            const popup = buildAgencyPopup(a, adresse, facea);
+            L.marker([a.lat, a.lon], {
+                icon: L.divIcon({
+                    html: `
+                        <div style="width:36px;height:36px;background:linear-gradient(135deg, #ff4d4d, #e2001a);border-radius:10px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px var(--accent-glow);">
+                            <img src="assets/Agence.svg" style="width:18px;height:18px;filter:brightness(0) invert(1);">
+                        </div>`,
+                    className: '',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
+                })
+            }).bindPopup(popup, { maxWidth: 250, className: 'tcl-popup' }).addTo(agenceLayer);
+        });
+        console.log("✅ Agences chargées");
+    } catch (e) {
+        setTimeout(loadAgencies, 10000);
     }
 }
 
@@ -700,77 +766,17 @@ async function updateAccessibility() {
 }
 
 // ============================================
-// CHARGEMENT DES AGENCES
-// ============================================
-
-/**
- * Charge les agences TCL.
- */
-async function loadAgencies() {
-    try {
-        const data = await apiFetch('api/agencies');
-        if (data.is_loading) {
-            setTimeout(loadAgencies, 10000);
-            return;
-        }
-        const allAgences = (data || []).filter(a => a.lat && a.lon);
-        allAgences.forEach(a => {
-            const adresse = [a.numero, (a.typevoie || '').charAt(0).toUpperCase() + (a.typevoie || '').slice(1).toLowerCase(), (a.adr || '').toUpperCase()].filter(Boolean).join(' ');
-            const facea = a.facea === true ? '✅ Oui' : (a.facea === false ? '❌ Non' : '—');
-            const popup = buildAgencyPopup(a, adresse, facea);
-            L.marker([a.lat, a.lon], {
-                icon: L.divIcon({
-                    html: `
-                        <div style="width:36px;height:36px;background:linear-gradient(135deg, #ff4d4d, #e2001a);border-radius:10px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px var(--accent-glow);">
-                            <img src="assets/Agence.svg" style="width:18px;height:18px;filter:brightness(0) invert(1);">
-                        </div>`,
-                    className: '',
-                    iconSize: [36, 36],
-                    iconAnchor: [18, 18]
-                })
-            }).bindPopup(popup, { maxWidth: 250, className: 'tcl-popup' }).addTo(agenceLayer);
-        });
-        console.log("✅ Agences chargées");
-    } catch (e) {
-        setTimeout(loadAgencies, 10000);
-    }
-}
-
-// ============================================
-// VÉRIFICATION DU STATUT DU SYSTÈME
-// ============================================
-
-/**
- * Vérifie le statut du système.
- */
-async function checkSystemStatus() {
-    try {
-        const res = await fetch(API_BASE_URL);
-        const data = await res.json();
-        const dot = document.getElementById('system-status-dot');
-        if (data.data_loaded && data.data_loaded.stops) {
-            dot.classList.add('ready');
-            dot.title = "Toutes les données sont chargées et prêtes";
-        } else {
-            dot.classList.remove('ready');
-            dot.title = "Initialisation des données en cours...";
-        }
-    } catch (e) {
-        console.warn("Erreur checkSystemStatus:", e);
-    }
-}
-
-// ============================================
 // RENDU DES ARRÊTS SUR LA CARTE
 // ============================================
 
 /**
- * Rend les arrêts sur la carte (avec limitation).
+ * Rend les arrêts sur la carte (avec regroupement et limitation).
  */
 function renderStopsOnMap() {
     stopMapLayer.clearLayers();
     stopsOnMap = [];
 
+    // Regroupe les arrêts par nom (pour éviter les doublons)
     const grouped = new Map();
     for (const s of allStops) {
         if (!s.lat || !s.lon) continue;
@@ -781,6 +787,7 @@ function renderStopsOnMap() {
         grouped.get(key).push({ ...s, lat, lon });
     }
 
+    // Fusionne les arrêts proches (moins de 30m)
     for (const [, stops] of grouped) {
         const clusters = [];
         for (const s of stops) {
@@ -820,6 +827,7 @@ function renderVisibleStops() {
     }
 
     const bounds = map.getBounds();
+    // Filtre les arrêts visibles dans la vue ET limite à MAX_STOPS_ON_MAP
     const visible = stopsOnMap.filter(s => bounds.contains([s.lat, s.lon])).slice(0, MAX_STOPS_ON_MAP);
     const seen = new Map();
 
@@ -828,13 +836,17 @@ function renderVisibleStops() {
         if (seen.has(key)) return;
 
         const isHighlighted = currentLineFilter && s.stops.some(st => stopServesLine(st.desserte, currentLineFilter));
+
+        // Taille adaptative en fonction du zoom
+        const iconSize = zoom < 15 ? 10 : 14;
+
         const marker = L.marker([s.lat, s.lon], {
             pane: 'stopPane',
             icon: L.divIcon({
                 className: '',
-                html: `<div class="stop-map-marker ${isHighlighted ? 'highlighted' : ''}" title="${s.nom}"></div>`,
-                iconSize: [14, 14],
-                iconAnchor: [7, 7]
+                html: `<div class="stop-map-marker ${isHighlighted ? 'highlighted' : ''}" title="${s.nom}" style="width:${iconSize}px;height:${iconSize}px;"></div>`,
+                iconSize: [iconSize, iconSize],
+                iconAnchor: [iconSize / 2, iconSize / 2]
             })
         }).addTo(stopMapLayer);
 
@@ -1287,4 +1299,28 @@ async function filterLineFromPopup(line) {
  */
 function getLinesForStop(stop) {
     return extractLines(stop.desserte);
+}
+
+// ============================================
+// VÉRIFICATION DU STATUT DU SYSTÈME
+// ============================================
+
+/**
+ * Vérifie le statut du système.
+ */
+async function checkSystemStatus() {
+    try {
+        const res = await fetch(API_BASE_URL);
+        const data = await res.json();
+        const dot = document.getElementById('system-status-dot');
+        if (data.data_loaded && data.data_loaded.stops) {
+            dot.classList.add('ready');
+            dot.title = "Toutes les données sont chargées et prêtes";
+        } else {
+            dot.classList.remove('ready');
+            dot.title = "Initialisation des données en cours...";
+        }
+    } catch (e) {
+        console.warn("Erreur checkSystemStatus:", e);
+    }
 }
