@@ -997,3 +997,144 @@ body, html {
         opacity: 1;
     }
 }
+/* ============================================ */
+/* PANNEAU LATÉRAL (GLISSER-DÉPOSER)            */
+/* ============================================ */
+#info-panel {
+    position: fixed;
+    top: 56px;
+    right: 0;
+    bottom: 0;
+    width: 360px;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1), height 0.1s ease-out;
+    touch-action: pan-y;
+    overflow: hidden;
+    resize: vertical; /* Permet de redimensionner avec la souris */
+    min-height: 100px;
+    max-height: 90vh;
+}
+
+#info-panel.collapsed {
+    transform: translateX(calc(100% - 40px));
+    height: auto !important;
+}
+
+#info-panel > * {
+    pointer-events: all;
+}
+
+.panel-toggle {
+    position: absolute;
+    left: -40px;
+    top: 0;
+    background: var(--glass-bg-heavy);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border-highlight);
+    border-right: none;
+    color: var(--text-secondary);
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+    transition: all 0.2s;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+    touch-action: none;
+    user-select: none;
+}
+
+.panel-toggle:hover {
+    color: var(--accent);
+    background: rgba(226, 0, 26, 0.08);
+}
+
+#info-panel.collapsed .panel-toggle span {
+    transform: rotate(180deg);
+}
+
+/* Style pour indiquer que le panneau est redimensionnable */
+#info-panel::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 8px;
+    background: rgba(0, 0, 0, 0.05);
+    cursor: row-resize;
+    touch-action: none;
+}
+
+/* ============================================ */
+/* ONGLETS GLISSABLES                           */
+/* ============================================ */
+.header-tabs {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 0 4px;
+    touch-action: pan-x;
+    user-select: none;
+}
+
+.header-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.header-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    touch-action: none;
+    user-select: none;
+}
+
+.header-tab:active {
+    transform: scale(0.98);
+}
+
+/* ============================================ */
+/* SPINNER DE CHARGEMENT (MASQUAGE AUTO)        */
+/* ============================================ */
+.loading-spinner {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--glass-bg-heavy);
+    padding: 20px;
+    border-radius: var(--radius-md);
+    z-index: 9999;
+    display: none; /* Masqué par défaut */
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--glass-border-highlight);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+    transition: opacity 0.3s, visibility 0.3s;
+}
+
+.loading-spinner.hidden {
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s, visibility 0.3s;
+}
