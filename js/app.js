@@ -124,6 +124,11 @@ function toggleAllLayers() {
 function togglePanel() {
     const panel = document.getElementById('info-panel');
     panel.classList.toggle('visible');
+    if (panel.classList.contains('visible')) {
+        panel.style.bottom = '0';
+    } else {
+        panel.style.bottom = '-90%';
+    }
     setTimeout(() => map.invalidateSize(), 300);
 }
 
@@ -159,14 +164,6 @@ function initPanelDrag() {
         const clampedBottom = Math.max(minBottom, Math.min(newBottom, maxBottom));
 
         panel.style.bottom = `${clampedBottom}px`;
-
-        // Si le panneau est presque caché, le masquer complètement
-        if (clampedBottom < -window.innerHeight * 0.8) {
-            panel.classList.remove('visible');
-        } else {
-            panel.classList.add('visible');
-        }
-
         e.preventDefault();
     }, { passive: false });
 
@@ -205,12 +202,6 @@ function initPanelDrag() {
         const clampedBottom = Math.max(minBottom, Math.min(newBottom, maxBottom));
 
         panel.style.bottom = `${clampedBottom}px`;
-
-        if (clampedBottom < -window.innerHeight * 0.8) {
-            panel.classList.remove('visible');
-        } else {
-            panel.classList.add('visible');
-        }
         e.preventDefault();
     });
 
