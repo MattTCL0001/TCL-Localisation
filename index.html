@@ -85,37 +85,9 @@
                 </div>
             </div>
 
-            <!-- Onglets du panneau -->
-            <div class="panel-tabs">
-                <button class="panel-tab active" data-tab="traffic" onclick="switchPanelTab('traffic')">
-                    <img src="assets/SVG_Icons/trafic.svg" class="svg-ic">
-                    <span>Trafic</span>
-                </button>
-                <button class="panel-tab" data-tab="accessibility" onclick="switchPanelTab('accessibility')">
-                    <img src="assets/SVG_Icons/PMR.svg" class="svg-ic">
-                    <span>PMR</span>
-                </button>
-                <button class="panel-tab" data-tab="stops" onclick="switchPanelTab('stops')">
-                    <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic">
-                    <span>Arrêts</span>
-                </button>
-                <button class="panel-tab" data-tab="lines" onclick="switchPanelTab('lines')">
-                    <img src="assets/SVG_Icons/lignes.svg" class="svg-ic">
-                    <span>Lignes</span>
-                </button>
-                <button class="panel-tab" data-tab="velov" onclick="switchPanelTab('velov')">
-                    <img src="assets/SVG_Icons/velo.svg" class="svg-ic">
-                    <span>Vélo'v</span>
-                </button>
-                <button class="panel-tab" data-tab="credits" onclick="switchPanelTab('credits')">
-                    <img src="assets/SVG_Icons/id.svg" class="svg-ic">
-                    <span>Infos</span>
-                </button>
-            </div>
-
-            <!-- Contenu des onglets du panneau -->
+            <!-- Contenu du panneau (sans onglets redondants) -->
             <div class="panel-content">
-                <!-- Onglet Trafic -->
+                <!-- Onglet Trafic (actif par défaut) -->
                 <div id="panel-traffic" class="panel-tab-pane active">
                     <div class="tab-header">Perturbations en cours</div>
                     <div id="traffic-list" class="info-list">
