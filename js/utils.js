@@ -77,9 +77,6 @@ function getLineColors(colorMap) {
     return master;
 }
 
-// Génération de l'objet final
-const LINE_COLORS_MASTER = getLineColors(COLOR_TO_LINES);
-
 const LINE_TYPE_COLORS = {
     metro: '#E2001A', tram: '#662483', tb: '#fdc300', funiculaire: '#6da432',
     navgone: '#00A3A6', chrono: '#2699d6', bus: '#6e8997', navette: '#EC6608',
@@ -101,7 +98,13 @@ const lineMapping = {
     'NAVI1': '7601'
 };
 
-// ===== FONCTIONS UTILITAIRES =====
+// ============================================
+// FONCTIONS UTILITAIRES
+// ============================================
+
+/**
+ * Obtient la couleur d'une ligne.
+ */
 function getLineColor(code) {
     if (!code) return LINE_TYPE_COLORS.other;
     const u = String(code).trim();
@@ -110,6 +113,9 @@ function getLineColor(code) {
     return LINE_TYPE_COLORS[getLineType(u)] || LINE_TYPE_COLORS.other;
 }
 
+/**
+ * Obtient le type d'une ligne.
+ */
 function getLineType(line) {
     const u = line.toUpperCase();
     if (/^[ABCD]$/.test(u)) return 'metro';
@@ -126,6 +132,9 @@ function getLineType(line) {
     return 'bus';
 }
 
+/**
+ * Vérifie si le SVG d'une ligne JD doit être chargé.
+ */
 function shouldLoadJDSvg(lineNum) {
     const s = String(lineNum);
     if (!s.startsWith('JD')) return true;
@@ -133,6 +142,9 @@ function shouldLoadJDSvg(lineNum) {
     return !isNaN(num) && num >= 300;
 }
 
+/**
+ * Génère le HTML pour une icône de ligne.
+ */
 function lineImgHtml(lineNum, height = '20px') {
     const src = `assets/Lignes/${lineNum}.svg`;
     const fallbackStyle = `background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:2px 6px;border-radius:6px;font-size:11px;font-weight:600;color:#eee;display:inline-flex;align-items:center;justify-content:center;height:${height};min-width:24px;`;
@@ -151,6 +163,9 @@ function lineImgHtml(lineNum, height = '20px') {
         onerror="imgCache.set(this.src,'error');var s=document.createElement('span');s.textContent=this.dataset.line;s.style.cssText='${fallbackStyle}color:${color};';this.replaceWith(s)">`;
 }
 
+/**
+ * Obtient la couleur de disponibilité (pour les parkings/Vélo'v).
+ */
 function getDispoColor(value, total) {
     if (value === null || total === null) return null;
     const path = 'assets/SVG_Icons/';
@@ -196,6 +211,9 @@ function getDispoColor(value, total) {
     };
 }
 
+/**
+ * Obtient la couleur de disponibilité pour les Vélo'v.
+ */
 function getVelovDispoColor(bikes, stands, total) {
     if (bikes === 0 && stands === 0) return {
         color: '#4B0082',
@@ -206,6 +224,9 @@ function getVelovDispoColor(bikes, stands, total) {
     return getDispoColor(bikes, total || (bikes + stands));
 }
 
+/**
+ * Calcule la distance entre deux points en mètres (formule de Haversine).
+ */
 function haversineMeters(lat1, lon1, lat2, lon2) {
     const R = 6371000;
     const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -217,6 +238,9 @@ function haversineMeters(lat1, lon1, lat2, lon2) {
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
 }
 
+/**
+ * Met en surbrillance le texte correspondant à la recherche.
+ */
 function highlightText(text, term) {
     if (!term || !text) return text || '';
     return text.replace(
@@ -225,6 +249,9 @@ function highlightText(text, term) {
     );
 }
 
+/**
+ * Formate l'heure de départ.
+ */
 function fmtDepAt(isoStr, now) {
     if (!isoStr) return '—';
     const d = new Date(isoStr);
@@ -241,10 +268,16 @@ function fmtDepAt(isoStr, now) {
     return `<span style="color:var(--text-secondary)">${hhmm}</span>`;
 }
 
+/**
+ * Obtient le nouveau numéro de ligne (mappage ancien → nouveau).
+ */
 function getNewLineNumber(l) {
     return lineMapping[l] || l;
 }
 
+/**
+ * Obtient les codes originaux pour une ligne mappée.
+ */
 function getOriginalCodes(targetMapped) {
     const codes = new Set([targetMapped]);
     for (const [orig, mapped] of Object.entries(lineMapping)) {
@@ -253,6 +286,9 @@ function getOriginalCodes(targetMapped) {
     return codes;
 }
 
+/**
+ * Vérifie si un arrêt dessert une ligne.
+ */
 function stopServesLine(desserte, targetMapped) {
     if (!desserte) return false;
     const codes = getOriginalCodes(targetMapped);
@@ -262,6 +298,9 @@ function stopServesLine(desserte, targetMapped) {
     });
 }
 
+/**
+ * Extrait les lignes d'un arrêt.
+ */
 function extractLines(desserte) {
     if (!desserte) return [];
     const lines = [...new Set(
@@ -270,11 +309,17 @@ function extractLines(desserte) {
     return lines.sort(sortLinesByType);
 }
 
+/**
+ * Génère le HTML pour les icônes des lignes d'un arrêt.
+ */
 function renderLineSvgs(lines) {
     if (!lines?.length) return '<span style="color:var(--text-muted);font-size:11px;">Aucune ligne</span>';
     return lines.map(l => lineImgHtml(getNewLineNumber(l), '20px')).join('');
 }
 
+/**
+ * Obtient la priorité d'un type de ligne pour le tri.
+ */
 function getLineTypePriority(type) {
     const priorities = {
         metro: 1, tram: 2, tb: 3, navgone: 4, funiculaire: 5,
@@ -283,6 +328,9 @@ function getLineTypePriority(type) {
     return priorities[type] || 999;
 }
 
+/**
+ * Trie les lignes par type et numéro.
+ */
 function sortLinesByType(a, b) {
     const typeA = getLineType(a);
     const typeB = getLineType(b);
@@ -298,35 +346,13 @@ function sortLinesByType(a, b) {
     return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
 }
 
-// Hash pour les bus (pour éviter les doublons)
-function busHash(b) {
-    return `${b.lat},${b.lon},${b.bearing},${b.delay},${b.dest_code}`;
-}
+// ============================================
+// FONCTIONS DE CONSTRUCTION DES POPUPS
+// ============================================
 
-// Obtenir le nom d'un arrêt
-function getStopName(code) {
-    if (!code) return null;
-    const clean = code.includes(':') ? code.split(':').pop() : code;
-    return stopsMapping[clean] || stopsMapping[code] || null;
-}
-
-// Obtenir le type de véhicule
-function getVehicleType(bus) {
-    const id = parseInt(bus.id);
-    if (isNaN(id)) return 'Véhicule TCL';
-    if (id === 111) return 'Le Gône';
-    if (id === 112) return 'La Fenotte';
-    if (id === 113) return 'Le Canut';
-    if (id >= 801 && id < 873) return 'Alstom Citadis 302';
-    if (id >= 874 && id < 937) return 'Alstom Citadis 402';
-    if (id >= 101 && id < 106) return 'Stadler Tango';
-    if ((id >= 1001 && id < 1030) || (id >= 1201 && id < 1218) || (id >= 1301 && id < 1333) || (id >= 1401 && id < 1417) || (id >= 2301 && id < 2328)) return 'Iveco Urbanway 18';
-    if ((id >= 2401 && id < 2458) || (id >= 2501 && id < 2524) || (id >= 2701 && id < 2750) || (id >= 3000 && id < 3065)) return 'Iveco Urbanway 12';
-    if ((id >= 2001 && id < 2034) || (id >= 2801 && id < 2835)) return 'Hess LighTram 19 DC';
-    return 'Véhicule TCL';
-}
-
-// Construire le popup d'un bus
+/**
+ * Construit le popup d'un bus.
+ */
 function buildBusPopup(bus) {
     return `<div style="width:260px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
         <div style="position:relative;height:80px;background:linear-gradient(135deg,${bus.color}33 0%,#08090f 55%,${bus.color}22 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
@@ -357,9 +383,45 @@ function buildBusPopup(bus) {
     </div>`;
 }
 
-// Construire le popup d'un parking
-function buildParkingPopup(p, tr, titre = 'Parking', iconEmoji = '🅿️') {
-    const dispo = p._nb_dispo ?? p.nb_place_dispo ?? tr?.nb_tot_place_dispo ?? null;
+/**
+ * Obtient le type de véhicule.
+ */
+function getVehicleType(bus) {
+    const id = parseInt(bus.id);
+    if (isNaN(id)) return 'Véhicule TCL';
+    if (id === 111) return 'Le Gône';
+    if (id === 112) return 'La Fenotte';
+    if (id === 113) return 'Le Canut';
+    if (id >= 801 && id < 873) return 'Alstom Citadis 302';
+    if (id >= 874 && id < 937) return 'Alstom Citadis 402';
+    if (id >= 101 && id < 106) return 'Stadler Tango';
+    if ((id >= 1001 && id < 1030) || (id >= 1201 && id < 1218) || (id >= 1301 && id < 1333) || (id >= 1401 && id < 1417) || (id >= 2301 && id < 2328)) return 'Iveco Urbanway 18';
+    if ((id >= 2401 && id < 2458) || (id >= 2501 && id < 2524) || (id >= 2701 && id < 2750) || (id >= 3000 && id < 3065)) return 'Iveco Urbanway 12';
+    if ((id >= 2001 && id < 2034) || (id >= 2801 && id < 2835)) return 'Hess LighTram 19 DC';
+    return 'Véhicule TCL';
+}
+
+/**
+ * Hash pour les bus (pour éviter les doublons).
+ */
+function busHash(b) {
+    return `${b.lat},${b.lon},${b.bearing},${b.delay},${b.dest_code}`;
+}
+
+/**
+ * Obtient le nom d'un arrêt.
+ */
+function getStopName(code) {
+    if (!code) return null;
+    const clean = code.includes(':') ? code.split(':').pop() : code;
+    return stopsMapping[clean] || stopsMapping[code] || null;
+}
+
+/**
+ * Construit le popup d'un parking.
+ */
+function buildParkingPopup(p, titre = 'Parking') {
+    const dispo = p._nb_dispo ?? p.nb_place_dispo ?? null;
     const cap = p.capacite ?? p.nb_place_tot ?? null;
 
     let dispoSection = '';
@@ -378,13 +440,15 @@ function buildParkingPopup(p, tr, titre = 'Parking', iconEmoji = '🅿️') {
     }
 
     return `<div style="width:220px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
-        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${iconEmoji} ${p.nom}</div>
+        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">🅿️ ${p.nom || titre}</div>
         <div style="font-size:11px;color:var(--text-secondary);">${p.horaires || 'Horaires non disponibles'}</div>
         ${dispoSection}
     </div>`;
 }
 
-// Construire le popup d'une agence
+/**
+ * Construit le popup d'une agence.
+ */
 function buildAgencyPopup(a, adresse, facea) {
     return `<div style="width:230px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
         <div style="background:linear-gradient(135deg,rgba(226,0,26,0.2),rgba(226,0,26,0.05));padding:14px;border-bottom:1px solid var(--glass-border);">
@@ -418,7 +482,9 @@ function buildAgencyPopup(a, adresse, facea) {
     </div>`;
 }
 
-// Construire le popup d'une station Vélo'v
+/**
+ * Construit le popup d'une station Vélo'v.
+ */
 function buildVelovPopup(s) {
     const bikes = s.available_bikes || 0;
     const stands = s.available_bike_stands || 0;
@@ -446,25 +512,13 @@ function buildVelovPopup(s) {
     </div>`;
 }
 
-// Vérifier le statut du système
-async function checkSystemStatus() {
-    try {
-        const res = await fetch(API_BASE_URL);
-        const data = await res.json();
-        const dot = document.getElementById('system-status-dot');
-        if (data.data_loaded && data.data_loaded.stops) {
-            dot.classList.add('ready');
-            dot.title = "Toutes les données sont chargées et prêtes";
-        } else {
-            dot.classList.remove('ready');
-            dot.title = "Initialisation des données en cours...";
-        }
-    } catch (e) {
-        console.warn("Erreur checkSystemStatus:", e);
-    }
-}
+// ============================================
+// NOTIFICATIONS ET SPINNER
+// ============================================
 
-// ===== NOTIFICATIONS =====
+/**
+ * Affiche une notification.
+ */
 function showNotification(message, type = 'info') {
     const container = document.getElementById('notification-container');
     const notification = document.createElement('div');
@@ -477,11 +531,16 @@ function showNotification(message, type = 'info') {
     setTimeout(() => notification.remove(), 5000);
 }
 
-// ===== GESTION DU SPINNER =====
+/**
+ * Affiche le spinner de chargement.
+ */
 function showSpinner() {
     document.getElementById('loading-spinner').style.display = 'flex';
 }
 
+/**
+ * Masque le spinner de chargement.
+ */
 function hideSpinner() {
     document.getElementById('loading-spinner').style.display = 'none';
 }
