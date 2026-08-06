@@ -499,3 +499,792 @@ function updateVisibleParkAndRideLots() {
         }
     }
 }
+// ============================================
+// CHARGEMENT DES VÉLO'V
+// ============================================
+
+/**
+ * Met à jour les stations Vélo'v.
+ */
+async function updateVelov() {
+    try {
+        const data = await apiFetch('api/velov');
+        if (data.is_loading) {
+            setTimeout(updateVelov, 10000);
+            return;
+        }
+        allVelovStations = data.values || [];
+        velovLoaded = true; // Marque les Vélo'v comme chargés
+        updateVisibleVelov();
+        console.log("✅ Vélo'v mis à jour");
+    } catch (e) {
+        setTimeout(updateVelov, 10000);
+    }
+}
+
+/**
+ * Met à jour les stations Vélo'v visibles sur la carte.
+ */
+function updateVisibleVelov() {
+    if (!layerVisibility.velov) {
+        velovLayer.clearLayers();
+        velovMarkerMap.clear();
+        return;
+    }
+
+    const zoom = map.getZoom();
+    if (zoom < 13) {
+        velovMarkerMap.forEach(m => velovLayer.removeLayer(m));
+        velovMarkerMap.clear();
+        return;
+    }
+
+    const bounds = map.getBounds();
+    const visible = allVelovStations.filter(s => {
+        const lat = parseFloat(s.lat), lng = parseFloat(s.lng);
+        return !isNaN(lat) && !isNaN(lng) && bounds.contains([lat, lng]);
+    }).slice(0, MAX_VELOV_ON_MAP);
+
+    const seen = new Set();
+    visible.forEach(s => {
+        const key = `${s.lat},${s.lng}`;
+        seen.add(key);
+        if (velovMarkerMap.has(key)) return;
+
+        const bikes = s.available_bikes || 0;
+        const stands = s.available_bike_stands || 0;
+        const total = s.bike_stands || (bikes + stands) || 0;
+        const dispoInfo = getVelovDispoColor(bikes, stands, total);
+
+        // Taille adaptative en fonction du zoom
+        const iconSize = zoom < 14 ? 12 : 18;
+
+        const m = L.circleMarker([parseFloat(s.lat), parseFloat(s.lng)], {
+            pane: 'velovPane',
+            radius: iconSize / 2,
+            fillColor: dispoInfo.color,
+            color: 'rgba(13, 15, 24, 0.8)',
+            weight: 2,
+            opacity: 1,
+            fillOpacity: 0.9
+        }).bindPopup(buildVelovPopup(s), { maxWidth: 230, className: 'tcl-popup' }).addTo(velovLayer);
+        velovMarkerMap.set(key, m);
+    });
+
+    for (const [k, m] of velovMarkerMap) {
+        if (!seen.has(k)) {
+            velovLayer.removeLayer(m);
+            velovMarkerMap.delete(k);
+        }
+    }
+}
+
+// ============================================
+// CHARGEMENT DES PERTURBATIONS (TRAFIC)
+// ============================================
+
+/**
+ * Met à jour les perturbations trafic.
+ */
+async function updateTraffic() {
+    try {
+        const data = await apiFetch('api/traffic');
+        if (data.is_loading) {
+            setTimeout(updateTraffic, 10000);
+            return;
+        }
+        const items = data.values || [];
+        const list = document.getElementById('traffic-list');
+        if (!items.length) {
+            list.innerHTML = `
+                <div class="info-empty">
+                    <img src="assets/SVG_Icons/validé.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);">
+                    Aucune perturbation
+                </div>`;
+            return;
+        }
+
+        const grouped = new Map();
+        items.forEach(a => {
+            const key = [a.titre, a.message, a.type, a.cause].join('|');
+            if (!grouped.has(key)) grouped.set(key, { ...a, lines: new Set() });
+            const g = grouped.get(key);
+            [a.ligne_cli, a.ligne_com].forEach(l => l?.split(',').forEach(x => {
+                const t = x.trim();
+                if (t) g.lines.add(t);
+            }));
+        });
+
+        list.innerHTML = [...grouped.values()].map(a => {
+            const isP = a.type?.toLowerCase().includes('perturbation');
+            const isT = a.cause?.toLowerCase().includes('travaux');
+            const icon = 'trafic.svg';
+            const filterP = isP
+                ? 'invert(36%) sepia(74%) saturate(3000%) hue-rotate(340deg) brightness(95%)'
+                : (isT
+                    ? 'invert(72%) sepia(46%) saturate(800%) hue-rotate(1deg) brightness(105%)'
+                    : 'invert(67%) sepia(82%) saturate(2000%) hue-rotate(160deg)');
+            const bg = isP ? 'rgba(255,77,77,0.12)' : (isT ? 'rgba(255,184,77,0.12)' : 'rgba(0,210,255,0.12)');
+            const bdr = isP ? 'rgba(255,77,77,0.3)' : (isT ? 'rgba(255,184,77,0.3)' : 'rgba(0,210,255,0.3)');
+            return `
+                <div class="info-item">
+                    <div class="info-summary" onclick="toggleInfoItem(this)">
+                        <div class="info-line-badge" style="background:${bg};border:1px solid ${bdr};">
+                            <img src="assets/SVG_Icons/${icon}" style="width:18px;height:18px;filter:${filterP};">
+                        </div>
+                        <div class="info-summary-text">
+                            <div class="info-titre">${a.titre || 'Info trafic'}</div>
+                            <div class="stop-lines" style="margin-top:6px;">${[...a.lines].map(l => lineImgHtml(l, '24px')).join('')}</div>
+                            <div class="info-type">${a.mode || 'TCL'} • ${a.type || 'Information'}</div>
+                        </div>
+                        <span class="info-chevron">▼</span>
+                    </div>
+                    <div class="info-detail">${a.message || 'Aucun détail'}</div>
+                </div>`;
+        }).join('');
+        console.log("✅ Trafic mis à jour");
+    } catch (e) {
+        setTimeout(updateTraffic, 10000);
+    }
+}
+
+// ============================================
+// CHARGEMENT DES ALERTES ACCESSIBILITÉ
+// ============================================
+
+/**
+ * Met à jour les alertes accessibilité.
+ */
+async function updateAccessibility() {
+    try {
+        const data = await apiFetch('api/accessibility');
+        if (data.is_loading) {
+            setTimeout(updateAccessibility, 10000);
+            return;
+        }
+        const items = data.values || [];
+        const list = document.getElementById('accessibility-list');
+        if (!items.length) {
+            list.innerHTML = `
+                <div class="info-empty">
+                    <img src="assets/SVG_Icons/PMR.svg" class="svg-ic" style="width:20px;height:20px;filter:invert(72%) sepia(64%) saturate(540%) hue-rotate(78deg);">
+                    Aucune alerte
+                </div>`;
+            return;
+        }
+
+        list.innerHTML = items.map(a => {
+            const bg = a.cause === 'Panne' ? 'rgba(255,77,77,0.12)' : 'rgba(255,184,77,0.12)';
+            const bdr = a.cause === 'Panne' ? 'rgba(255,77,77,0.3)' : 'rgba(255,184,77,0.3)';
+            const debut = a.debut_indispo ? new Date(a.debut_indispo).toLocaleDateString('fr-FR') : '';
+            const fin = a.fin_indispo ? new Date(a.fin_indispo).toLocaleDateString('fr-FR') : '';
+            return `
+                <div class="info-item">
+                    <div class="info-summary" onclick="toggleInfoItem(this)">
+                        <div class="info-line-badge" style="background:${bg};border:1px solid ${bdr};">
+                            <img src="assets/SVG_Icons/PMR.svg" class="svg-ic" style="width:18px;height:18px;">
+                        </div>
+                        <div class="info-summary-text">
+                            <div class="info-titre">${a.type_equipement || 'Équipement'} – ${a.nom_station || ''}</div>
+                            <div class="info-type">${a.cause || ''}</div>
+                        </div>
+                        <span class="info-chevron">▼</span>
+                    </div>
+                    <div class="info-detail">${a.equipement || ''}<br>📅 ${debut} → ${fin}</div>
+                </div>`;
+        }).join('');
+        console.log("✅ Accessibilité mise à jour");
+    } catch (e) {
+        setTimeout(updateAccessibility, 10000);
+    }
+}
+
+// ============================================
+// CHARGEMENT DES AGENCES
+// ============================================
+
+/**
+ * Charge les agences TCL.
+ */
+async function loadAgencies() {
+    try {
+        const data = await apiFetch('api/agencies');
+        if (data.is_loading) {
+            setTimeout(loadAgencies, 10000);
+            return;
+        }
+        const allAgences = (data || []).filter(a => a.lat && a.lon);
+        allAgences.forEach(a => {
+            const adresse = [a.numero, (a.typevoie || '').charAt(0).toUpperCase() + (a.typevoie || '').slice(1).toLowerCase(), (a.adr || '').toUpperCase()].filter(Boolean).join(' ');
+            const facea = a.facea === true ? '✅ Oui' : (a.facea === false ? '❌ Non' : '—');
+            const popup = buildAgencyPopup(a, adresse, facea);
+            L.marker([a.lat, a.lon], {
+                icon: L.divIcon({
+                    html: `
+                        <div style="width:36px;height:36px;background:linear-gradient(135deg, #ff4d4d, #e2001a);border-radius:10px;border:2px solid rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px var(--accent-glow);">
+                            <img src="assets/Agence.svg" style="width:18px;height:18px;filter:brightness(0) invert(1);">
+                        </div>`,
+                    className: '',
+                    iconSize: [36, 36],
+                    iconAnchor: [18, 18]
+                })
+            }).bindPopup(popup, { maxWidth: 250, className: 'tcl-popup' }).addTo(agenceLayer);
+        });
+        console.log("✅ Agences chargées");
+    } catch (e) {
+        setTimeout(loadAgencies, 10000);
+    }
+}
+
+// ============================================
+// VÉRIFICATION DU STATUT DU SYSTÈME
+// ============================================
+
+/**
+ * Vérifie le statut du système.
+ */
+async function checkSystemStatus() {
+    try {
+        const res = await fetch(API_BASE_URL);
+        const data = await res.json();
+        const dot = document.getElementById('system-status-dot');
+        if (data.data_loaded && data.data_loaded.stops) {
+            dot.classList.add('ready');
+            dot.title = "Toutes les données sont chargées et prêtes";
+        } else {
+            dot.classList.remove('ready');
+            dot.title = "Initialisation des données en cours...";
+        }
+    } catch (e) {
+        console.warn("Erreur checkSystemStatus:", e);
+    }
+}
+
+// ============================================
+// RENDU DES ARRÊTS SUR LA CARTE
+// ============================================
+
+/**
+ * Rend les arrêts sur la carte (avec limitation).
+ */
+function renderStopsOnMap() {
+    stopMapLayer.clearLayers();
+    stopsOnMap = [];
+
+    const grouped = new Map();
+    for (const s of allStops) {
+        if (!s.lat || !s.lon) continue;
+        const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
+        if (isNaN(lat) || isNaN(lon)) continue;
+        const key = (s.nom || '').toLowerCase();
+        if (!grouped.has(key)) grouped.set(key, []);
+        grouped.get(key).push({ ...s, lat, lon });
+    }
+
+    for (const [, stops] of grouped) {
+        const clusters = [];
+        for (const s of stops) {
+            let merged = false;
+            for (const c of clusters) {
+                if (haversineMeters(s.lat, s.lon, c.lat, c.lon) < 30) {
+                    c.stops.push(s);
+                    merged = true;
+                    break;
+                }
+            }
+            if (!merged) clusters.push({ lat: s.lat, lon: s.lon, stops: [s] });
+        }
+
+        for (const c of clusters) {
+            const main = c.stops[0];
+            stopsOnMap.push({ lat: c.lat, lon: c.lon, nom: main.nom, stops: c.stops });
+        }
+    }
+
+    renderVisibleStops();
+}
+
+/**
+ * Rend les arrêts visibles sur la carte (avec limitation).
+ */
+function renderVisibleStops() {
+    if (!layerVisibility.stops) {
+        stopMapLayer.clearLayers();
+        return;
+    }
+
+    const zoom = map.getZoom();
+    if (zoom < 13) {
+        stopMapLayer.clearLayers();
+        return;
+    }
+
+    const bounds = map.getBounds();
+    const visible = stopsOnMap.filter(s => bounds.contains([s.lat, s.lon])).slice(0, MAX_STOPS_ON_MAP);
+    const seen = new Map();
+
+    visible.forEach(s => {
+        const key = `${s.lat},${s.lon}`;
+        if (seen.has(key)) return;
+
+        const isHighlighted = currentLineFilter && s.stops.some(st => stopServesLine(st.desserte, currentLineFilter));
+        const marker = L.marker([s.lat, s.lon], {
+            pane: 'stopPane',
+            icon: L.divIcon({
+                className: '',
+                html: `<div class="stop-map-marker ${isHighlighted ? 'highlighted' : ''}" title="${s.nom}"></div>`,
+                iconSize: [14, 14],
+                iconAnchor: [7, 7]
+            })
+        }).addTo(stopMapLayer);
+
+        marker.on('click', async () => {
+            await openStopGroupPopup(s);
+        });
+
+        seen.set(key, marker);
+    });
+}
+
+// ============================================
+// OUVRIR LE POPUP D'UN GROUPE D'ARRÊTS
+// ============================================
+
+/**
+ * Ouvre le popup d'un groupe d'arrêts.
+ */
+async function openStopGroupPopup(stopGroup) {
+    const main = stopGroup.stops[0];
+    const lines = getLinesForStop(main);
+    const safeId = main.id || ('grp_' + stopGroup.lat + '_' + stopGroup.lon);
+    const popupEl = document.createElement('div');
+    popupEl.style.cssText = 'width:260px;font-family:inherit;';
+
+    popupEl.innerHTML = `
+        <div style="background:var(--glass-bg-heavy);border:1px solid var(--glass-border-highlight);border-radius:16px;overflow:hidden;">
+            <div style="padding:12px 14px;border-bottom:1px solid var(--glass-border);">
+                <div style="font-size:14px;font-weight:700;color:var(--text-primary);margin-bottom:6px;display:flex;align-items:center;gap:6px;">
+                    <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic" style="width:16px;height:16px;">${main.nom}
+                </div>
+                <div style="font-size:10px;display:flex;flex-wrap:wrap;gap:4px;align-items:center;">
+                    ${main.commune ? `<span style="color:#ffb84d;">${main.commune}</span>` : ''}
+                    ${main.zone ? `<span style="background:rgba(255,255,255,0.06);border:1px solid var(--glass-border);border-radius:4px;padding:1px 6px;font-size:10px;">Zone ${main.zone}</span>` : ''}
+                    ${stopGroup.stops.length > 1 ? `<span style="color:var(--text-muted);font-size:10px;">+ ${stopGroup.stops.length - 1} arrêt(s) à proximité</span>` : ''}
+                </div>
+                <div style="margin-top:8px;"><strong style="font-size:10px;color:var(--text-muted);text-transform:uppercase;">Lignes :</strong></div>
+                <div class="stop-lines" style="margin-top:4px;">${renderLineSvgs(lines)}</div>
+            </div>
+            <div id="deps-${safeId}" style="padding:10px 14px 12px;">
+                <div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">Prochains passages</div>
+                <div style="font-size:11px;color:var(--text-muted);text-align:center;padding:4px 0;">Chargement...</div>
+            </div>
+        </div>`;
+
+    if (currentStopMarker) {
+        map.removeLayer(currentStopMarker);
+        currentStopMarker = null;
+    }
+
+    currentStopMarker = L.marker([stopGroup.lat, stopGroup.lon], {
+        icon: L.divIcon({
+            className: 'my-custom-marker',
+            html: '<div style="background:var(--accent);width:16px;height:16px;border-radius:50%;border:2.5px solid #fff;box-shadow:0 0 12px var(--accent-glow);"></div>',
+            iconSize: [16, 16],
+            iconAnchor: [8, 8]
+        })
+    }).bindPopup(popupEl, { maxWidth: 280, className: 'tcl-popup', closeButton: true }).addTo(map);
+
+    currentStopMarker.on('popupclose', _stopDepInterval);
+    map.setView([stopGroup.lat, stopGroup.lon], Math.max(map.getZoom(), 16));
+    currentStopMarker.openPopup();
+
+    if (main.id) loadNextDepartures(main.id, `deps-${safeId}`);
+}
+
+// ============================================
+// CHARGEMENT DES PROCHAINS DÉPARTS
+// ============================================
+
+let _depInterval = null;
+
+/**
+ * Arrête l'intervalle de mise à jour des départs.
+ */
+function _stopDepInterval() {
+    if (_depInterval) {
+        clearInterval(_depInterval);
+        _depInterval = null;
+    }
+}
+
+/**
+ * Démarre l'intervalle de mise à jour des départs.
+ */
+function _startDepInterval(containerId) {
+    _stopDepInterval();
+    _depInterval = setInterval(() => {
+        const container = document.getElementById(containerId);
+        if (!container) {
+            _stopDepInterval();
+            return;
+        }
+        const now = Date.now();
+        container.querySelectorAll('[data-dep-ts]').forEach(cell => {
+            const ts = parseFloat(cell.dataset.depTs);
+            if (!ts) return;
+            if (now - ts * 1000 > 30000) {
+                cell.closest('[data-dep-row]')?.remove();
+                return;
+            }
+            cell.innerHTML = fmtDepAt(cell.dataset.depIso, now);
+        });
+    }, 1000);
+}
+
+/**
+ * Charge les prochains départs pour un arrêt.
+ */
+async function loadNextDepartures(stopId, containerId) {
+    if (!stopId) return;
+    await new Promise(r => setTimeout(r, 0));
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    _stopDepInterval();
+    const header = '<div style="font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:var(--text-muted);margin-bottom:8px;">Prochains passages</div>';
+    try {
+        const data = await apiFetch(`api/next-departures/${stopId}`);
+        if (data.is_loading) {
+            el.innerHTML = header + '<div style="font-size:11px;color:#f1c40f;text-align:center;padding:8px 0;">⏳ Initialisation des données en cours...</div>';
+            setTimeout(() => loadNextDepartures(stopId, containerId), 10000);
+            return;
+        }
+
+        const nowSec = Date.now() / 1000;
+        const deps = (data.departures || []).filter(d => d.ts > nowSec - 30);
+        if (!deps.length) {
+            el.innerHTML = header + '<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0;">Aucun passage prévu</div>';
+            return;
+        }
+
+        const nowMs = Date.now();
+        const rows = deps.slice(0, 5).map((dep, i) => {
+            const lineRemapped = getNewLineNumber(dep.line);
+            let timeDisplay = fmtDepAt(dep.expected || dep.aimed, nowMs);
+            let typeLabel = dep.type === 'E'
+                ? '<span style="font-size:9px;color:#4dff88;margin-left:4px;">⚡ TR</span>'
+                : '<span style="font-size:9px;color:var(--text-muted);margin-left:4px;">⏱ Th.</span>';
+
+            return `
+                <div data-dep-row="${i}" style="padding:6px 0;border-bottom:1px solid var(--glass-border);">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                        <div style="flex-shrink:0;">${lineImgHtml(lineRemapped, '20px')}</div>
+                        <div style="flex:1;min-width:0;">
+                            <div style="font-size:11px;color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">
+                                → ${dep.dest_name || dep.dest_id || '—'}${typeLabel}
+                            </div>
+                        </div>
+                        <div data-dep-ts="${dep.ts}" data-dep-iso="${dep.expected || dep.aimed}" style="font-size:12px;text-align:right;flex-shrink:0;">
+                            ${timeDisplay}
+                        </div>
+                    </div>
+                </div>`;
+        }).join('');
+        el.innerHTML = header + rows;
+        _startDepInterval(containerId);
+    } catch (e) {
+        el.innerHTML = header + '<div style="font-size:11px;color:var(--text-muted);text-align:center;padding:8px 0;">Indisponible</div>';
+    }
+}
+
+// ============================================
+// GESTION DES FILTRES
+// ============================================
+
+/**
+ * Applique un filtre de ligne.
+ */
+async function applyLineFilter(line) {
+    currentLineFilter = line;
+    busLineFilter = line;
+    document.getElementById('stop-filter-label').innerHTML = `Arrêts : &nbsp;${lineImgHtml(line, '18px')}`;
+    document.getElementById('stop-filter-banner').classList.add('visible');
+    document.getElementById('bus-filter-label').innerHTML = `Véhicules : &nbsp;${lineImgHtml(line, '18px')}`;
+    document.getElementById('bus-filter-banner').classList.add('visible');
+    applyBusLineFilter();
+    renderVisibleStops();
+    await showLineTrace(line);
+}
+
+/**
+ * Efface tous les filtres.
+ */
+function clearAllFilters() {
+    currentLineFilter = null;
+    busLineFilter = null;
+    document.getElementById('stop-filter-banner').classList.remove('visible');
+    document.getElementById('bus-filter-banner').classList.remove('visible');
+    for (const [, e] of busMarkers) {
+        if (!busLayer.hasLayer(e.marker)) busLayer.addLayer(e.marker);
+    }
+    document.getElementById('stop-search').value = '';
+    renderStopList('');
+    lineTraceLayer.clearLayers();
+    renderVisibleStops();
+}
+
+/**
+ * Filtre les arrêts en fonction de la recherche.
+ */
+let stopSearchTimer = null;
+function filterStops() {
+    currentLineFilter = null;
+    document.getElementById('stop-filter-banner').classList.remove('visible');
+    lineTraceLayer.clearLayers();
+    renderVisibleStops();
+    clearTimeout(stopSearchTimer);
+    stopSearchTimer = setTimeout(() => {
+        renderStopList(document.getElementById('stop-search').value.toLowerCase().trim());
+    }, 200);
+}
+
+/**
+ * Rend la liste des arrêts.
+ */
+function renderStopList(term = '') {
+    let stops = [...allStops].sort((a, b) => (a.nom || '').localeCompare(b.nom || ''));
+    if (currentLineFilter) {
+        stops = stops.filter(s => stopServesLine(s.desserte, currentLineFilter));
+    } else if (term) {
+        stops = stops.filter(s =>
+            (s.nom || '').toLowerCase().includes(term) ||
+            (s.commune || '').toLowerCase().includes(term) ||
+            (s.desserte || '').toLowerCase().includes(term)
+        );
+    }
+
+    document.getElementById('search-stats').textContent = `${stops.length}/${allStops.length}`;
+    if (!stops.length) {
+        document.getElementById('stops-list').innerHTML = `
+            <div class="info-empty">
+                <img src="assets/SVG_Icons/loupe.svg" class="svg-ic" style="width:20px;height:20px;opacity:0.5;">
+                Aucun arrêt trouvé
+            </div>`;
+        return;
+    }
+
+    const chunk = stops.slice(0, 300);
+    const html = chunk.map(s => {
+        const lines = extractLines(s.desserte);
+        const icon = s.desserte?.match(/T[1-7]/) ? 'tramway.svg' :
+                   (s.desserte?.match(/^[ABCD]$/) ? 'metro.svg' : 'bus.svg');
+        return `
+            <div class="info-item" data-lat="${s.lat}" data-lon="${s.lon}" data-id="${s.id || ''}" data-nom="${(s.nom || '').replace(/"/g, '&quot;')}" data-commune="${(s.commune || '').replace(/"/g, '&quot;')}" data-zone="${s.zone || ''}">
+                <div class="info-summary" onclick="selectStopOnMap(this)">
+                    <div class="info-line-badge"><img src="assets/SVG_Icons/${icon}" class="svg-ic" style="width:20px;height:20px;"></div>
+                    <div class="info-summary-text">
+                        <div class="info-titre">${highlightText(s.nom || 'Arrêt', term)}${s.pmr ? '<span class="stop-pmr-badge"><img src="assets/SVG_Icons/PMR.svg" style="width:10px;height:10px;filter:brightness(0) invert(1);"> PMR</span>' : ''}</div>
+                        <div class="stop-commune">${highlightText(s.commune || '', term)} • Zone ${s.zone || 'N/A'}</div>
+                        <div class="stop-lines">${renderLineSvgs(lines)}</div>
+                    </div>
+                    <span class="info-chevron">▼</span>
+                </div>
+                <div class="info-detail">
+                    <strong>📍 Adresse :</strong> ${s.adresse || 'Non renseignée'}<br>
+                    <strong>🚌 Lignes :</strong> ${s.desserte || 'Aucune'}<br>
+                    <strong>♿ PMR :</strong> ${s.pmr ? '✅ Accessible' : '❌ Non accessible'}<br>
+                    <strong>🏙️ Commune :</strong> ${s.commune || ''}
+                </div>
+            </div>`;
+    }).join('');
+
+    document.getElementById('stops-list').innerHTML = html +
+        (stops.length > 300 ? `<div class="info-empty">+${stops.length - 300} arrêts (affinez la recherche)</div>` : '');
+}
+
+/**
+ * Sélectionne un arrêt sur la carte.
+ */
+function selectStopOnMap(el) {
+    const item = el.closest('.info-item');
+    if (!item) return;
+    const lat = parseFloat(item.dataset.lat);
+    const lon = parseFloat(item.dataset.lon);
+    if (isNaN(lat) || isNaN(lon)) return;
+
+    let group = stopsOnMap.find(s =>
+        haversineMeters(s.lat, s.lon, lat, lon) < 30 &&
+        s.nom === item.dataset.nom
+    );
+    if (!group) {
+        group = {
+            lat,
+            lon,
+            nom: item.dataset.nom,
+            stops: [{
+                id: item.dataset.id,
+                lat,
+                lon,
+                nom: item.dataset.nom,
+                commune: item.dataset.commune,
+                zone: item.dataset.zone
+            }]
+        };
+    }
+
+    openStopGroupPopup(group);
+}
+
+// ============================================
+// AFFICHAGE DU TRACÉ D'UNE LIGNE
+// ============================================
+
+/**
+ * Affiche le tracé d'une ligne sur la carte.
+ */
+async function showLineTrace(lineCode) {
+    lineTraceLayer.clearLayers();
+    const traceColor = getLineColor(lineCode);
+    const lineStops = allStops.filter(s => stopServesLine(s.desserte, lineCode));
+    const bounds = [];
+
+    try {
+        const resp = await fetch(API_BASE_URL + 'api/line-trace/' + encodeURIComponent(lineCode));
+        if (resp.ok) {
+            const traceData = await resp.json();
+            const segs = traceData.segs || [];
+
+            if (segs.length > 0) {
+                segs.forEach(seg => {
+                    if (seg.length < 2) return;
+                    L.polyline(seg.map(([lon, lat]) => [lat, lon]), {
+                        pane: 'tracePane',
+                        color: traceColor,
+                        weight: 4,
+                        opacity: 0.85,
+                        lineJoin: 'round',
+                        lineCap: 'round'
+                    }).addTo(lineTraceLayer);
+                });
+            }
+        }
+    } catch (e) {
+        console.warn('Erreur tracé:', e);
+    }
+
+    lineStops.forEach(s => {
+        if (!s.lat || !s.lon) return;
+        const lat = parseFloat(s.lat), lon = parseFloat(s.lon);
+        if (isNaN(lat) || isNaN(lon)) return;
+        const cm = L.circleMarker([lat, lon], {
+            pane: 'tracePane',
+            radius: 5,
+            fillColor: traceColor,
+            color: '#fff',
+            weight: 2,
+            fillOpacity: 1
+        }).addTo(lineTraceLayer);
+        cm.on('click', async () => {
+            let group = stopsOnMap.find(st =>
+                haversineMeters(st.lat, st.lon, lat, lon) < 30 &&
+                st.nom === s.nom
+            );
+            if (!group) group = { lat, lon, nom: s.nom, stops: [s] };
+            await openStopGroupPopup(group);
+        });
+        bounds.push([lat, lon]);
+    });
+    if (bounds.length > 0) map.fitBounds(bounds, { padding: [50, 50], maxZoom: 15 });
+}
+
+// ============================================
+// FILTRAGE DES LIGNES
+// ============================================
+
+/**
+ * Type de ligne et métadonnées associées.
+ */
+const TYPE_META = {
+    metro: { icon: '<img src="assets/SVG_Icons/metro.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Métro', color: '#E2001A' },
+    tram: { icon: '<img src="assets/SVG_Icons/tramway.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Tramway', color: '#662483' },
+    tb: { icon: '<img src="assets/SVG_Icons/trolleybus.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'TramBus', color: '#fdc300' },
+    funiculaire: { icon: '<img src="assets/SVG_Icons/funicular.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Funiculaire', color: '#6da432' },
+    navgone: { icon: '<img src="assets/SVG_Icons/navigone.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Navigône', color: '#00A3A6' },
+    chrono: { icon: '<img src="assets/SVG_Icons/chrono.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Chrono', color: '#2699d6' },
+    bus: { icon: '<img src="assets/SVG_Icons/bus.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Bus', color: '#6e8997' },
+    navette: { icon: '<img src="assets/SVG_Icons/navette.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Navette', color: '#EC6608' },
+    pl: { icon: '<img src="assets/SVG_Icons/pleine_lune.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Pleine Lune', color: '#992358' },
+    jd: { icon: '<img src="assets/SVG_Icons/JD.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Junior Direct', color: '#17297B' },
+    other: { icon: '<img src="assets/SVG_Icons/lignes.svg" class="svg-ic" style="width:14px;height:14px;">', name: 'Autres', color: '#888' }
+};
+
+/**
+ * Filtre les lignes en fonction des cases cochées.
+ */
+function filterLines() {
+    const ck = id => document.getElementById(`filter-${id}`)?.checked;
+    const filters = {
+        metro: ck('metro'),
+        tram: ck('tram'),
+        tb: ck('trolleybus'),
+        funiculaire: ck('funicular'),
+        navgone: ck('navgone'),
+        chrono: ck('chrono'),
+        bus: ck('bus'),
+        navette: ck('navette'),
+        pl: ck('pl'),
+        jd: ck('jd')
+    };
+    let html = '';
+    for (const [type, meta] of Object.entries(TYPE_META)) {
+        if (!filters[type] && type !== 'other') continue;
+        const group = allLines.filter(l => getLineType(l) === type).sort(sortLinesByType);
+        if (!group.length) continue;
+        html += `
+            <div class="line-group">
+                <div class="line-group-header" style="color:${meta.color};border-left-color:${meta.color};">
+                    ${meta.icon} ${meta.name} <span style="opacity:0.6;font-weight:400;">(${group.length})</span>
+                </div>
+                <div class="line-items">
+                    ${group.map(l => `<div class="line-item" onclick="searchLineInStops('${l}')">${lineImgHtml(l, '24px')}</div>`).join('')}
+                </div>
+            </div>`;
+    }
+    document.getElementById('lines-list').innerHTML = html || `<div class="info-empty">Aucune ligne</div>`;
+}
+
+/**
+ * Recherche une ligne dans les arrêts.
+ */
+async function searchLineInStops(line) {
+    switchToTab('stops');
+    document.getElementById('stop-search').value = '';
+    await applyLineFilter(line);
+    renderStopList('');
+    const panel = document.getElementById('info-panel');
+    if (panel.classList.contains('collapsed')) {
+        panel.classList.remove('collapsed');
+        setTimeout(() => map.invalidateSize(), 300);
+    }
+}
+
+/**
+ * Filtre une ligne depuis un popup.
+ */
+async function filterLineFromPopup(line) {
+    switchToTab('stops');
+    document.getElementById('stop-search').value = '';
+    await applyLineFilter(getNewLineNumber(line));
+    renderStopList('');
+    const panel = document.getElementById('info-panel');
+    if (panel.classList.contains('collapsed')) {
+        panel.classList.remove('collapsed');
+        setTimeout(() => map.invalidateSize(), 300);
+    }
+}
+
+/**
+ * Obtient les lignes pour un arrêt.
+ */
+function getLinesForStop(stop) {
+    return extractLines(stop.desserte);
+}
