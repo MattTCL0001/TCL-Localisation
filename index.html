@@ -96,19 +96,52 @@
     </div>
 
     <!-- Panneau latéral -->
-    <div id="info-panel">
-        <div class="panel-toggle" onclick="togglePanel()"><span>❯</span></div>
-        <div class="tab-content">
-            <!-- Onglet Trafic -->
-            <div id="traffic-pane" class="tab-pane active">
-                <div class="tab-header">Perturbations en cours</div>
-                <div id="traffic-list" class="info-list">
-                    <div class="info-empty">
-                        <img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> Chargement...
-                    </div>
+    <!-- Panneau latéral (modifié) -->
+<div id="info-panel">
+    <!-- En-tête avec onglets et bouton de fermeture -->
+    <div class="panel-header">
+        <nav class="header-tabs" role="tablist">
+            <button class="header-tab active" data-tab="traffic" onclick="switchToTab('traffic')">
+                <img src="assets/SVG_Icons/trafic.svg" class="svg-ic">
+                <span>Trafic</span>
+            </button>
+            <button class="header-tab" data-tab="accessibility" onclick="switchToTab('accessibility')">
+                <img src="assets/SVG_Icons/PMR.svg" class="svg-ic">
+                <span>PMR</span>
+            </button>
+            <button class="header-tab" data-tab="stops" onclick="switchToTab('stops')">
+                <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic">
+                <span>Arrêts</span>
+            </button>
+            <button class="header-tab" data-tab="lines" onclick="switchToTab('lines')">
+                <img src="assets/SVG_Icons/lignes.svg" class="svg-ic">
+                <span>Lignes</span>
+            </button>
+            <button class="header-tab" data-tab="velov" onclick="switchToTab('velov')">
+                <img src="assets/SVG_Icons/velo.svg" class="svg-ic">
+                <span>Vélo'v</span>
+            </button>
+            <button class="header-tab" data-tab="credits" onclick="switchToTab('credits')">
+                <img src="assets/SVG_Icons/id.svg" class="svg-ic">
+                <span>Infos</span>
+            </button>
+        </nav>
+        <div class="panel-toggle" onclick="togglePanel()">
+            <span>❯</span>
+        </div>
+    </div>
+
+    <!-- Contenu des onglets -->
+    <div class="tab-content">
+        <!-- Onglet Trafic -->
+        <div id="traffic-pane" class="tab-pane active">
+            <div class="tab-header">Perturbations en cours</div>
+            <div id="traffic-list" class="info-list">
+                <div class="info-empty">
+                    <img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> Chargement...
                 </div>
             </div>
-
+        </div>
             <!-- Onglet Accessibilité -->
             <div id="accessibility-pane" class="tab-pane">
                 <div class="tab-header">Alertes accessibilité</div>
