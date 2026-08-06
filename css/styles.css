@@ -5,22 +5,22 @@
     /* Couleurs principales */
     --accent: #e2001a;
     --accent-glow: rgba(226, 0, 26, 0.4);
-    --text-primary: #edf0f8;
-    --text-secondary: #8a90a8;
-    --text-muted: #4a4f6a;
+    --text-primary: #1a1a1a;
+    --text-secondary: #4a4a4a;
+    --text-muted: #8a8a8a;
 
-    /* Effet verre */
-    --glass-bg: rgba(13, 15, 24, 0.65);
-    --glass-bg-heavy: rgba(13, 15, 24, 0.85);
-    --glass-border: rgba(255, 255, 255, 0.08);
-    --glass-border-highlight: rgba(255, 255, 255, 0.15);
-    --glass-blur: blur(24px) saturate(180%);
+    /* Effet verre (moins sombre) */
+    --glass-bg: rgba(255, 255, 255, 0.85);
+    --glass-bg-heavy: rgba(255, 255, 255, 0.95);
+    --glass-border: rgba(0, 0, 0, 0.1);
+    --glass-border-highlight: rgba(0, 0, 0, 0.2);
+    --glass-blur: blur(10px) saturate(150%);
 
     /* Bordures et ombres */
-    --radius-sm: 10px;
-    --radius-md: 16px;
-    --radius-lg: 24px;
-    --panel-height: 50vh;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --panel-height: 60vh;
 
     /* Couleurs des lignes */
     --metro-color: #E2001A;
@@ -46,25 +46,10 @@
 body, html {
     height: 100%;
     width: 100%;
-    background: #08090f;
+    background: #f5f5f5;
     color: var(--text-primary);
     overflow: hidden;
     font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-}
-
-/* Arrière-plan décoratif */
-body::before {
-    content: '';
-    position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    background:
-        radial-gradient(circle at 50% 50%, rgba(226, 0, 26, 0.03) 0%, transparent 50%),
-        radial-gradient(circle at 80% 20%, rgba(0, 210, 255, 0.03) 0%, transparent 40%);
-    pointer-events: none;
-    z-index: 0;
 }
 
 /* ============================================ */
@@ -80,16 +65,16 @@ body::before {
 
 /* En-tête */
 .app-header {
-    height: 60px;
+    height: 56px;
     background: var(--glass-bg-heavy);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border-bottom: 1px solid var(--glass-border);
-    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.4), inset 0 1px 0 var(--glass-border-highlight);
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0 16px;
+    padding: 0 12px;
     z-index: 1002;
     flex-shrink: 0;
 }
@@ -97,13 +82,13 @@ body::before {
 .logo-badge {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
 }
 
 .logo-badge img {
     height: 24px;
     width: auto;
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.2));
 }
 
 .system-status-dot {
@@ -111,25 +96,24 @@ body::before {
     height: 8px;
     border-radius: 50%;
     background: #f1c40f;
-    box-shadow: 0 0 8px rgba(241, 196, 15, 0.5);
+    box-shadow: 0 0 6px rgba(241, 196, 15, 0.5);
     transition: all 0.3s ease;
 }
 
 .system-status-dot.ready {
     background: #4dff88;
-    box-shadow: 0 0 8px rgba(77, 255, 136, 0.5);
+    box-shadow: 0 0 6px rgba(77, 255, 136, 0.5);
 }
 
 /* ============================================ */
-/* ONGLETS DE L'EN-TÊTE                         */
+/* ONGLETS DE L'EN-TÊTE (SUR LE CÔTÉ DU TIROIR) */
 /* ============================================ */
 .header-tabs {
     display: flex;
-    gap: 4px;
+    gap: 2px;
     overflow-x: auto;
     scrollbar-width: none;
-    mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
-    -webkit-mask-image: linear-gradient(to right, transparent, black 10px, black 90%, transparent);
+    -ms-overflow-style: none;
     padding: 0 4px;
 }
 
@@ -140,140 +124,49 @@ body::before {
 .header-tab {
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: 4px;
+    padding: 6px 10px;
     border-radius: var(--radius-sm);
     border: 1px solid transparent;
     background: transparent;
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 12px;
     font-weight: 500;
     cursor: pointer;
     white-space: nowrap;
     transition: all 0.2s ease;
+    touch-action: pan-x;
 }
 
 .header-tab:hover {
-    background: rgba(255, 255, 255, 0.05);
+    background: rgba(0, 0, 0, 0.05);
     color: var(--text-primary);
 }
 
 .header-tab.active {
-    background: rgba(226, 0, 26, 0.12);
-    border-color: rgba(226, 0, 26, 0.3);
-    color: #ff4d62;
-    box-shadow: 0 0 12px rgba(226, 0, 26, 0.15);
+    background: rgba(226, 0, 26, 0.1);
+    border-color: rgba(226, 0, 26, 0.2);
+    color: var(--accent);
+    box-shadow: 0 0 8px rgba(226, 0, 26, 0.1);
 }
 
 /* ============================================ */
 /* STYLES POUR LES ICÔNES (UNIFIÉS)              */
 /* ============================================ */
 .svg-ic {
-    width: 16px !important;
-    height: 16px !important;
+    width: 14px !important;
+    height: 14px !important;
     vertical-align: middle !important;
-    filter: brightness(0) invert(1) !important;
-    margin-right: 6px !important;
+    filter: brightness(0) invert(0.2) !important;
+    margin-right: 4px !important;
     flex-shrink: 0 !important;
 }
 
 /* Icônes dans les onglets de l'en-tête */
 .header-tab img.svg-ic {
-    width: 15px !important;
-    height: 15px !important;
-    margin-right: 6px !important;
-}
-
-/* Icônes dans les barres de recherche */
-.search-bar img.svg-ic {
-    width: 14px !important;
-    height: 14px !important;
-    opacity: 0.6;
-    margin-right: 8px !important;
-}
-
-/* Icônes dans la barre de filtres */
-.filter-bar img.svg-ic {
     width: 14px !important;
     height: 14px !important;
     margin-right: 4px !important;
-}
-
-/* Icônes dans les badges (ex: badges des lignes) */
-.info-line-badge img.svg-ic {
-    width: 18px !important;
-    height: 18px !important;
-    margin: 0 !important;
-}
-
-/* Icônes dans les bannières de filtre */
-.filter-banner img.svg-ic {
-    width: 12px !important;
-    height: 12px !important;
-    margin-right: 4px !important;
-}
-
-/* Icônes dans les popups */
-.tcl-popup img.svg-ic {
-    width: 12px !important;
-    height: 12px !important;
-    margin-right: 4px !important;
-}
-
-/* Icônes dans les listes */
-.info-item img.svg-ic {
-    width: 14px !important;
-    height: 14px !important;
-    margin-right: 6px !important;
-}
-
-/* Icônes dans les en-têtes d'onglets */
-.tab-header img.svg-ic {
-    width: 14px !important;
-    height: 14px !important;
-    margin-right: 6px !important;
-}
-
-/* Icônes dans les boutons de contrôle des couches */
-.layer-toggle-icon img.svg-ic {
-    width: 14px !important;
-    height: 14px !important;
-    margin: 0 !important;
-}
-
-/* Icônes dans les crédits */
-.credits-section img.svg-ic {
-    width: 16px !important;
-    height: 16px !important;
-    margin-right: 6px !important;
-}
-
-/* Icônes dans les groupes de lignes */
-.line-group-header img.svg-ic {
-    width: 14px !important;
-    height: 14px !important;
-    margin-right: 6px !important;
-}
-
-/* Icônes dans les éléments de ligne (ex: C1, T1, etc.) */
-.line-item img {
-    height: 20px !important;
-    width: auto !important;
-    margin: 0 2px !important;
-}
-
-/* Icônes dans les badges PMR */
-.stop-pmr-badge img.svg-ic {
-    width: 10px !important;
-    height: 10px !important;
-    margin: 0 !important;
-}
-
-/* Icônes dans les logos (ex: logo TCL) */
-.logo-badge img {
-    height: 24px !important;
-    width: auto !important;
-    margin: 0 !important;
 }
 
 /* ============================================ */
@@ -282,7 +175,7 @@ body::before {
 .map-container {
     flex: 1;
     position: relative;
-    background: #08090f;
+    background: #f5f5f5;
     min-height: 0;
 }
 
@@ -291,13 +184,13 @@ body::before {
     inset: 0;
     width: 100%;
     height: 100%;
-    background: #08090f;
+    background: #f5f5f5;
     z-index: 1;
 }
 
 /* Style Leaflet */
 .leaflet-container {
-    background: #08090f !important;
+    background: #f5f5f5 !important;
     font-family: inherit !important;
 }
 
@@ -315,7 +208,7 @@ body::before {
 }
 
 .leaflet-tile-container {
-    filter: contrast(1.1) brightness(0.9);
+    filter: contrast(1.05) brightness(1.05);
 }
 
 /* Style des popups Leaflet */
@@ -327,7 +220,7 @@ body::before {
     border: 1px solid var(--glass-border-highlight) !important;
     border-radius: var(--radius-md) !important;
     padding: 0 !important;
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15) !important;
     max-width: 300px !important;
 }
 
@@ -346,65 +239,59 @@ body::before {
 
 .leaflet-popup-close-button {
     color: var(--text-secondary) !important;
-    padding: 8px !important;
-    font-size: 18px !important;
+    padding: 6px !important;
+    font-size: 16px !important;
 }
 
 .leaflet-popup-close-button:hover {
     color: var(--text-primary) !important;
-    background: rgba(255, 255, 255, 0.05) !important;
+    background: rgba(0, 0, 0, 0.05) !important;
     border-radius: 50% !important;
 }
 
 /* Contrôle des couches */
 .layer-control {
     position: absolute;
-    top: 16px;
-    right: 16px;
+    top: 12px;
+    right: 12px;
     z-index: 1000;
     background: var(--glass-bg-heavy);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border-highlight);
     border-radius: var(--radius-md);
-    padding: 8px;
+    padding: 6px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-}
-
-/* Bouton "Tout masquer/afficher" */
-.layer-toggle:last-child {
-    border-top: 1px solid var(--glass-border);
-    margin-top: 4px;
-    padding-top: 8px;
+    gap: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
 .layer-toggle {
     display: flex;
     align-items: center;
-    gap: 8px;
-    padding: 6px 10px;
-    background: rgba(255, 255, 255, 0.04);
+    gap: 6px;
+    padding: 6px 8px;
+    background: rgba(0, 0, 0, 0.03);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     cursor: pointer;
     transition: all 0.15s;
-    font-size: 12px;
+    font-size: 11px;
     color: var(--text-secondary);
     user-select: none;
+    touch-action: none;
 }
 
 .layer-toggle:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(0, 0, 0, 0.06);
     color: var(--text-primary);
 }
 
 .layer-toggle.active {
-    background: rgba(226, 0, 26, 0.12);
-    border-color: rgba(226, 0, 26, 0.3);
-    color: #ff4d62;
+    background: rgba(226, 0, 26, 0.1);
+    border-color: rgba(226, 0, 26, 0.2);
+    color: var(--accent);
 }
 
 .layer-toggle-icon {
@@ -415,25 +302,32 @@ body::before {
     justify-content: center;
 }
 
+/* Bouton "Tout masquer/afficher" */
+.layer-toggle:last-child {
+    border-top: 1px solid var(--glass-border);
+    margin-top: 4px;
+    padding-top: 6px;
+}
+
 /* Bannières de filtre */
 .filter-banner {
     display: none;
     position: absolute;
-    top: 16px;
+    top: 12px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 1001;
-    background: rgba(13, 15, 24, 0.8);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(0, 210, 255, 0.2);
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 100px;
-    padding: 8px 16px;
+    padding: 6px 12px;
     align-items: center;
-    gap: 12px;
-    font-size: 12px;
+    gap: 8px;
+    font-size: 11px;
     white-space: nowrap;
-    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 .filter-banner.visible {
@@ -442,51 +336,54 @@ body::before {
 
 #bus-filter-label,
 #stop-filter-label {
-    color: #00d2ff;
+    color: var(--accent);
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 4px;
     font-weight: 500;
 }
 
 .filter-clear-btn {
     cursor: pointer;
     color: var(--text-secondary);
-    background: rgba(255, 255, 255, 0.06);
+    background: rgba(0, 0, 0, 0.04);
     border: 1px solid var(--glass-border);
-    border-radius: 20px;
-    padding: 4px 10px;
-    font-size: 11px;
+    border-radius: 16px;
+    padding: 4px 8px;
+    font-size: 10px;
     font-family: inherit;
     transition: all 0.15s;
     display: flex;
     align-items: center;
     gap: 4px;
+    touch-action: none;
 }
 
 .filter-clear-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
+    background: rgba(0, 0, 0, 0.08);
     color: var(--text-primary);
 }
 
 /* ============================================ */
-/* PANNEAU LATÉRAL                              */
+/* PANNEAU LATÉRAL (AVEC GLISSER-DÉPOSER)       */
 /* ============================================ */
 #info-panel {
     position: fixed;
-    top: 70px;
-    right: 16px;
-    bottom: 16px;
-    width: 380px;
+    top: 56px;
+    right: 0;
+    bottom: 0;
+    width: 360px;
     z-index: 1000;
     display: flex;
     flex-direction: column;
     pointer-events: none;
-    transition: transform 0.4s cubic-bezier(0.32, 0.72, 0, 1);
+    transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
+    touch-action: pan-y;
+    overflow: hidden;
 }
 
 #info-panel.collapsed {
-    transform: translateX(calc(100% + 32px));
+    transform: translateX(calc(100% - 40px));
 }
 
 #info-panel > * {
@@ -495,27 +392,28 @@ body::before {
 
 .panel-toggle {
     position: absolute;
-    left: -44px;
-    top: 24px;
+    left: -40px;
+    top: 0;
     background: var(--glass-bg-heavy);
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border-highlight);
     border-right: none;
     color: var(--text-secondary);
-    width: 44px;
-    height: 44px;
+    width: 40px;
+    height: 40px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
     border-radius: var(--radius-sm) 0 0 var(--radius-sm);
     transition: all 0.2s;
-    box-shadow: -4px 4px 12px rgba(0, 0, 0, 0.3);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
+    touch-action: none;
 }
 
 .panel-toggle:hover {
     color: var(--accent);
-    background: rgba(226, 0, 26, 0.1);
+    background: rgba(226, 0, 26, 0.08);
 }
 
 #info-panel.collapsed .panel-toggle span {
@@ -529,11 +427,12 @@ body::before {
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border-highlight);
-    border-radius: var(--radius-md);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md) 0 0 var(--radius-md);
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
     overflow: hidden;
+    touch-action: pan-y;
 }
 
 /* Adaptation mobile */
@@ -546,11 +445,12 @@ body::before {
         width: 100%;
         height: var(--panel-height);
         padding-bottom: env(safe-area-inset-bottom, 0px);
-        transform: translateY(calc(100% - 56px));
+        transform: translateY(calc(100% - 48px));
+        border-radius: var(--radius-lg) var(--radius-lg) 0 0;
     }
 
     #info-panel.collapsed {
-        transform: translateY(calc(100% - 56px));
+        transform: translateY(calc(100% - 48px));
     }
 
     #info-panel:not(.collapsed) {
@@ -559,25 +459,25 @@ body::before {
 
     .panel-toggle {
         left: 50%;
-        top: -48px;
+        top: -40px;
         transform: translateX(-50%);
         border-radius: var(--radius-sm) var(--radius-sm) 0 0;
         border: 1px solid var(--glass-border-highlight);
         border-bottom: none;
-        width: 56px;
-        height: 48px;
-        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.3);
+        width: 48px;
+        height: 40px;
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
     }
 
     .panel-toggle::before {
         content: '';
         position: absolute;
-        top: 12px;
+        top: 8px;
         left: 50%;
         transform: translateX(-50%);
-        width: 32px;
-        height: 4px;
-        background: rgba(255, 255, 255, 0.2);
+        width: 24px;
+        height: 3px;
+        background: rgba(0, 0, 0, 0.15);
         border-radius: 4px;
     }
 
@@ -588,23 +488,27 @@ body::before {
     .tab-content {
         border-radius: var(--radius-lg) var(--radius-lg) 0 0;
         border-bottom: none;
-        box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.1);
     }
 
     #bus-filter-banner,
     #stop-filter-banner {
-        top: 70px;
+        top: 60px;
     }
 
     .app-header {
-        padding: 0 12px;
-        height: 56px;
+        padding: 0 8px;
+        height: 48px;
         padding-top: env(safe-area-inset-top, 0px);
     }
 
     .layer-control {
-        top: 70px;
+        top: 60px;
         right: 8px;
+    }
+
+    .header-tabs {
+        display: none;
     }
 }
 
@@ -624,7 +528,7 @@ body::before {
 }
 
 .tab-header {
-    padding: 14px 16px;
+    padding: 12px 14px;
     border-bottom: 1px solid var(--glass-border);
     font-size: 11px;
     font-weight: 700;
@@ -632,10 +536,11 @@ body::before {
     letter-spacing: 0.1em;
     color: var(--text-muted);
     flex-shrink: 0;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.03);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    touch-action: none;
 }
 
 /* ============================================ */
@@ -645,7 +550,8 @@ body::before {
     flex: 1;
     overflow-y: auto;
     scrollbar-width: thin;
-    scrollbar-color: rgba(255, 255, 255, 0.1) transparent;
+    scrollbar-color: rgba(0, 0, 0, 0.1) transparent;
+    touch-action: pan-y;
 }
 
 .info-list::-webkit-scrollbar {
@@ -653,13 +559,14 @@ body::before {
 }
 
 .info-list::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(0, 0, 0, 0.15);
     border-radius: 4px;
 }
 
 .info-item {
     border-bottom: 1px solid var(--glass-border);
     transition: background 0.15s;
+    touch-action: none;
 }
 
 .info-item:last-child {
@@ -669,22 +576,23 @@ body::before {
 .info-summary {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 12px 16px;
+    gap: 10px;
+    padding: 10px 12px;
     cursor: pointer;
+    touch-action: none;
 }
 
 .info-line-badge {
     flex-shrink: 0;
-    width: 38px;
-    height: 38px;
+    width: 34px;
+    height: 34px;
     border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(0, 0, 0, 0.03);
     border: 1px solid var(--glass-border);
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    box-shadow: inset 0 1px 0 rgba(0, 0, 0, 0.05);
 }
 
 .info-summary-text {
@@ -718,13 +626,14 @@ body::before {
 
 .info-detail {
     display: none;
-    padding: 0 16px 16px 66px;
+    padding: 0 12px 12px 50px;
     font-size: 12px;
     color: var(--text-secondary);
     line-height: 1.7;
-    background: rgba(0, 0, 0, 0.15);
+    background: rgba(0, 0, 0, 0.02);
     border-top: 1px solid var(--glass-border);
     animation: slideDown 0.25s ease-out;
+    touch-action: none;
 }
 
 .info-item.expanded .info-detail {
@@ -743,23 +652,23 @@ body::before {
 }
 
 .info-empty {
-    padding: 40px 16px;
+    padding: 30px 12px;
     text-align: center;
     color: var(--text-muted);
-    font-size: 13px;
+    font-size: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 /* ============================================ */
 /* BARRE DE RECHERCHE                           */
 /* ============================================ */
 .search-bar {
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.02);
     border-bottom: 1px solid var(--glass-border);
-    padding: 12px;
+    padding: 10px 12px;
     display: flex;
     gap: 8px;
     flex-shrink: 0;
@@ -767,10 +676,10 @@ body::before {
 
 .search-bar input {
     flex: 1;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.6);
     border: 1px solid var(--glass-border);
     color: var(--text-primary);
-    padding: 10px 14px;
+    padding: 8px 12px;
     border-radius: var(--radius-sm);
     font-size: 13px;
     font-family: inherit;
@@ -780,8 +689,8 @@ body::before {
 .search-bar input:focus {
     outline: none;
     border-color: var(--accent);
-    background: rgba(255, 255, 255, 0.06);
-    box-shadow: 0 0 0 3px rgba(226, 0, 26, 0.1);
+    background: rgba(255, 255, 255, 0.8);
+    box-shadow: 0 0 0 2px rgba(226, 0, 26, 0.1);
 }
 
 .search-bar input::placeholder {
@@ -791,7 +700,7 @@ body::before {
 .search-bar label {
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex: 1;
 }
 
@@ -799,39 +708,40 @@ body::before {
 /* BARRE DE FILTRES                             */
 /* ============================================ */
 .filter-bar {
-    padding: 10px 12px;
-    background: rgba(0, 0, 0, 0.2);
+    padding: 8px 10px;
+    background: rgba(0, 0, 0, 0.02);
     border-bottom: 1px solid var(--glass-border);
     display: flex;
     flex-wrap: wrap;
-    gap: 6px;
+    gap: 4px;
     flex-shrink: 0;
 }
 
 .filter-bar label {
     display: flex;
     align-items: center;
-    gap: 5px;
+    gap: 4px;
     cursor: pointer;
-    padding: 5px 10px;
-    border-radius: 100px;
+    padding: 4px 8px;
+    border-radius: 16px;
     border: 1px solid var(--glass-border);
-    background: rgba(255, 255, 255, 0.03);
+    background: rgba(255, 255, 255, 0.5);
     color: var(--text-secondary);
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 500;
     transition: all 0.15s;
+    touch-action: none;
 }
 
 .filter-bar label:hover {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.7);
     color: var(--text-primary);
 }
 
 .filter-bar label:has(input:checked) {
     background: rgba(226, 0, 26, 0.1);
-    border-color: rgba(226, 0, 26, 0.3);
-    color: #ff4d62;
+    border-color: rgba(226, 0, 26, 0.2);
+    color: var(--accent);
 }
 
 .filter-bar input {
@@ -842,40 +752,41 @@ body::before {
 /* GROUPES DE LIGNES                            */
 /* ============================================ */
 .line-group {
-    margin-top: 8px;
+    margin-top: 6px;
 }
 
 .line-group-header {
-    padding: 8px 16px;
+    padding: 6px 12px;
     font-weight: 700;
     font-size: 11px;
     letter-spacing: 0.05em;
     border-left: 3px solid currentColor;
-    background: rgba(0, 0, 0, 0.2);
+    background: rgba(0, 0, 0, 0.02);
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 .line-items {
     display: flex;
     flex-wrap: wrap;
-    padding: 10px 12px;
-    gap: 8px;
+    padding: 8px 10px;
+    gap: 6px;
 }
 
 .line-item {
-    padding: 6px 10px;
+    padding: 4px 8px;
     cursor: pointer;
-    background: rgba(255, 255, 255, 0.04);
+    background: rgba(255, 255, 255, 0.5);
     border: 1px solid var(--glass-border);
     border-radius: var(--radius-sm);
     transition: all 0.15s;
+    touch-action: none;
 }
 
 .line-item:hover {
     transform: translateY(-1px);
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.7);
     border-color: var(--glass-border-highlight);
 }
 
@@ -885,40 +796,40 @@ body::before {
 .stop-pmr-badge {
     display: inline-flex;
     align-items: center;
-    gap: 3px;
+    gap: 2px;
     background: rgba(77, 255, 136, 0.1);
-    color: #4dff88;
+    color: var(--pmr-color);
     border: 1px solid rgba(77, 255, 136, 0.2);
-    font-size: 10px;
-    padding: 2px 6px;
-    border-radius: 100px;
-    margin-left: 6px;
+    font-size: 9px;
+    padding: 2px 5px;
+    border-radius: 8px;
+    margin-left: 4px;
 }
 
 .stop-lines {
     display: flex;
     flex-wrap: wrap;
-    gap: 4px;
-    margin-top: 6px;
+    gap: 3px;
+    margin-top: 4px;
 }
 
 .stop-lines img {
-    height: 18px !important;
+    height: 16px !important;
     width: auto !important;
-    margin: 0 2px !important;
+    margin: 0 1px !important;
 }
 
 .stop-commune {
-    font-size: 11px;
-    color: rgba(255, 184, 77, 0.8);
-    margin-top: 2px;
+    font-size: 10px;
+    color: var(--warning-color);
+    margin-top: 1px;
 }
 
 .search-highlight {
-    background: rgba(226, 0, 26, 0.3);
-    color: #fff;
-    border-radius: 3px;
-    padding: 0 3px;
+    background: rgba(226, 0, 26, 0.2);
+    color: var(--accent);
+    border-radius: 2px;
+    padding: 0 2px;
     font-weight: 600;
 }
 
@@ -932,7 +843,7 @@ body::before {
 
 /* Marqueur sélectionné (arrêt cliqué) */
 .selected-stop-marker {
-    filter: drop-shadow(0 0 10px var(--accent-glow));
+    filter: drop-shadow(0 0 8px var(--accent-glow));
 }
 
 /* Style des cercles Vélo'v */
@@ -944,15 +855,15 @@ body::before {
 
 /* Style des marqueurs d'arrêts (petits cercles) */
 .stop-map-marker {
-    background: rgba(13, 15, 24, 0.85);
-    border: 1.2px solid rgba(255, 255, 255, 0.25);
+    background: rgba(13, 15, 24, 0.7);
+    border: 1.2px solid rgba(255, 255, 255, 0.3);
     border-radius: 50%;
     width: 10px;
     height: 10px;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     transition: all 0.2s ease;
 }
 
@@ -967,16 +878,16 @@ body::before {
 /* CONTENU DES CRÉDITS                          */
 /* ============================================ */
 .credits-content {
-    padding: 20px;
+    padding: 16px;
     line-height: 1.8;
     color: var(--text-secondary);
-    font-size: 13px;
+    font-size: 12px;
 }
 
 .credits-content a {
     color: var(--accent);
     text-decoration: none;
-    border-bottom: 1px solid rgba(226, 0, 26, 0.3);
+    border-bottom: 1px solid rgba(226, 0, 26, 0.2);
     transition: all 0.2s;
 }
 
@@ -986,17 +897,17 @@ body::before {
 }
 
 .credits-section {
-    margin-bottom: 24px;
+    margin-bottom: 16px;
 }
 
 .credits-section h3 {
     color: var(--text-primary);
-    margin-bottom: 10px;
-    font-size: 14px;
+    margin-bottom: 8px;
+    font-size: 13px;
     font-weight: 600;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
 }
 
 /* ============================================ */
@@ -1008,22 +919,22 @@ body::before {
     left: 50%;
     transform: translate(-50%, -50%);
     background: var(--glass-bg-heavy);
-    padding: 20px;
+    padding: 16px;
     border-radius: var(--radius-md);
     z-index: 9999;
     display: none;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 10px;
     backdrop-filter: var(--glass-blur);
     border: 1px solid var(--glass-border-highlight);
-    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .spinner {
-    width: 40px;
-    height: 40px;
-    border: 3px solid rgba(255, 255, 255, 0.1);
+    width: 32px;
+    height: 32px;
+    border: 3px solid rgba(0, 0, 0, 0.1);
     border-top-color: var(--accent);
     border-radius: 50%;
     animation: spin 1s linear infinite;
@@ -1040,12 +951,12 @@ body::before {
 /* ============================================ */
 .notification-container {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 16px;
+    right: 16px;
     z-index: 10000;
     display: flex;
     flex-direction: column;
-    gap: 10px;
+    gap: 8px;
     pointer-events: none;
 }
 
@@ -1053,14 +964,15 @@ body::before {
     background: var(--glass-bg-heavy);
     border: 1px solid var(--glass-border-highlight);
     border-radius: var(--radius-sm);
-    padding: 12px 20px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    padding: 10px 16px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     pointer-events: all;
     animation: slideIn 0.3s ease-out;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 8px;
     font-size: 12px;
+    touch-action: none;
 }
 
 .notification.info {
