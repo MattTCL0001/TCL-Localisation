@@ -58,6 +58,7 @@
         <!-- Carte (prend tout l'espace disponible) -->
         <div class="map-container">
             <div id="map"></div>
+            <!-- Bannières de filtre (au-dessus de la carte) -->
             <div id="bus-filter-banner" class="filter-banner">
                 <span id="bus-filter-label">Véhicules filtrés</span>
                 <button class="filter-clear-btn" onclick="clearAllFilters()">
@@ -72,7 +73,7 @@
             </div>
         </div>
 
-        <!-- Panneau latéral (en bas, glissable vers le haut) -->
+        <!-- Panneau latéral (UNIQUE, en bas, glissable) -->
         <div id="info-panel">
             <!-- Titre du panneau (pour glisser) -->
             <div class="panel-header" id="panel-drag-handle">
