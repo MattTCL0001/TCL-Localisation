@@ -12,9 +12,6 @@
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
-    <!-- Tabler Icons -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
-
     <!-- Styles personnalisés -->
     <link rel="stylesheet" href="css/styles.css">
 
@@ -26,7 +23,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- En-tête -->
+        <!-- En-tête fixe en haut -->
         <header class="app-header">
             <div class="logo-badge">
                 <img src="assets/logo.svg" onerror="this.src='assets/SVG_Icons/lignes.svg'; this.classList.add('svg-ic');">
@@ -34,52 +31,48 @@
             </div>
             <nav class="header-tabs" role="tablist">
                 <button class="header-tab active" data-tab="traffic" onclick="switchToTab('traffic')">
-                    <img src="assets/SVG_Icons/trafic.svg" class="svg-ic"> <span>Trafic</span>
+                    <img src="assets/SVG_Icons/trafic.svg" class="svg-ic">
                 </button>
                 <button class="header-tab" data-tab="accessibility" onclick="switchToTab('accessibility')">
-                    <img src="assets/SVG_Icons/PMR.svg" class="svg-ic"> <span>PMR</span>
+                    <img src="assets/SVG_Icons/PMR.svg" class="svg-ic">
                 </button>
                 <button class="header-tab" data-tab="stops" onclick="switchToTab('stops')">
-                    <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic"> <span>Arrêts</span>
+                    <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic">
                 </button>
                 <button class="header-tab" data-tab="lines" onclick="switchToTab('lines')">
-                    <img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> <span>Lignes</span>
+                    <img src="assets/SVG_Icons/lignes.svg" class="svg-ic">
                 </button>
                 <button class="header-tab" data-tab="velov" onclick="switchToTab('velov')">
-                    <img src="assets/SVG_Icons/velo.svg" class="svg-ic"> <span>Vélo'v</span>
+                    <img src="assets/SVG_Icons/velo.svg" class="svg-ic">
                 </button>
                 <button class="header-tab" data-tab="credits" onclick="switchToTab('credits')">
-                    <img src="assets/SVG_Icons/id.svg" class="svg-ic"> <span>Infos</span>
+                    <img src="assets/SVG_Icons/id.svg" class="svg-ic">
                 </button>
             </nav>
         </header>
 
-        <!-- Carte -->
+        <!-- Contrôles des couches (en haut à droite) -->
+        <div class="layer-control">
+            <div class="layer-toggle active" data-layer="bus" onclick="toggleLayer('bus')">
+                <div class="layer-toggle-icon"><img src="assets/SVG_Icons/bus.svg" class="svg-ic"></div>
+            </div>
+            <div class="layer-toggle active" data-layer="stops" onclick="toggleLayer('stops')">
+                <div class="layer-toggle-icon"><img src="assets/SVG_Icons/arrêt.svg" class="svg-ic"></div>
+            </div>
+            <div class="layer-toggle active" data-layer="velov" onclick="toggleLayer('velov')">
+                <div class="layer-toggle-icon"><img src="assets/SVG_Icons/velo.svg" class="svg-ic"></div>
+            </div>
+            <div class="layer-toggle active" data-layer="parking" onclick="toggleLayer('parking')">
+                <div class="layer-toggle-icon">🅿️</div>
+            </div>
+            <div class="layer-toggle" onclick="toggleAllLayers()" title="Masquer/Afficher tout">
+                <div class="layer-toggle-icon">🌍</div>
+            </div>
+        </div>
+
+        <!-- Carte (prend tout l'espace disponible) -->
         <div class="map-container">
             <div id="map"></div>
-            <div class="layer-control">
-                <div class="layer-toggle active" data-layer="bus" onclick="toggleLayer('bus')">
-                    <div class="layer-toggle-icon"><img src="assets/SVG_Icons/bus.svg" class="svg-ic"></div>
-                    <span>Bus</span>
-                </div>
-                <div class="layer-toggle active" data-layer="stops" onclick="toggleLayer('stops')">
-                    <div class="layer-toggle-icon"><img src="assets/SVG_Icons/arrêt.svg" class="svg-ic"></div>
-                    <span>Arrêts</span>
-                </div>
-                <div class="layer-toggle active" data-layer="velov" onclick="toggleLayer('velov')">
-                    <div class="layer-toggle-icon"><img src="assets/SVG_Icons/velo.svg" class="svg-ic"></div>
-                    <span>Vélo'v</span>
-                </div>
-                <div class="layer-toggle active" data-layer="parking" onclick="toggleLayer('parking')">
-                    <div class="layer-toggle-icon">🅿️</div>
-                    <span>Parkings</span>
-                </div>
-                <!-- Nouveau bouton pour masquer/afficher toutes les couches -->
-                <div class="layer-toggle" onclick="toggleAllLayers()" title="Masquer/Afficher tout">
-                    <div class="layer-toggle-icon">🌍</div>
-                    <span>Tout</span>
-                </div>
-            </div>
             <div id="bus-filter-banner" class="filter-banner">
                 <span id="bus-filter-label">Véhicules filtrés</span>
                 <button class="filter-clear-btn" onclick="clearAllFilters()">
@@ -93,134 +86,139 @@
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- Panneau latéral -->
-    <!-- Panneau latéral (modifié) -->
-<div id="info-panel">
-    <!-- En-tête avec onglets et bouton de fermeture -->
-    <div class="panel-header">
-        <nav class="header-tabs" role="tablist">
-            <button class="header-tab active" data-tab="traffic" onclick="switchToTab('traffic')">
-                <img src="assets/SVG_Icons/trafic.svg" class="svg-ic">
-                <span>Trafic</span>
-            </button>
-            <button class="header-tab" data-tab="accessibility" onclick="switchToTab('accessibility')">
-                <img src="assets/SVG_Icons/PMR.svg" class="svg-ic">
-                <span>PMR</span>
-            </button>
-            <button class="header-tab" data-tab="stops" onclick="switchToTab('stops')">
-                <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic">
-                <span>Arrêts</span>
-            </button>
-            <button class="header-tab" data-tab="lines" onclick="switchToTab('lines')">
-                <img src="assets/SVG_Icons/lignes.svg" class="svg-ic">
-                <span>Lignes</span>
-            </button>
-            <button class="header-tab" data-tab="velov" onclick="switchToTab('velov')">
-                <img src="assets/SVG_Icons/velo.svg" class="svg-ic">
-                <span>Vélo'v</span>
-            </button>
-            <button class="header-tab" data-tab="credits" onclick="switchToTab('credits')">
-                <img src="assets/SVG_Icons/id.svg" class="svg-ic">
-                <span>Infos</span>
-            </button>
-        </nav>
-        <div class="panel-toggle" onclick="togglePanel()">
-            <span>❯</span>
-        </div>
-    </div>
-
-    <!-- Contenu des onglets -->
-    <div class="tab-content">
-        <!-- Onglet Trafic -->
-        <div id="traffic-pane" class="tab-pane active">
-            <div class="tab-header">Perturbations en cours</div>
-            <div id="traffic-list" class="info-list">
-                <div class="info-empty">
-                    <img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> Chargement...
+        <!-- Panneau latéral (en bas, glissable) -->
+        <div id="info-panel">
+            <!-- Titre du panneau (glissable) -->
+            <div class="panel-header">
+                <div class="panel-title">
+                    <span id="panel-title-text">Informations</span>
+                </div>
+                <div class="panel-toggle" onclick="togglePanel()">
+                    <span>❯</span>
                 </div>
             </div>
-        </div>
-            <!-- Onglet Accessibilité -->
-            <div id="accessibility-pane" class="tab-pane">
-                <div class="tab-header">Alertes accessibilité</div>
-                <div id="accessibility-list" class="info-list">
-                    <div class="info-empty">
-                        <img src="assets/SVG_Icons/PMR.svg" class="svg-ic"> Chargement...
+
+            <!-- Onglets du panneau -->
+            <div class="panel-tabs">
+                <button class="panel-tab active" data-tab="traffic" onclick="switchPanelTab('traffic')">
+                    <img src="assets/SVG_Icons/trafic.svg" class="svg-ic">
+                    <span>Trafic</span>
+                </button>
+                <button class="panel-tab" data-tab="accessibility" onclick="switchPanelTab('accessibility')">
+                    <img src="assets/SVG_Icons/PMR.svg" class="svg-ic">
+                    <span>PMR</span>
+                </button>
+                <button class="panel-tab" data-tab="stops" onclick="switchPanelTab('stops')">
+                    <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic">
+                    <span>Arrêts</span>
+                </button>
+                <button class="panel-tab" data-tab="lines" onclick="switchPanelTab('lines')">
+                    <img src="assets/SVG_Icons/lignes.svg" class="svg-ic">
+                    <span>Lignes</span>
+                </button>
+                <button class="panel-tab" data-tab="velov" onclick="switchPanelTab('velov')">
+                    <img src="assets/SVG_Icons/velo.svg" class="svg-ic">
+                    <span>Vélo'v</span>
+                </button>
+                <button class="panel-tab" data-tab="credits" onclick="switchPanelTab('credits')">
+                    <img src="assets/SVG_Icons/id.svg" class="svg-ic">
+                    <span>Infos</span>
+                </button>
+            </div>
+
+            <!-- Contenu des onglets du panneau -->
+            <div class="panel-content">
+                <!-- Onglet Trafic -->
+                <div id="panel-traffic" class="panel-tab-pane active">
+                    <div class="tab-header">Perturbations en cours</div>
+                    <div id="traffic-list" class="info-list">
+                        <div class="info-empty">
+                            <img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> Chargement...
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Onglet Arrêts -->
-            <div id="stops-pane" class="tab-pane">
-                <div class="search-bar">
-                    <label>
-                        <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
-                        <input type="text" id="stop-search" placeholder="Nom d'arrêt, commune..." oninput="filterStops()">
-                    </label>
-                </div>
-                <div class="tab-header">
-                    <span>Tous les arrêts</span>
-                    <span id="search-stats" style="font-size:10px;color:var(--text-muted);">0/0</span>
-                </div>
-                <div id="stops-list" class="info-list">
-                    <div class="info-empty">Chargement...</div>
-                </div>
-            </div>
-
-            <!-- Onglet Lignes -->
-            <div id="lines-pane" class="tab-pane">
-                <div class="filter-bar">
-                    <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="assets/SVG_Icons/metro.svg" class="svg-ic"> Métro</label>
-                    <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="assets/SVG_Icons/tramway.svg" class="svg-ic"> Tram</label>
-                    <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="assets/SVG_Icons/trolleybus.svg" class="svg-ic"> TramBus</label>
-                    <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="assets/SVG_Icons/funicular.svg" class="svg-ic"> Funiculaire</label>
-                    <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navigone.svg" class="svg-ic"> Navigône</label>
-                    <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="assets/SVG_Icons/chrono.svg" class="svg-ic"> Chrono</label>
-                    <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="assets/SVG_Icons/bus.svg" class="svg-ic"> Bus</label>
-                    <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navette.svg" class="svg-ic"> Navette</label>
-                    <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="assets/SVG_Icons/pleine_lune.svg" class="svg-ic"> Pleine Lune</label>
-                    <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="assets/SVG_Icons/JD.svg" class="svg-ic"> Junior Direct</label>
-                </div>
-                <div class="tab-header">Toutes les lignes</div>
-                <div id="lines-list" class="info-list">
-                    <div class="info-empty">Chargement...</div>
-                </div>
-            </div>
-
-            <!-- Onglet Vélo'v -->
-            <div id="velov-pane" class="tab-pane">
-                <div class="search-bar">
-                    <label>
-                        <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
-                        <input type="text" id="velov-search" placeholder="Adresse, nom ou numéro..." oninput="filterVelovStations()">
-                    </label>
-                </div>
-                <div class="tab-header">
-                    <span>Stations Vélo'v</span>
-                    <span id="velov-stats" style="font-size:10px;color:var(--text-muted);">0/0</span>
-                </div>
-                <div id="velov-list" class="info-list">
-                    <div class="info-empty">Chargement...</div>
-                </div>
-            </div>
-
-            <!-- Onglet Infos -->
-            <div id="credits-pane" class="tab-pane">
-                <div class="tab-header">À propos</div>
-                <div class="credits-content">
-                    <div class="credits-section">
-                        <h3><img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> TCL Localisation</h3>
-                        <p>Application de localisation en temps réel des transports en commun lyonnais.</p>
+                <!-- Onglet Accessibilité -->
+                <div id="panel-accessibility" class="panel-tab-pane">
+                    <div class="tab-header">Alertes accessibilité</div>
+                    <div id="accessibility-list" class="info-list">
+                        <div class="info-empty">
+                            <img src="assets/SVG_Icons/PMR.svg" class="svg-ic"> Chargement...
+                        </div>
                     </div>
-                    <div class="credits-section">
-                        <h3><i class="ti ti-database"></i> Sources de données</h3>
-                        <p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a> et API TCL.</p>
+                </div>
+
+                <!-- Onglet Arrêts -->
+                <div id="panel-stops" class="panel-tab-pane">
+                    <div class="search-bar">
+                        <label>
+                            <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
+                            <input type="text" id="stop-search" placeholder="Nom d'arrêt, commune..." oninput="filterStops()">
+                        </label>
                     </div>
-                    <div class="credits-section">
-                        <h3><i class="ti ti-code"></i> Développement</h3>
-                        <p>Matt TCL, NDR, S1ba<br><span style="font-size:11px;opacity:0.7;">Version BETA – v1.0</span></p>
+                    <div class="tab-header">
+                        <span>Tous les arrêts</span>
+                        <span id="search-stats" style="font-size:10px;color:var(--text-muted);">0/0</span>
+                    </div>
+                    <div id="stops-list" class="info-list">
+                        <div class="info-empty">Chargement...</div>
+                    </div>
+                </div>
+
+                <!-- Onglet Lignes -->
+                <div id="panel-lines" class="panel-tab-pane">
+                    <div class="filter-bar">
+                        <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="assets/SVG_Icons/metro.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-tramway" checked onchange="filterLines()"> <img src="assets/SVG_Icons/tramway.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-trolleybus" checked onchange="filterLines()"> <img src="assets/SVG_Icons/trolleybus.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="assets/SVG_Icons/funicular.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navigone.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="assets/SVG_Icons/chrono.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="assets/SVG_Icons/bus.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navette.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="assets/SVG_Icons/pleine_lune.svg" class="svg-ic"></label>
+                        <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="assets/SVG_Icons/JD.svg" class="svg-ic"></label>
+                    </div>
+                    <div class="tab-header">Toutes les lignes</div>
+                    <div id="lines-list" class="info-list">
+                        <div class="info-empty">Chargement...</div>
+                    </div>
+                </div>
+
+                <!-- Onglet Vélo'v -->
+                <div id="panel-velov" class="panel-tab-pane">
+                    <div class="search-bar">
+                        <label>
+                            <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
+                            <input type="text" id="velov-search" placeholder="Adresse, nom ou numéro..." oninput="filterVelovStations()">
+                        </label>
+                    </div>
+                    <div class="tab-header">
+                        <span>Stations Vélo'v</span>
+                        <span id="velov-stats" style="font-size:10px;color:var(--text-muted);">0/0</span>
+                    </div>
+                    <div id="velov-list" class="info-list">
+                        <div class="info-empty">Chargement...</div>
+                    </div>
+                </div>
+
+                <!-- Onglet Infos -->
+                <div id="panel-credits" class="panel-tab-pane">
+                    <div class="tab-header">À propos</div>
+                    <div class="credits-content">
+                        <div class="credits-section">
+                            <h3><img src="assets/SVG_Icons/lignes.svg" class="svg-ic"> TCL Localisation</h3>
+                            <p>Application de localisation en temps réel des transports en commun lyonnais.</p>
+                        </div>
+                        <div class="credits-section">
+                            <h3><i class="ti ti-database"></i> Sources de données</h3>
+                            <p>Données fournies par <a href="https://data.grandlyon.com" target="_blank">data.grandlyon.com</a> et API TCL.</p>
+                        </div>
+                        <div class="credits-section">
+                            <h3><i class="ti ti-code"></i> Développement</h3>
+                            <p>Matt TCL, NDR, S1ba<br><span style="font-size:11px;opacity:0.7;">Version BETA – v1.0</span></p>
+                        </div>
                     </div>
                 </div>
             </div>
