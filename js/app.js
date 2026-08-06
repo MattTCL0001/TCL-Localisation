@@ -267,3 +267,99 @@ if (window.screen?.orientation) {
 document.querySelectorAll('.header-tab').forEach(b => {
     b.addEventListener('click', () => switchToTab(b.dataset.tab));
 });
+// ============================================
+// GESTION DU GLISSER-DÉPOSER POUR LE TIROIR
+// ============================================
+let isPanelDragging = false;
+let panelStartY = 0;
+let panelStartHeight = 0;
+let initialPanelHeight = 0;
+
+// Initialise la hauteur du panneau
+function initPanelHeight() {
+    const panel = document.getElementById('info-panel');
+    if (panel) {
+        initialPanelHeight = window.innerHeight * 0.6; // 60% de la hauteur par défaut
+        panel.style.height = `${initialPanelHeight}px`;
+    }
+}
+
+// Écouteurs pour le glisser-déposer du panneau
+document.getElementById('info-panel')?.addEventListener('touchstart', (e) => {
+    isPanelDragging = true;
+    panelStartY = e.touches[0].clientY;
+    panelStartHeight = parseInt(document.getElementById('info-panel').style.height || initialPanelHeight);
+    e.preventDefault();
+}, { passive: false });
+
+document.getElementById('info-panel')?.addEventListener('touchmove', (e) => {
+    if (!isPanelDragging) return;
+    const deltaY = e.touches[0].clientY - panelStartY;
+    const newHeight = panelStartHeight - deltaY;
+
+    // Limite la hauteur entre 100px et 90% de la hauteur de l'écran
+    const minHeight = 100;
+    const maxHeight = window.innerHeight * 0.9;
+    const clampedHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
+
+    document.getElementById('info-panel').style.height = `${clampedHeight}px`;
+    e.preventDefault();
+}, { passive: false });
+
+document.getElementById('info-panel')?.addEventListener('touchend', () => {
+    isPanelDragging = false;
+    // Met à jour la taille de la carte après le glisser
+    setTimeout(() => map.invalidateSize(), 100);
+});
+
+// ============================================
+// GESTION DU GLISSER ENTRE LES ONGLETS
+// ============================================
+let isTabDragging = false;
+let tabStartX = 0;
+let currentTabIndex = 0;
+
+// Écouteurs pour le glisser entre onglets
+document.querySelector('.header-tabs')?.addEventListener('touchstart', (e) => {
+    isTabDragging = true;
+    tabStartX = e.touches[0].clientX;
+    const activeTab = document.querySelector('.header-tab.active');
+    currentTabIndex = Array.from(document.querySelectorAll('.header-tab')).indexOf(activeTab);
+    e.preventDefault();
+}, { passive: false });
+
+document.querySelector('.header-tabs')?.addEventListener('touchmove', (e) => {
+    if (!isTabDragging) return;
+    const deltaX = e.touches[0].clientX - tabStartX;
+
+    // Seuil de 50px pour changer d'onglet
+    if (Math.abs(deltaX) > 50) {
+        const tabs = Array.from(document.querySelectorAll('.header-tab'));
+        if (deltaX > 50 && currentTabIndex > 0) {
+            // Glisser vers la droite → onglet précédent
+            switchToTab(tabs[currentTabIndex - 1].dataset.tab);
+            isTabDragging = false;
+        } else if (deltaX < -50 && currentTabIndex < tabs.length - 1) {
+            // Glisser vers la gauche → onglet suivant
+            switchToTab(tabs[currentTabIndex + 1].dataset.tab);
+            isTabDragging = false;
+        }
+    }
+    e.preventDefault();
+}, { passive: false });
+
+document.querySelector('.header-tabs')?.addEventListener('touchend', () => {
+    isTabDragging = false;
+});
+
+// ============================================
+// INITIALISATION
+// ============================================
+// Appelle initPanelHeight au chargement
+window.addEventListener('load', initPanelHeight);
+window.addEventListener('resize', initPanelHeight);
+
+// Met à jour les icônes quand on zoome/dézoome
+map.on('zoomend', () => {
+    updateIconSizes();
+});
