@@ -1138,3 +1138,160 @@ body, html {
     visibility: hidden;
     transition: opacity 0.3s, visibility 0.3s;
 }
+/* ============================================ */
+/* PANNEAU LATÉRAL (EN BAS, AVEC ONGLETS EN HAUT) */
+/* ============================================ */
+#info-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: auto;
+    height: 60vh; /* Hauteur par défaut */
+    max-height: 90vh;
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    pointer-events: none;
+    transition: height 0.2s ease-out, bottom 0.2s ease-out;
+    touch-action: none;
+    border-radius: 16px 16px 0 0;
+    overflow: hidden;
+}
+
+#info-panel.collapsed {
+    height: auto !important;
+    bottom: -100% !important; /* Cache complètement le panneau */
+    transition: bottom 0.3s ease-out;
+}
+
+#info-panel > * {
+    pointer-events: all;
+}
+
+/* En-tête du panneau (contenant les onglets) */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--glass-bg-heavy);
+    border-bottom: 1px solid var(--glass-border-highlight);
+    cursor: grab; /* Indique que l'élément est glissable */
+    user-select: none;
+    touch-action: none;
+}
+
+.panel-header:active {
+    cursor: grabbing;
+}
+
+/* Onglets dans l'en-tête du panneau */
+.header-tabs {
+    display: flex;
+    gap: 2px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    flex: 1;
+    margin-right: 10px; /* Espace pour le bouton de fermeture */
+}
+
+.header-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.header-tab {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 8px;
+    border-radius: 8px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    touch-action: none;
+    user-select: none;
+    min-width: 32px; /* Largeur minimale pour l'icône seule */
+    justify-content: center;
+}
+
+.header-tab:hover {
+    background: rgba(0, 0, 0, 0.05);
+    color: var(--text-primary);
+}
+
+.header-tab.active {
+    background: rgba(226, 0, 26, 0.1);
+    border-color: rgba(226, 0, 26, 0.2);
+    color: var(--accent);
+}
+
+.header-tab img.svg-ic {
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+}
+
+/* Bouton pour fermer/ouvrir le panneau */
+.panel-toggle {
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--glass-border);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s;
+    touch-action: none;
+    user-select: none;
+    flex-shrink: 0;
+}
+
+.panel-toggle:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: var(--text-primary);
+}
+
+.panel-toggle span {
+    font-size: 18px;
+    transform: rotate(90deg);
+    transition: transform 0.2s;
+}
+
+#info-panel.collapsed .panel-toggle span {
+    transform: rotate(-90deg);
+}
+
+/* Contenu du panneau (sous les onglets) */
+.tab-content {
+    flex: 1;
+    overflow-y: auto;
+    background: var(--glass-bg-heavy);
+    border: 1px solid var(--glass-border-highlight);
+    border-bottom: none;
+    border-radius: 0 0 16px 16px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* Adaptation mobile */
+@media (max-width: 768px) {
+    #info-panel {
+        border-radius: 16px 16px 0 0;
+    }
+
+    .header-tab span {
+        display: none; /* Masque les textes par défaut sur mobile */
+    }
+}
