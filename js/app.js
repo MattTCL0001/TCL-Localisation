@@ -36,19 +36,24 @@ const agenceLayer = L.layerGroup().addTo(map);
 const stopMapLayer = L.layerGroup().addTo(map);
 
 // ============================================
-// GESTION DES COUCHES ET DE L'INTERFACE
+// VARIABLES GLOBALES (ÉTAT DE L'INTERFACE)
 // ============================================
-
-// État du panneau latéral (ouvert/fermé)
+// État du panneau latéral (glisser-déposer)
 let isPanelDragging = false;
 let panelStartY = 0;
 let panelStartHeight = 0;
+let initialPanelHeight = 0;
 
-// État des onglets
+// État des onglets (glisser entre onglets)
+let isTabDragging = false;
+let tabStartX = 0;
+let currentTabIndex = 0;
+
+// État des onglets (actif)
 let currentTab = 'traffic';
 
 // ============================================
-// FONCTIONS DE BASE
+// FONCTIONS DE BASE (GESTION DES COUCHES)
 // ============================================
 
 /**
@@ -120,7 +125,7 @@ function toggleAllLayers() {
 }
 
 /**
- * Bascule l'affichage du panneau latéral (avec animation glissée).
+ * Bascule l'affichage du panneau latéral.
  */
 function togglePanel() {
     const panel = document.getElementById('info-panel');
@@ -128,34 +133,51 @@ function togglePanel() {
     setTimeout(() => map.invalidateSize(), 300);
 }
 
-// Gestion du glisser-déposer pour le panneau latéral
-document.getElementById('info-panel').addEventListener('touchstart', (e) => {
+// ============================================
+// GESTION DU GLISSER-DÉPOSER POUR LE TIROIR
+// ============================================
+
+/**
+ * Initialise la hauteur du panneau.
+ */
+function initPanelHeight() {
+    const panel = document.getElementById('info-panel');
+    if (panel) {
+        initialPanelHeight = window.innerHeight * 0.6; // 60% de la hauteur par défaut
+        panel.style.height = `${initialPanelHeight}px`;
+    }
+}
+
+// Écouteurs pour le glisser-déposer du panneau
+document.getElementById('info-panel')?.addEventListener('touchstart', (e) => {
     isPanelDragging = true;
     panelStartY = e.touches[0].clientY;
-    panelStartHeight = document.getElementById('info-panel').offsetHeight;
+    panelStartHeight = parseInt(document.getElementById('info-panel').style.height || initialPanelHeight);
     e.preventDefault();
 }, { passive: false });
 
-document.getElementById('info-panel').addEventListener('touchmove', (e) => {
+document.getElementById('info-panel')?.addEventListener('touchmove', (e) => {
     if (!isPanelDragging) return;
     const deltaY = e.touches[0].clientY - panelStartY;
     const newHeight = panelStartHeight - deltaY;
-    document.getElementById('info-panel').style.height = `${Math.max(100, newHeight)}px`;
+
+    // Limite la hauteur entre 100px et 90% de la hauteur de l'écran
+    const minHeight = 100;
+    const maxHeight = window.innerHeight * 0.9;
+    const clampedHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
+
+    document.getElementById('info-panel').style.height = `${clampedHeight}px`;
     e.preventDefault();
 }, { passive: false });
 
-document.getElementById('info-panel').addEventListener('touchend', () => {
+document.getElementById('info-panel')?.addEventListener('touchend', () => {
     isPanelDragging = false;
+    setTimeout(() => map.invalidateSize(), 100);
 });
 
 // ============================================
 // GESTION DES ONGLETS (GLISSER ENTRE LES MENUS)
 // ============================================
-
-// État du glissement entre onglets
-let isTabDragging = false;
-let tabStartX = 0;
-let currentTabIndex = 0;
 
 /**
  * Change d'onglet dans le panneau latéral.
@@ -171,12 +193,12 @@ function switchToTab(name) {
     document.getElementById(`${name}-pane`).classList.add('active');
     if (name === 'velov' && !velovLoaded) {
         velovLoaded = true;
-        loadVelovList();
+        updateVelov(); // Utilise updateVelov au lieu de loadVelovList
     }
 }
 
-// Gestion du glisser entre onglets
-document.querySelector('.header-tabs').addEventListener('touchstart', (e) => {
+// Écouteurs pour le glisser entre onglets
+document.querySelector('.header-tabs')?.addEventListener('touchstart', (e) => {
     isTabDragging = true;
     tabStartX = e.touches[0].clientX;
     const activeTab = document.querySelector('.header-tab.active');
@@ -184,9 +206,11 @@ document.querySelector('.header-tabs').addEventListener('touchstart', (e) => {
     e.preventDefault();
 }, { passive: false });
 
-document.querySelector('.header-tabs').addEventListener('touchmove', (e) => {
+document.querySelector('.header-tabs')?.addEventListener('touchmove', (e) => {
     if (!isTabDragging) return;
     const deltaX = e.touches[0].clientX - tabStartX;
+
+    // Seuil de 50px pour changer d'onglet
     if (Math.abs(deltaX) > 50) {
         const tabs = Array.from(document.querySelectorAll('.header-tab'));
         if (deltaX > 50 && currentTabIndex > 0) {
@@ -202,7 +226,7 @@ document.querySelector('.header-tabs').addEventListener('touchmove', (e) => {
     e.preventDefault();
 }, { passive: false });
 
-document.querySelector('.header-tabs').addEventListener('touchend', () => {
+document.querySelector('.header-tabs')?.addEventListener('touchend', () => {
     isTabDragging = false;
 });
 
@@ -249,7 +273,7 @@ map.on('moveend zoomend', () => {
         updateVisibleParkings();
         updateVisibleParkAndRideLots();
         renderVisibleStops();
-        updateBusIcons(); // Met à jour la taille des icônes de bus
+        updateBusIcons();
     }, 200);
 }, { passive: true });
 
@@ -267,95 +291,8 @@ if (window.screen?.orientation) {
 document.querySelectorAll('.header-tab').forEach(b => {
     b.addEventListener('click', () => switchToTab(b.dataset.tab));
 });
-// ============================================
-// GESTION DU GLISSER-DÉPOSER POUR LE TIROIR
-// ============================================
-let isPanelDragging = false;
-let panelStartY = 0;
-let panelStartHeight = 0;
-let initialPanelHeight = 0;
 
-// Initialise la hauteur du panneau
-function initPanelHeight() {
-    const panel = document.getElementById('info-panel');
-    if (panel) {
-        initialPanelHeight = window.innerHeight * 0.6; // 60% de la hauteur par défaut
-        panel.style.height = `${initialPanelHeight}px`;
-    }
-}
-
-// Écouteurs pour le glisser-déposer du panneau
-document.getElementById('info-panel')?.addEventListener('touchstart', (e) => {
-    isPanelDragging = true;
-    panelStartY = e.touches[0].clientY;
-    panelStartHeight = parseInt(document.getElementById('info-panel').style.height || initialPanelHeight);
-    e.preventDefault();
-}, { passive: false });
-
-document.getElementById('info-panel')?.addEventListener('touchmove', (e) => {
-    if (!isPanelDragging) return;
-    const deltaY = e.touches[0].clientY - panelStartY;
-    const newHeight = panelStartHeight - deltaY;
-
-    // Limite la hauteur entre 100px et 90% de la hauteur de l'écran
-    const minHeight = 100;
-    const maxHeight = window.innerHeight * 0.9;
-    const clampedHeight = Math.max(minHeight, Math.min(newHeight, maxHeight));
-
-    document.getElementById('info-panel').style.height = `${clampedHeight}px`;
-    e.preventDefault();
-}, { passive: false });
-
-document.getElementById('info-panel')?.addEventListener('touchend', () => {
-    isPanelDragging = false;
-    // Met à jour la taille de la carte après le glisser
-    setTimeout(() => map.invalidateSize(), 100);
-});
-
-// ============================================
-// GESTION DU GLISSER ENTRE LES ONGLETS
-// ============================================
-let isTabDragging = false;
-let tabStartX = 0;
-let currentTabIndex = 0;
-
-// Écouteurs pour le glisser entre onglets
-document.querySelector('.header-tabs')?.addEventListener('touchstart', (e) => {
-    isTabDragging = true;
-    tabStartX = e.touches[0].clientX;
-    const activeTab = document.querySelector('.header-tab.active');
-    currentTabIndex = Array.from(document.querySelectorAll('.header-tab')).indexOf(activeTab);
-    e.preventDefault();
-}, { passive: false });
-
-document.querySelector('.header-tabs')?.addEventListener('touchmove', (e) => {
-    if (!isTabDragging) return;
-    const deltaX = e.touches[0].clientX - tabStartX;
-
-    // Seuil de 50px pour changer d'onglet
-    if (Math.abs(deltaX) > 50) {
-        const tabs = Array.from(document.querySelectorAll('.header-tab'));
-        if (deltaX > 50 && currentTabIndex > 0) {
-            // Glisser vers la droite → onglet précédent
-            switchToTab(tabs[currentTabIndex - 1].dataset.tab);
-            isTabDragging = false;
-        } else if (deltaX < -50 && currentTabIndex < tabs.length - 1) {
-            // Glisser vers la gauche → onglet suivant
-            switchToTab(tabs[currentTabIndex + 1].dataset.tab);
-            isTabDragging = false;
-        }
-    }
-    e.preventDefault();
-}, { passive: false });
-
-document.querySelector('.header-tabs')?.addEventListener('touchend', () => {
-    isTabDragging = false;
-});
-
-// ============================================
-// INITIALISATION
-// ============================================
-// Appelle initPanelHeight au chargement
+// Initialiser la hauteur du panneau au chargement
 window.addEventListener('load', initPanelHeight);
 window.addEventListener('resize', initPanelHeight);
 
