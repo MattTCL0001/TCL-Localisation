@@ -1,11 +1,4 @@
 // ============================================
-// CONSTANTES GLOBALES (CARTE)
-// ============================================
-const API_BASE_URL = window.location.hostname.includes('hf.space')
-    ? ''
-    : 'https://matttcl-tcl-localisation.hf.space/';
-
-// ============================================
 // INITIALISATION DE LA CARTE
 // ============================================
 const map = L.map('map', {
