@@ -7,11 +7,11 @@ const map = L.map('map', {
     renderer: L.canvas()
 }).setView([45.757, 4.832], 13);
 
-// Ajouter le fond de carte (OpenStreetMap - version claire)
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+// Ajouter le fond de carte (sombre mais lisible)
+L.tileLayer('https://{s}.tile.openstreetmap.fr/osmfr/{z}/{x}/{y}.png', {
     subdomains: 'abc',
     maxZoom: 20,
-    attribution: '© OpenStreetMap contributors'
+    attribution: '© OpenStreetMap France | © <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 }).addTo(map);
 
 // Créer les panes personnalisés pour le z-index
@@ -38,19 +38,13 @@ const stopMapLayer = L.layerGroup().addTo(map);
 // ============================================
 // VARIABLES GLOBALES (ÉTAT DE L'INTERFACE)
 // ============================================
-// État du panneau latéral (glisser-déposer)
-let isPanelDragging = false;
-let panelStartY = 0;
-let panelStartHeight = 0;
-let initialPanelHeight = 0;
+// État du panneau latéral (glisser pour monter/descendre)
+let isDraggingPanel = false;
+let dragStartY = 0;
+let panelStartBottom = 0;
 
-// État des onglets (glisser entre onglets)
-let isTabDragging = false;
-let tabStartX = 0;
-let currentTabIndex = 0;
-
-// État des onglets (actif)
-let currentTab = 'traffic';
+// État des onglets du panneau
+let currentPanelTab = 'traffic';
 
 // ============================================
 // FONCTIONS DE BASE (GESTION DES COUCHES)
@@ -129,138 +123,134 @@ function toggleAllLayers() {
  */
 function togglePanel() {
     const panel = document.getElementById('info-panel');
-    panel.classList.toggle('collapsed');
+    panel.classList.toggle('visible');
     setTimeout(() => map.invalidateSize(), 300);
 }
 
 // ============================================
-// GESTION DU GLISSER-DÉPOSER POUR LE TIROIR (PAR LE TITRE)
+// GESTION DU GLISSER-DÉPOSER POUR LE PANNEAU
 // ============================================
-let isDraggingPanel = false;
-let dragStartY = 0;
-let panelStartTop = 0;
-let panelHeight = 0;
 
 /**
- * Initialise le glisser-déposer du panneau par son titre.
+ * Initialise le glisser-déposer du panneau.
  */
 function initPanelDrag() {
     const panel = document.getElementById('info-panel');
-    const panelHeader = document.querySelector('.panel-header');
+    const dragHandle = document.getElementById('panel-drag-handle');
 
-    if (!panel || !panelHeader) return;
+    if (!panel || !dragHandle) return;
 
-    // Initialise la hauteur et la position
-    panelHeight = window.innerHeight * 0.6;
-    panel.style.height = `${panelHeight}px`;
-    panel.style.bottom = '0';
-    panel.style.top = 'auto';
-
-    // Écouteurs pour le glisser depuis le titre
-    panelHeader.addEventListener('touchstart', (e) => {
+    // Écouteurs pour le glisser (tactile)
+    dragHandle.addEventListener('touchstart', (e) => {
         isDraggingPanel = true;
         dragStartY = e.touches[0].clientY;
-        panelStartTop = parseInt(window.getComputedStyle(panel).bottom) || 0;
+        panelStartBottom = parseInt(window.getComputedStyle(panel).bottom) || 0;
         e.preventDefault();
     }, { passive: false });
 
-    panelHeader.addEventListener('touchmove', (e) => {
+    dragHandle.addEventListener('touchmove', (e) => {
         if (!isDraggingPanel) return;
         const deltaY = dragStartY - e.touches[0].clientY; // Inversé pour un mouvement naturel
-        const newBottom = panelStartTop + deltaY;
+        const newBottom = panelStartBottom + deltaY;
 
-        // Limite la position entre 0 (en bas) et 80% de la hauteur de l'écran (en haut)
-        const minBottom = 0;
-        const maxBottom = window.innerHeight * 0.8;
+        // Limite la position entre 0 (complètement visible) et -90% (complètement caché)
+        const minBottom = -window.innerHeight * 0.9;
+        const maxBottom = 0;
         const clampedBottom = Math.max(minBottom, Math.min(newBottom, maxBottom));
 
         panel.style.bottom = `${clampedBottom}px`;
+
+        // Si le panneau est presque caché, le masquer complètement
+        if (clampedBottom < -window.innerHeight * 0.8) {
+            panel.classList.remove('visible');
+        } else {
+            panel.classList.add('visible');
+        }
+
         e.preventDefault();
     }, { passive: false });
 
-    panelHeader.addEventListener('touchend', () => {
+    dragHandle.addEventListener('touchend', () => {
         isDraggingPanel = false;
+        const panel = document.getElementById('info-panel');
+        const bottom = parseInt(window.getComputedStyle(panel).bottom) || 0;
+
+        // Si le panneau est à mi-chemin ou plus caché, le cacher complètement
+        if (bottom < -window.innerHeight * 0.4) {
+            panel.style.bottom = `-90%`;
+            panel.classList.remove('visible');
+        } else {
+            // Sinon, le montrer complètement
+            panel.style.bottom = `0`;
+            panel.classList.add('visible');
+        }
         setTimeout(() => map.invalidateSize(), 100);
     });
 
-    // Version souris (pour desktop)
-    panelHeader.addEventListener('mousedown', (e) => {
+    // Écouteurs pour la souris (desktop)
+    dragHandle.addEventListener('mousedown', (e) => {
         isDraggingPanel = true;
         dragStartY = e.clientY;
-        panelStartTop = parseInt(window.getComputedStyle(panel).bottom) || 0;
+        panelStartBottom = parseInt(window.getComputedStyle(panel).bottom) || 0;
         e.preventDefault();
     });
 
     window.addEventListener('mousemove', (e) => {
         if (!isDraggingPanel) return;
         const deltaY = dragStartY - e.clientY;
-        const newBottom = panelStartTop + deltaY;
+        const newBottom = panelStartBottom + deltaY;
 
-        const minBottom = 0;
-        const maxBottom = window.innerHeight * 0.8;
+        const minBottom = -window.innerHeight * 0.9;
+        const maxBottom = 0;
         const clampedBottom = Math.max(minBottom, Math.min(newBottom, maxBottom));
 
         panel.style.bottom = `${clampedBottom}px`;
+
+        if (clampedBottom < -window.innerHeight * 0.8) {
+            panel.classList.remove('visible');
+        } else {
+            panel.classList.add('visible');
+        }
         e.preventDefault();
     });
 
     window.addEventListener('mouseup', () => {
         isDraggingPanel = false;
+        const panel = document.getElementById('info-panel');
+        const bottom = parseInt(window.getComputedStyle(panel).bottom) || 0;
+
+        if (bottom < -window.innerHeight * 0.4) {
+            panel.style.bottom = `-90%`;
+            panel.classList.remove('visible');
+        } else {
+            panel.style.bottom = `0`;
+            panel.classList.add('visible');
+        }
         setTimeout(() => map.invalidateSize(), 100);
     });
 }
 
 // ============================================
-// GESTION DES ONGLETS (EN HAUT DU TIROIR)
+// GESTION DES ONGLETS DU PANNEAU
 // ============================================
 
 /**
  * Change d'onglet dans le panneau latéral.
  */
-function switchToTab(name) {
-    currentTab = name;
-    document.querySelectorAll('.header-tab').forEach(b => {
+function switchPanelTab(name) {
+    currentPanelTab = name;
+    document.querySelectorAll('.panel-tab').forEach(b => {
         b.classList.toggle('active', b.dataset.tab === name);
     });
-    document.querySelectorAll('.tab-pane').forEach(p => {
+    document.querySelectorAll('.panel-tab-pane').forEach(p => {
         p.classList.remove('active');
     });
-    document.getElementById(`${name}-pane`).classList.add('active');
+    document.getElementById(`panel-${name}`).classList.add('active');
     if (name === 'velov' && !velovLoaded) {
         velovLoaded = true;
         updateVelov();
     }
 }
-
-// Écouteurs pour le glisser entre onglets
-document.querySelector('.header-tabs')?.addEventListener('touchstart', (e) => {
-    isTabDragging = true;
-    tabStartX = e.touches[0].clientX;
-    const activeTab = document.querySelector('.header-tab.active');
-    currentTabIndex = Array.from(document.querySelectorAll('.header-tab')).indexOf(activeTab);
-    e.preventDefault();
-}, { passive: false });
-
-document.querySelector('.header-tabs')?.addEventListener('touchmove', (e) => {
-    if (!isTabDragging) return;
-    const deltaX = e.touches[0].clientX - tabStartX;
-
-    if (Math.abs(deltaX) > 50) {
-        const tabs = Array.from(document.querySelectorAll('.header-tab'));
-        if (deltaX > 50 && currentTabIndex > 0) {
-            switchToTab(tabs[currentTabIndex - 1].dataset.tab);
-            isTabDragging = false;
-        } else if (deltaX < -50 && currentTabIndex < tabs.length - 1) {
-            switchToTab(tabs[currentTabIndex + 1].dataset.tab);
-            isTabDragging = false;
-        }
-    }
-    e.preventDefault();
-}, { passive: false });
-
-document.querySelector('.header-tabs')?.addEventListener('touchend', () => {
-    isTabDragging = false;
-});
 
 // ============================================
 // INITIALISATION
@@ -312,6 +302,11 @@ map.on('moveend zoomend', () => {
 // Gérer le redimensionnement
 window.addEventListener('resize', () => {
     setTimeout(() => map.invalidateSize(), 250);
+    // Réinitialise la position du panneau si la fenêtre est redimensionnée
+    const panel = document.getElementById('info-panel');
+    if (panel && panel.classList.contains('visible')) {
+        panel.style.bottom = '0';
+    }
 });
 if (window.screen?.orientation) {
     window.screen.orientation.addEventListener('change', () => {
@@ -319,52 +314,10 @@ if (window.screen?.orientation) {
     });
 }
 
-// Initialiser les onglets
-document.querySelectorAll('.header-tab').forEach(b => {
-    b.addEventListener('click', () => switchToTab(b.dataset.tab));
-});
-
 // Initialiser le glisser-déposer du panneau
-window.addEventListener('load', () => {
-    initPanelDrag();
-    // Masquer les textes des onglets si pas assez de place
-    checkTabSpace();
-});
-window.addEventListener('resize', () => {
-    checkTabSpace();
-});
+window.addEventListener('load', initPanelDrag);
 
 // Met à jour les icônes quand on zoome/dézoome
 map.on('zoomend', () => {
     updateIconSizes();
 });
-
-// ============================================
-// FONCTION POUR MASQUER LES TEXTES DES ONGLETS SI PAS ASSEZ DE PLACE
-// ============================================
-/**
- * Masque les textes des onglets si pas assez de place.
- */
-function checkTabSpace() {
-    const tabsContainer = document.querySelector('.header-tabs');
-    if (!tabsContainer) return;
-
-    const tabs = Array.from(tabsContainer.querySelectorAll('.header-tab'));
-    const containerWidth = tabsContainer.offsetWidth;
-    let totalWidth = 0;
-
-    // Mesure la largeur totale nécessaire (avec textes)
-    tabs.forEach(tab => {
-        totalWidth += tab.offsetWidth;
-    });
-
-    // Si la largeur totale dépasse la largeur du conteneur, masquer les textes
-    const shouldHideText = totalWidth > containerWidth * 1.2; // Marge de 20%
-
-    tabs.forEach(tab => {
-        const textSpan = tab.querySelector('span');
-        if (textSpan) {
-            textSpan.style.display = shouldHideText ? 'none' : 'inline';
-        }
-    });
-}
