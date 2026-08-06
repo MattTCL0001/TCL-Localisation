@@ -7,10 +7,11 @@ const map = L.map('map', {
     renderer: L.canvas()
 }).setView([45.757, 4.832], 13);
 
-// Ajouter le fond de carte (OpenStreetMap)
-L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    subdomains: 'abcd',
-    maxZoom: 20
+// Ajouter le fond de carte (OpenStreetMap - version plus claire)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    subdomains: 'abc',
+    maxZoom: 20,
+    attribution: '© OpenStreetMap contributors'
 }).addTo(map);
 
 // Créer les panes personnalisés pour le z-index
@@ -35,12 +36,23 @@ const agenceLayer = L.layerGroup().addTo(map);
 const stopMapLayer = L.layerGroup().addTo(map);
 
 // ============================================
-// FONCTIONS DE BASE (GESTION DES COUCHES)
+// GESTION DES COUCHES ET DE L'INTERFACE
+// ============================================
+
+// État du panneau latéral (ouvert/fermé)
+let isPanelDragging = false;
+let panelStartY = 0;
+let panelStartHeight = 0;
+
+// État des onglets
+let currentTab = 'traffic';
+
+// ============================================
+// FONCTIONS DE BASE
 // ============================================
 
 /**
  * Bascule l'affichage d'une couche (bus, arrêts, Vélo'v, parkings).
- * @param {string} layerName - Nom de la couche.
  */
 function toggleLayer(layerName) {
     layerVisibility[layerName] = !layerVisibility[layerName];
@@ -92,7 +104,7 @@ function toggleLayer(layerName) {
 }
 
 /**
- * Bascule l'affichage de TOUTES les couches (bus, arrêts, Vélo'v, parkings).
+ * Bascule l'affichage de TOUTES les couches.
  */
 function toggleAllLayers() {
     const allVisible = Object.values(layerVisibility).every(v => v);
@@ -101,8 +113,6 @@ function toggleAllLayers() {
         const btn = document.querySelector(`[data-layer="${layer}"]`);
         if (btn) btn.classList.toggle('active', layerVisibility[layer]);
     });
-
-    // Met à jour chaque couche
     toggleLayer('bus');
     toggleLayer('stops');
     toggleLayer('velov');
@@ -110,25 +120,48 @@ function toggleAllLayers() {
 }
 
 /**
- * Bascule l'affichage du panneau latéral.
+ * Bascule l'affichage du panneau latéral (avec animation glissée).
  */
 function togglePanel() {
-    document.getElementById('info-panel').classList.toggle('collapsed');
+    const panel = document.getElementById('info-panel');
+    panel.classList.toggle('collapsed');
     setTimeout(() => map.invalidateSize(), 300);
 }
 
-/**
- * Bascule l'affichage des détails d'un élément dans les listes.
- */
-function toggleInfoItem(el) {
-    el.closest('.info-item').classList.toggle('expanded');
-}
+// Gestion du glisser-déposer pour le panneau latéral
+document.getElementById('info-panel').addEventListener('touchstart', (e) => {
+    isPanelDragging = true;
+    panelStartY = e.touches[0].clientY;
+    panelStartHeight = document.getElementById('info-panel').offsetHeight;
+    e.preventDefault();
+}, { passive: false });
+
+document.getElementById('info-panel').addEventListener('touchmove', (e) => {
+    if (!isPanelDragging) return;
+    const deltaY = e.touches[0].clientY - panelStartY;
+    const newHeight = panelStartHeight - deltaY;
+    document.getElementById('info-panel').style.height = `${Math.max(100, newHeight)}px`;
+    e.preventDefault();
+}, { passive: false });
+
+document.getElementById('info-panel').addEventListener('touchend', () => {
+    isPanelDragging = false;
+});
+
+// ============================================
+// GESTION DES ONGLETS (GLISSER ENTRE LES MENUS)
+// ============================================
+
+// État du glissement entre onglets
+let isTabDragging = false;
+let tabStartX = 0;
+let currentTabIndex = 0;
 
 /**
  * Change d'onglet dans le panneau latéral.
- * @param {string} name - Nom de l'onglet.
  */
 function switchToTab(name) {
+    currentTab = name;
     document.querySelectorAll('.header-tab').forEach(b => {
         b.classList.toggle('active', b.dataset.tab === name);
     });
@@ -141,6 +174,37 @@ function switchToTab(name) {
         loadVelovList();
     }
 }
+
+// Gestion du glisser entre onglets
+document.querySelector('.header-tabs').addEventListener('touchstart', (e) => {
+    isTabDragging = true;
+    tabStartX = e.touches[0].clientX;
+    const activeTab = document.querySelector('.header-tab.active');
+    currentTabIndex = Array.from(document.querySelectorAll('.header-tab')).indexOf(activeTab);
+    e.preventDefault();
+}, { passive: false });
+
+document.querySelector('.header-tabs').addEventListener('touchmove', (e) => {
+    if (!isTabDragging) return;
+    const deltaX = e.touches[0].clientX - tabStartX;
+    if (Math.abs(deltaX) > 50) {
+        const tabs = Array.from(document.querySelectorAll('.header-tab'));
+        if (deltaX > 50 && currentTabIndex > 0) {
+            // Glisser vers la droite → onglet précédent
+            switchToTab(tabs[currentTabIndex - 1].dataset.tab);
+            isTabDragging = false;
+        } else if (deltaX < -50 && currentTabIndex < tabs.length - 1) {
+            // Glisser vers la gauche → onglet suivant
+            switchToTab(tabs[currentTabIndex + 1].dataset.tab);
+            isTabDragging = false;
+        }
+    }
+    e.preventDefault();
+}, { passive: false });
+
+document.querySelector('.header-tabs').addEventListener('touchend', () => {
+    isTabDragging = false;
+});
 
 // ============================================
 // INITIALISATION
@@ -176,7 +240,7 @@ setInterval(checkSystemStatus, 30_000);
 // Corriger la taille de la carte après un délai
 setTimeout(() => map.invalidateSize(), 300);
 
-// Gérer le mouvement de la carte
+// Gérer le mouvement de la carte (pour adapter les icônes)
 let moveTimer = null;
 map.on('moveend zoomend', () => {
     clearTimeout(moveTimer);
@@ -185,6 +249,7 @@ map.on('moveend zoomend', () => {
         updateVisibleParkings();
         updateVisibleParkAndRideLots();
         renderVisibleStops();
+        updateBusIcons(); // Met à jour la taille des icônes de bus
     }, 200);
 }, { passive: true });
 
