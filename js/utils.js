@@ -2,19 +2,83 @@
 const imgCache = new Map();
 
 // Couleurs des lignes
-const LINE_COLORS_MASTER = {
-    'A': '#e50069', 'B': '#0075bf', 'C': '#ec6608', 'D': '#cf7eae',
-    'T1': '#004f9f', 'T2': '#6ba230', 'T3': '#00a3a6', 'T4': '#662483', 'T5': '#ec6608', 'T6': '#f191a3', 'T7': '#992358',
-    'F1': '#6da432', 'F2': '#006f9e',
-    'C1': '#004f9f', 'C2': '#e50069', 'C3': '#6ba230', 'C4': '#c57e65', 'C5': '#ec6608', 'C6': '#83c491',
-    'C7': '#6e8997', 'C8': '#662483', 'C9': '#c88817', 'C10': '#cf7eae', 'C11': '#6ba230', 'C12': '#0099bc',
-    'C13': '#c20344', 'C14': '#f191a3', 'C15': '#d3d800', 'C16': '#c57e65', 'C17': '#3f4e55', 'C18': '#00a3a6',
-    'C19': '#e50069', 'C20': '#836c77', 'C21': '#0099bc', 'C22': '#bca3ce', 'C23': '#009e3d', 'C24': '#00336a',
-    'C25': '#fdc300', 'C26': '#2699d6', 'C27': '#6ba230',
-    'C20EX': '#f59c00', 'C22EX': '#80682e', 'C20E': '#f59c00',
-    'TB11': '#fdc300', 'TB12': '#80682e',
-    'NAVI1': '#00a3a6'
+// Définition des lignes regroupées par couleur
+const COLOR_TO_LINES = {
+    // Bleu Ardoise
+    '#0099BC': ['C12', 'C21', '63', 'N180'],
+    // Bleu Azur
+    '#2699D6': ['C26', 'C204', '68', '99EX', '130', '212', '214', '237', '248', '285'],
+    // Bleu Canard
+    '#006F9E': ['F2', '49', '85', '118', '148', '243'],
+    // Bleu Glacial
+    '#00A3A6': ['NAVI1', 'T3', 'C18', '54', '90', '124', '134', 'A32', 'PL3'],
+    // Bleu Indigo
+    '#004F9F': ['T1', 'C1', '39', '77', '133', 'N184', 'N196'],
+    // Bleu Nuit
+    '#00336A': ['C24', '64', '71', '103', 'N183'],
+    // Bleu Océan
+    '#0075BF': ['B', 'C201', '37', '62', '110', '152', 'PL2'],
+    // Bleu Roi
+    '#312783': ['33', '106', '136'],
+    // Brun Orangé
+    '#C88817': ['C9', '50', '88', '119', '149', '151', 'TN190'],
+    // Brun Terre
+    '#80682E': ['TB12', '46', '84', '117', '128', 'N185'],
+    // Gris Ardoise
+    '#3F4E55': ['C17', '95', '98EX'],
+    // Gris Souris
+    '#6E8997': ['C7', '36', '87', '110EX', '150', '164', '218', '222'],
+    // Jaune Soleil
+    '#FDC300': ['TB11', 'C25', 'C200', '45', '137', '144', '231', '232', '247'],
+    // Orange Mandarine
+    '#F59C00': ['C20EX', 'C203', '60', '81', '116', '120', '146'],
+    // Orange Ocre
+    '#C57E65': ['C4', 'C16', '65'],
+    // Orange Safran
+    '#EC6608': ['C', 'T5', 'C5', 'C205', '40', '107', '111', '123', '126', '131', '239', 'N186'],
+    // Prune
+    '#992358': ['T7', 'F1', '59', '96', '127', 'N189', 'PL1'],
+    // Rose Azalée
+    '#D682B5': ['C10', '43', '80', '145'],
+    // Rose Framboise
+    '#E50069': ['C2', 'C19', '41', '93', '121', '165', '265'],
+    // Rose Fushia
+    '#E8308A': ['A', '57', '72', '125', 'PL4'],
+    // Rose Mountbatten
+    '#836C77': ['C20', '79', '102', '114', 'N187'],
+    // Rose Poudré
+    '#F191A3': ['T6', 'C14', '82', '86', '104A', '109', '219', '238', '241', 'TN192'],
+    // Rouge Grenat
+    '#C20344': ['C13', '67', '216', 'N195'],
+    // Vert Anis
+    '#D3D800': ['C15', '44', '61', '98', '217', '220', 'N181', 'TN191'],
+    // Vert Céladon
+    '#83C491': ['C6', 'C202', '38', '76', '112', '141', '143', '147'],
+    // Vert Kaki
+    '#9F9825': ['52EX', '89EX'],
+    // Vert Pomme
+    '#6BA230': ['T2', 'C3', 'C11', 'C27', '32', '34', '105', '106EX', '135', '142', '156', '213', '215', '235', '240', 'N182'],
+    // Vert Prairie
+    '#009E3D': ['D', 'C23', '52', '55', '89', '97', '104B', '122', '139', '140', '153', '245', 'N197'],
+    // Violet Intense
+    '#662483': ['T4', 'C8', '31', '66', '69', '78', '115', '132', '161', '236'],
+    // Violet Lilas
+    '#BCA3CE': ['C22', '35', '70', '108', '138', '154'],
 };
+
+// Fonction de décodage pour reconstruire l'objet LINE_COLORS_MASTER
+function getLineColors(colorMap) {
+    const master = {};
+    for (const [color, lines] of Object.entries(colorMap)) {
+        for (const line of lines) {
+            master[line] = color;
+        }
+    }
+    return master;
+}
+
+// Génération de l'objet final
+const LINE_COLORS_MASTER = getLineColors(COLOR_TO_LINES);
 
 const LINE_TYPE_COLORS = {
     metro: '#E2001A', tram: '#662483', tb: '#fdc300', funiculaire: '#6da432',
