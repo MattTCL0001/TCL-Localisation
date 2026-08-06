@@ -1,3 +1,6 @@
+/* ============================================ */
+/* VARIABLES CSS (COULEURS ET STYLES GLOBAUX)   */
+/* ============================================ */
 :root {
     /* Couleurs principales */
     --accent: #e2001a;
@@ -163,7 +166,7 @@ body::before {
 }
 
 /* ============================================ */
-/* STYLES POUR LES ICÔNES (UNIFORMISATION)       */
+/* STYLES POUR LES ICÔNES (UNIFIÉS)              */
 /* ============================================ */
 .svg-ic {
     width: 16px !important;
@@ -369,6 +372,13 @@ body::before {
     flex-direction: column;
     gap: 6px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
+}
+
+/* Bouton "Tout masquer/afficher" */
+.layer-toggle:last-child {
+    border-top: 1px solid var(--glass-border);
+    margin-top: 4px;
+    padding-top: 8px;
 }
 
 .layer-toggle {
@@ -869,12 +879,6 @@ body::before {
     border-color: var(--glass-border-highlight);
 }
 
-.line-item img {
-    height: 20px !important;
-    width: auto !important;
-    margin: 0 2px !important;
-}
-
 /* ============================================ */
 /* BADGES ET ÉLÉMENTS SPÉCIFIQUES               */
 /* ============================================ */
@@ -924,21 +928,6 @@ body::before {
 .leaflet-marker-icon {
     width: auto !important;
     height: auto !important;
-}
-
-/* Marqueur de bus */
-.bus-marker {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
-}
-
-/* Marqueur d'arrêt */
-.stop-marker {
-    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
-}
-
-/* Marqueur de parking */
-.parking-marker {
-    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
 }
 
 /* Marqueur sélectionné (arrêt cliqué) */
@@ -1095,42 +1084,4 @@ body::before {
         transform: translateX(0);
         opacity: 1;
     }
-}
-
-/* ============================================ */
-/* STYLES POUR LES POPUPS PERSONNALISÉES       */
-/* ============================================ */
-.tcl-popup {
-    font-family: inherit !important;
-    font-size: 12px !important;
-}
-
-.tcl-popup .popup-header {
-    background: linear-gradient(135deg, rgba(226, 0, 26, 0.2), rgba(226, 0, 26, 0.05));
-    padding: 14px;
-    border-bottom: 1px solid var(--glass-border);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    position: relative;
-}
-
-.tcl-popup .popup-header::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(226, 0, 26, 0.33) 0%, transparent 55%, rgba(226, 0, 26, 0.22) 100%);
-    pointer-events: none;
-}
-
-.tcl-popup .popup-body {
-    padding: 12px 14px;
-    border-bottom: 1px solid var(--glass-border);
-}
-
-.tcl-popup .popup-footer {
-    padding: 10px 14px;
-    font-size: 11px;
-    color: var(--text-secondary);
 }
