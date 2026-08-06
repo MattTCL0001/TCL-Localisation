@@ -66,6 +66,8 @@ const COLOR_TO_LINES = {
     '#BCA3CE': ['C22', '35', '70', '108', '138', '154'],
 };
 
+const LINE_COLORS_MASTER = getLineColors(COLOR_TO_LINES);
+
 // Fonction de décodage pour reconstruire l'objet LINE_COLORS_MASTER
 function getLineColors(colorMap) {
     const master = {};
