@@ -1,11 +1,7 @@
 // ===== CONSTANTES =====
-const API_BASE_URL = window.location.hostname.includes('hf.space')
-    ? ''
-    : 'https://matttcl-tcl-localisation.hf.space/';
-
 const imgCache = new Map();
 
-// Couleurs des lignes (source unique)
+// Couleurs des lignes
 const LINE_COLORS_MASTER = {
     'A': '#e50069', 'B': '#0075bf', 'C': '#ec6608', 'D': '#cf7eae',
     'T1': '#004f9f', 'T2': '#6ba230', 'T3': '#00a3a6', 'T4': '#662483', 'T5': '#ec6608', 'T6': '#f191a3', 'T7': '#992358',
@@ -24,6 +20,21 @@ const LINE_TYPE_COLORS = {
     metro: '#E2001A', tram: '#662483', tb: '#fdc300', funiculaire: '#6da432',
     navgone: '#00A3A6', chrono: '#2699d6', bus: '#6e8997', navette: '#EC6608',
     pl: '#992358', jd: '#17297B', other: '#888'
+};
+
+// Mappage des lignes (ancien → nouveau)
+const lineMapping = {
+    'C3': 'C3', 'C11': 'C27', 'C7': '36', 'C15E': '32', 'C19': '41', 'C20E': 'C20EX', 'C22E': 'C22EX',
+    '2': '102', '3': '103', '5': '105', '6': '106', '6E': '106EX', '7': '107', '8': '108', '9': '109',
+    '10': '110', '10E': '110EX', '11': '111', '12': '112', '14': '114', '15': '115', '15E': '99EX',
+    '16': '116', '17': '117', '18': '118', '19': '119', '20': '120', '21': '121', '22': '123', '23': '123',
+    '24': '124', '25': '125', '26': '126', '27': '127', '30': '230', '32': '232', '47': '248',
+    '52E': '52EX', '89D': '89EX', '98E': '98EX', 'Zi1': '145', 'Zi2': '146', 'Zi3': '147', 'Zi4': '148',
+    'Zi5': '149', 'Zi8': '150', 'GE2': '130', 'GE4': '131', 'GE6': '132', 'N20': 'N185', 'N80': 'N180',
+    'N81': 'N181', 'N82': 'N182', 'N83': 'N183', 'N84': 'N184', 'N100': 'N186', 'S1': '133', 'S2': '138',
+    'S3': '139', 'S4A': '104A', 'S4B': '104B', 'S5': '140', 'S6': '141', 'S7': '142', 'S8': '143',
+    'S9': '144', 'S10': '134', 'S11': '135', 'S14': '136', 'S15': '137',
+    'NAVI1': '7601'
 };
 
 // ===== FONCTIONS UTILITAIRES =====
@@ -166,21 +177,6 @@ function fmtDepAt(isoStr, now) {
     return `<span style="color:var(--text-secondary)">${hhmm}</span>`;
 }
 
-// Mappage des lignes (ancien → nouveau)
-const lineMapping = {
-    'C3': 'C3', 'C11': 'C27', 'C7': '36', 'C15E': '32', 'C19': '41', 'C20E': 'C20EX', 'C22E': 'C22EX',
-    '2': '102', '3': '103', '5': '105', '6': '106', '6E': '106EX', '7': '107', '8': '108', '9': '109',
-    '10': '110', '10E': '110EX', '11': '111', '12': '112', '14': '114', '15': '115', '15E': '99EX',
-    '16': '116', '17': '117', '18': '118', '19': '119', '20': '120', '21': '121', '22': '123', '23': '123',
-    '24': '124', '25': '125', '26': '126', '27': '127', '30': '230', '32': '232', '47': '248',
-    '52E': '52EX', '89D': '89EX', '98E': '98EX', 'Zi1': '145', 'Zi2': '146', 'Zi3': '147', 'Zi4': '148',
-    'Zi5': '149', 'Zi8': '150', 'GE2': '130', 'GE4': '131', 'GE6': '132', 'N20': 'N185', 'N80': 'N180',
-    'N81': 'N181', 'N82': 'N182', 'N83': 'N183', 'N84': 'N184', 'N100': 'N186', 'S1': '133', 'S2': '138',
-    'S3': '139', 'S4A': '104A', 'S4B': '104B', 'S5': '140', 'S6': '141', 'S7': '142', 'S8': '143',
-    'S9': '144', 'S10': '134', 'S11': '135', 'S14': '136', 'S15': '137',
-    'NAVI1': '7601'
-};
-
 function getNewLineNumber(l) {
     return lineMapping[l] || l;
 }
@@ -236,6 +232,172 @@ function sortLinesByType(a, b) {
     if (numA !== numB) return numA - numB;
 
     return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
+}
+
+// Hash pour les bus (pour éviter les doublons)
+function busHash(b) {
+    return `${b.lat},${b.lon},${b.bearing},${b.delay},${b.dest_code}`;
+}
+
+// Obtenir le nom d'un arrêt
+function getStopName(code) {
+    if (!code) return null;
+    const clean = code.includes(':') ? code.split(':').pop() : code;
+    return stopsMapping[clean] || stopsMapping[code] || null;
+}
+
+// Obtenir le type de véhicule
+function getVehicleType(bus) {
+    const id = parseInt(bus.id);
+    if (isNaN(id)) return 'Véhicule TCL';
+    if (id === 111) return 'Le Gône';
+    if (id === 112) return 'La Fenotte';
+    if (id === 113) return 'Le Canut';
+    if (id >= 801 && id < 873) return 'Alstom Citadis 302';
+    if (id >= 874 && id < 937) return 'Alstom Citadis 402';
+    if (id >= 101 && id < 106) return 'Stadler Tango';
+    if ((id >= 1001 && id < 1030) || (id >= 1201 && id < 1218) || (id >= 1301 && id < 1333) || (id >= 1401 && id < 1417) || (id >= 2301 && id < 2328)) return 'Iveco Urbanway 18';
+    if ((id >= 2401 && id < 2458) || (id >= 2501 && id < 2524) || (id >= 2701 && id < 2750) || (id >= 3000 && id < 3065)) return 'Iveco Urbanway 12';
+    if ((id >= 2001 && id < 2034) || (id >= 2801 && id < 2835)) return 'Hess LighTram 19 DC';
+    return 'Véhicule TCL';
+}
+
+// Construire le popup d'un bus
+function buildBusPopup(bus) {
+    return `<div style="width:260px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
+        <div style="position:relative;height:80px;background:linear-gradient(135deg,${bus.color}33 0%,#08090f 55%,${bus.color}22 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+            <div style="position:absolute;inset:0;background:linear-gradient(135deg,${bus.color}33 0%,transparent 55%,${bus.color}22 100%);pointer-events:none;"></div>
+            <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,var(--glass-bg-heavy));pointer-events:none;"></div>
+            <div onclick="filterLineFromPopup('${bus.line}')" title="Filtrer la ligne ${bus.line}" style="position:absolute;bottom:12px;left:12px;background:rgba(13,15,24,0.75);border:1px solid ${bus.color}66;border-radius:12px;padding:6px;cursor:pointer;backdrop-filter:blur(12px);box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)';this.style.borderColor='${bus.color}'" onmouseout="this.style.transform='scale(1)';this.style.borderColor='${bus.color}66'">
+                ${lineImgHtml(bus.line, '30px')}
+            </div>
+        </div>
+        <div style="padding:12px 14px;border-bottom:1px solid var(--glass-border);">
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                <div style="display:flex;align-items:center;gap:8px;">
+                    <div style="width:6px;height:6px;border-radius:50%;background:${bus.color};flex-shrink:0;"></div>
+                    <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;">Ligne ${bus.line}</span>
+                </div>
+                <span style="font-size:10px;padding:3px 8px;border-radius:20px;${bus.delayOk ? 'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);' : 'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">${bus.delayOk ? "À l'heure" : bus.delay}</span>
+            </div>
+            <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${bus.dest}</div>
+        </div>
+        <div style="padding:10px 14px;">
+            <div style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
+                <img src="assets/SVG_Icons/bus.svg" class="svg-ic" style="width:12px;height:12px;">${getVehicleType(bus)}
+            </div>
+            <div style="font-size:10px;color:var(--text-muted);font-family:monospace;margin-top:4px;display:flex;align-items:center;gap:6px;">
+                <img src="assets/SVG_Icons/id.svg" class="svg-ic" style="width:11px;height:11px;">${bus.id}
+            </div>
+        </div>
+    </div>`;
+}
+
+// Construire le popup d'un parking
+function buildParkingPopup(p, tr, titre = 'Parking', iconEmoji = '🅿️') {
+    const dispo = p._nb_dispo ?? p.nb_place_dispo ?? tr?.nb_tot_place_dispo ?? null;
+    const cap = p.capacite ?? p.nb_place_tot ?? null;
+
+    let dispoSection = '';
+    if (dispo !== null && cap !== null) {
+        const dispoInfo = getDispoColor(dispo, cap);
+        dispoSection = `<div style="display:flex;gap:8px;margin-top:10px;">
+            <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
+                <div style="font-size:18px;font-weight:700;color:${dispoInfo.textColor};">${dispo}</div>
+                <div style="font-size:10px;color:var(--text-muted);">libres</div>
+            </div>
+            <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
+                <div style="font-size:18px;font-weight:700;color:var(--text-secondary);">${cap}</div>
+                <div style="font-size:10px;color:var(--text-muted);">total</div>
+            </div>
+        </div>`;
+    }
+
+    return `<div style="width:220px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
+        <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${iconEmoji} ${p.nom}</div>
+        <div style="font-size:11px;color:var(--text-secondary);">${p.horaires || 'Horaires non disponibles'}</div>
+        ${dispoSection}
+    </div>`;
+}
+
+// Construire le popup d'une agence
+function buildAgencyPopup(a, adresse, facea) {
+    return `<div style="width:230px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
+        <div style="background:linear-gradient(135deg,rgba(226,0,26,0.2),rgba(226,0,26,0.05));padding:14px;border-bottom:1px solid var(--glass-border);">
+            <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px var(--accent-glow);">
+                    <img src="assets/Agence.svg" class="svg-ic" style="width:18px;height:18px;">
+                </div>
+                <div>
+                    <div style="font-size:14px;font-weight:700;color:var(--text-primary);line-height:1.2;">${a.nom}</div>
+                    <div style="font-size:10px;color:var(--text-secondary);margin-top:2px;">Agence commerciale TCL</div>
+                </div>
+            </div>
+        </div>
+        <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-secondary);">
+            <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span style="flex-shrink:0;">📍</span>
+                <div>
+                    <div style="color:var(--text-primary);">${adresse}</div>
+                    <div style="font-size:11px;">${a.codepostal || ''}</div>
+                </div>
+            </div>
+            <div style="display:flex;align-items:center;gap:8px;">
+                <span>🪟</span>
+                <span>Face à face : <span style="color:var(--text-primary);">${facea}</span></span>
+            </div>
+            <div style="display:flex;align-items:flex-start;gap:8px;">
+                <span>🕒</span>
+                <span>${a.horaires || 'Non renseignés'}</span>
+            </div>
+        </div>
+    </div>`;
+}
+
+// Construire le popup d'une station Vélo'v
+function buildVelovPopup(s) {
+    const bikes = s.available_bikes || 0;
+    const stands = s.available_bike_stands || 0;
+    const total = s.bike_stands || (bikes + stands) || 0;
+    const dispoInfo = getVelovDispoColor(bikes, stands, total);
+    const ms = s.main_stands?.availabilities || {};
+    return `<div style="width:210px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
+        <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
+            <img src="assets/SVG_Icons/velo.svg" class="svg-ic" style="width:14px;height:14px;"> ${s.name}
+        </div>
+        <div style="display:flex;gap:8px;">
+            <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
+                <div style="font-size:20px;font-weight:700;color:${dispoInfo.textColor};">${bikes}</div>
+                <div style="font-size:10px;color:var(--text-muted);">vélos</div>
+            </div>
+            <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
+                <div style="font-size:20px;font-weight:700;color:var(--text-secondary);">${stands}</div>
+                <div style="font-size:10px;color:var(--text-muted);">places</div>
+            </div>
+        </div>
+        ${(ms.electricalBikes > 0 || ms.mechanicalBikes > 0) ? `<div style="display:flex;gap:6px;margin-top:10px;">
+            ${ms.electricalBikes > 0 ? `<span style="font-size:10px;color:#00d2ff;background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.2);border-radius:6px;padding:3px 8px;">⚡ ${ms.electricalBikes} élec</span>` : ''}
+            ${ms.mechanicalBikes > 0 ? `<span style="font-size:10px;color:var(--text-secondary);background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:6px;padding:3px 8px;">🔧 ${ms.mechanicalBikes} méca</span>` : ''}
+        </div>` : ''}
+    </div>`;
+}
+
+// Vérifier le statut du système
+async function checkSystemStatus() {
+    try {
+        const res = await fetch(API_BASE_URL);
+        const data = await res.json();
+        const dot = document.getElementById('system-status-dot');
+        if (data.data_loaded && data.data_loaded.stops) {
+            dot.classList.add('ready');
+            dot.title = "Toutes les données sont chargées et prêtes";
+        } else {
+            dot.classList.remove('ready');
+            dot.title = "Initialisation des données en cours...";
+        }
+    } catch (e) {
+        console.warn("Erreur checkSystemStatus:", e);
+    }
 }
 
 // ===== NOTIFICATIONS =====
