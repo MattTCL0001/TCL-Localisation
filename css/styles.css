@@ -84,13 +84,12 @@
  /* ============================================ */
  /* CARTE */
  /* ============================================ */
- .map-container {
-     flex: 1;
-     position: relative;
-     min-height: 0;
-     margin-left: 0;
-     transition: margin-left 0.3s ease-out;
- }
+/* Ajustement de la carte : PAS DE DÉCALAGE (superposition) */
+.map-container {
+    margin-left: 0; /* Pas de marge à gauche */
+    margin-right: 0; /* Pas de marge à droite */
+    transition: none; /* Pas de transition nécessaire */
+}
 
  #map {
      position: absolute;
@@ -192,73 +191,73 @@
  /* ============================================ */
  /* SIDEBAR (remplace l'ancien panneau du bas) */
  /* ============================================ */
- .sidebar {
-     position: fixed;
-     left: 0;
-     top: 56px;
-     bottom: 0;
-     width: 320px;
-     max-width: 90vw;
-     background: var(--glass-bg-heavy);
-     backdrop-filter: var(--glass-blur);
-     border-right: 1px solid var(--glass-border-highlight);
-     border-radius: 0 var(--radius-lg) var(--radius-lg) 0;
-     box-shadow: 4px 0 20px rgba(0, 0, 0, 0.5);
-     z-index: 1000;
-     display: flex;
-     flex-direction: column;
-     transition: width 0.3s ease-out;
-     overflow: hidden;
- }
+/* ============================================ */
+/* SIDEBAR (à droite, superposée à la carte)      */
+/* ============================================ */
+.sidebar {
+    position: fixed;
+    right: 0; /* À droite au lieu de left: 0 */
+    top: 56px; /* En dessous du header */
+    bottom: 0;
+    width: 320px;
+    max-width: 90vw; /* Pour les petits écrans */
+    background: var(--glass-bg-heavy);
+    backdrop-filter: var(--glass-blur);
+    border-left: 1px solid var(--glass-border-highlight); /* Bordure à gauche */
+    border-radius: var(--radius-lg) 0 0 var(--radius-lg); /* Bordure arrondie à gauche */
+    box-shadow: -4px 0 20px rgba(0, 0, 0, 0.5); /* Ombre à gauche */
+    z-index: 1000;
+    display: flex;
+    flex-direction: column;
+    transition: width 0.3s ease-out;
+    overflow: hidden;
+}
 
- .sidebar.collapsed {
-     width: 40px;
- }
+.sidebar.collapsed {
+    width: 40px; /* Largeur réduite */
+}
 
- .sidebar-toggle {
-     position: absolute;
-     top: 0;
-     right: 0;
-     width: 40px;
-     height: 40px;
-     background: rgba(255, 255, 255, 0.06);
-     border: 1px solid var(--glass-border);
-     border-radius: 0 var(--radius-sm) 0 var(--radius-sm);
-     display: flex;
-     align-items: center;
-     justify-content: center;
-     cursor: pointer;
-     z-index: 1001;
-     transition: all 0.2s;
- }
+.sidebar-toggle {
+    position: absolute;
+    top: 0;
+    left: 0; /* À gauche dans la sidebar */
+    width: 40px;
+    height: 40px;
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid var(--glass-border);
+    border-radius: var(--radius-sm) 0 0 var(--radius-sm); /* Bordure arrondie à gauche */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 1001;
+    transition: all 0.2s;
+}
 
- .sidebar-toggle:hover {
-     background: rgba(255, 255, 255, 0.12);
- }
+.sidebar-toggle-icon {
+    font-size: 16px;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease-out;
+}
 
- .sidebar-toggle-icon {
-     font-size: 16px;
-     color: var(--text-secondary);
-     transition: transform 0.3s ease-out;
- }
+.sidebar.collapsed .sidebar-toggle-icon {
+    transform: rotate(180deg); /* Flèche tournée quand réduit */
+}
 
- .sidebar.collapsed .sidebar-toggle-icon {
-     transform: rotate(180deg);
- }
+/* Contenu de la sidebar */
+.sidebar-content {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    opacity: 1;
+    transition: opacity 0.2s ease-out;
+}
 
- .sidebar-content {
-     width: 100%;
-     height: 100%;
-     display: flex;
-     flex-direction: column;
-     opacity: 1;
-     transition: opacity 0.2s ease-out;
- }
-
- .sidebar.collapsed .sidebar-content {
-     opacity: 0;
-     pointer-events: none;
- }
+.sidebar.collapsed .sidebar-content {
+    opacity: 0;
+    pointer-events: none;
+}
 
  /* Onglets dans la sidebar */
  .sidebar .panel-tabs {
@@ -334,30 +333,19 @@
  }
 
  /* Bannières de filtre (adaptées pour la sidebar) */
- .filter-banner {
-     position: fixed;
-     top: 16px;
-     left: calc(320px + 16px);
-     transform: none;
-     z-index: 1001;
-     background: var(--glass-bg-heavy);
-     border: 1px solid var(--glass-border-highlight);
-     border-radius: 100px;
-     padding: 8px 16px;
-     align-items: center;
-     gap: 12px;
-     font-size: 12px;
-     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.5);
-     display: none;
- }
+/* Bannières de filtre (adaptées pour la sidebar à droite) */
+.filter-banner {
+    left: auto;
+    right: calc(320px + 16px); /* Décalage pour éviter la sidebar */
+}
 
  .filter-banner.visible {
      display: flex;
  }
 
- .sidebar.collapsed ~ .filter-banner {
-     left: 16px;
- }
+.sidebar.collapsed ~ .filter-banner {
+    right: 16px; /* Repositionne si sidebar réduite */
+}
 
  .filter-clear-btn {
      background: rgba(255, 255, 255, 0.06);
