@@ -1,88 +1,66 @@
-// ===== CONSTANTES =====
+// ============================================
+// CONSTANTES GLOBALES (UTILITAIRES)
+// ============================================
 const imgCache = new Map();
 
-// Couleurs des lignes
-// Définition des lignes regroupées par couleur
+// Couleurs des lignes (mappage couleur → lignes)
 const COLOR_TO_LINES = {
-    // Bleu Ardoise
     '#0099BC': ['C12', 'C21', '63', 'N180'],
-    // Bleu Azur
     '#2699D6': ['C26', 'C204', '68', '99EX', '130', '212', '214', '237', '248', '285'],
-    // Bleu Canard
     '#006F9E': ['F2', '49', '85', '118', '148', '243'],
-    // Bleu Glacial
     '#00A3A6': ['NAVI1', 'T3', 'C18', '54', '90', '124', '134', 'A32', 'PL3'],
-    // Bleu Indigo
     '#004F9F': ['T1', 'C1', '39', '77', '133', 'N184', 'N196'],
-    // Bleu Nuit
     '#00336A': ['C24', '64', '71', '103', 'N183'],
-    // Bleu Océan
     '#0075BF': ['B', 'C201', '37', '62', '110', '152', 'PL2'],
-    // Bleu Roi
     '#312783': ['33', '106', '136'],
-    // Brun Orangé
     '#C88817': ['C9', '50', '88', '119', '149', '151', 'TN190'],
-    // Brun Terre
     '#80682E': ['TB12', '46', '84', '117', '128', 'N185'],
-    // Gris Ardoise
     '#3F4E55': ['C17', '95', '98EX'],
-    // Gris Souris
     '#6E8997': ['C7', '36', '87', '110EX', '150', '164', '218', '222'],
-    // Jaune Soleil
     '#FDC300': ['TB11', 'C25', 'C200', '45', '137', '144', '231', '232', '247'],
-    // Orange Mandarine
     '#F59C00': ['C20EX', 'C203', '60', '81', '116', '120', '146'],
-    // Orange Ocre
     '#C57E65': ['C4', 'C16', '65'],
-    // Orange Safran
     '#EC6608': ['C', 'T5', 'C5', 'C205', '40', '107', '111', '123', '126', '131', '239', 'N186'],
-    // Prune
     '#992358': ['T7', 'F1', '59', '96', '127', 'N189', 'PL1'],
-    // Rose Azalée
     '#D682B5': ['C10', '43', '80', '145'],
-    // Rose Framboise
     '#E50069': ['C2', 'C19', '41', '93', '121', '165', '265'],
-    // Rose Fushia
     '#E8308A': ['A', '57', '72', '125', 'PL4'],
-    // Rose Mountbatten
     '#836C77': ['C20', '79', '102', '114', 'N187'],
-    // Rose Poudré
     '#F191A3': ['T6', 'C14', '82', '86', '104A', '109', '219', '238', '241', 'TN192'],
-    // Rouge Grenat
     '#C20344': ['C13', '67', '216', 'N195'],
-    // Vert Anis
     '#D3D800': ['C15', '44', '61', '98', '217', '220', 'N181', 'TN191'],
-    // Vert Céladon
     '#83C491': ['C6', 'C202', '38', '76', '112', '141', '143', '147'],
-    // Vert Kaki
     '#9F9825': ['52EX', '89EX'],
-    // Vert Pomme
     '#6BA230': ['T2', 'C3', 'C11', 'C27', '32', '34', '105', '106EX', '135', '142', '156', '213', '215', '235', '240', 'N182'],
-    // Vert Prairie
     '#009E3D': ['D', 'C23', '52', '55', '89', '97', '104B', '122', '139', '140', '153', '245', 'N197'],
-    // Violet Intense
     '#662483': ['T4', 'C8', '31', '66', '69', '78', '115', '132', '161', '236'],
-    // Violet Lilas
-    '#BCA3CE': ['C22', '35', '70', '108', '138', '154'],
+    '#BCA3CE': ['C22', '35', '70', '108', '138', '154']
 };
 
-const LINE_COLORS_MASTER = getLineColors(COLOR_TO_LINES);
-
-// Fonction de décodage pour reconstruire l'objet LINE_COLORS_MASTER
-function getLineColors(colorMap) {
+// Génère LINE_COLORS_MASTER à partir de COLOR_TO_LINES
+const LINE_COLORS_MASTER = (() => {
     const master = {};
-    for (const [color, lines] of Object.entries(colorMap)) {
+    for (const [color, lines] of Object.entries(COLOR_TO_LINES)) {
         for (const line of lines) {
             master[line] = color;
         }
     }
     return master;
-}
+})();
 
+// Couleurs par type de ligne
 const LINE_TYPE_COLORS = {
-    metro: '#E2001A', tram: '#662483', tb: '#fdc300', funiculaire: '#6da432',
-    navgone: '#00A3A6', chrono: '#2699d6', bus: '#6e8997', navette: '#EC6608',
-    pl: '#992358', jd: '#17297B', other: '#888'
+    metro: '#E2001A',
+    tram: '#662483',
+    tb: '#fdc300',
+    funiculaire: '#6da432',
+    navgone: '#00A3A6',
+    chrono: '#2699d6',
+    bus: '#6e8997',
+    navette: '#EC6608',
+    pl: '#992358',
+    jd: '#17297B',
+    other: '#888'
 };
 
 // Mappage des lignes (ancien → nouveau)
@@ -96,8 +74,7 @@ const lineMapping = {
     'Zi5': '149', 'Zi8': '150', 'GE2': '130', 'GE4': '131', 'GE6': '132', 'N20': 'N185', 'N80': 'N180',
     'N81': 'N181', 'N82': 'N182', 'N83': 'N183', 'N84': 'N184', 'N100': 'N186', 'S1': '133', 'S2': '138',
     'S3': '139', 'S4A': '104A', 'S4B': '104B', 'S5': '140', 'S6': '141', 'S7': '142', 'S8': '143',
-    'S9': '144', 'S10': '134', 'S11': '135', 'S14': '136', 'S15': '137',
-    'NAVI1': '7601'
+    'S9': '144', 'S10': '134', 'S11': '135', 'S14': '136', 'S15': '137', 'NAVI1': '7601'
 };
 
 // ============================================
@@ -130,18 +107,7 @@ function getLineType(line) {
     if (/^N\d*/.test(u) || /^BGS\d*/.test(u)) return 'navette';
     if (/^PL/.test(u)) return 'pl';
     if (/^JD/.test(u)) return 'jd';
-    if (/^BR/.test(u)) return 'bus';
     return 'bus';
-}
-
-/**
- * Vérifie si le SVG d'une ligne JD doit être chargé.
- */
-function shouldLoadJDSvg(lineNum) {
-    const s = String(lineNum);
-    if (!s.startsWith('JD')) return true;
-    const num = parseInt(s.replace('JD', ''), 10);
-    return !isNaN(num) && num >= 300;
 }
 
 /**
@@ -151,10 +117,6 @@ function lineImgHtml(lineNum, height = '20px') {
     const src = `assets/Lignes/${lineNum}.svg`;
     const fallbackStyle = `background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.1);padding:2px 6px;border-radius:6px;font-size:11px;font-weight:600;color:#eee;display:inline-flex;align-items:center;justify-content:center;height:${height};min-width:24px;`;
     const color = getLineColor(lineNum);
-
-    if (!shouldLoadJDSvg(lineNum)) {
-        return `<span style="${fallbackStyle}color:${color};">${lineNum}</span>`;
-    }
 
     const state = imgCache.get(src);
     if (state === 'ok') return `<img src="${src}" style="height:${height};width:auto;display:inline-block;vertical-align:middle;">`;
@@ -166,7 +128,7 @@ function lineImgHtml(lineNum, height = '20px') {
 }
 
 /**
- * Obtient la couleur de disponibilité (pour les parkings/Vélo'v).
+ * Obtient la couleur de disponibilité.
  */
 function getDispoColor(value, total) {
     if (value === null || total === null) return null;
@@ -227,7 +189,7 @@ function getVelovDispoColor(bikes, stands, total) {
 }
 
 /**
- * Calcule la distance entre deux points en mètres (formule de Haversine).
+ * Calcule la distance entre deux points (formule de Haversine).
  */
 function haversineMeters(lat1, lon1, lat2, lon2) {
     const R = 6371000;
@@ -271,7 +233,7 @@ function fmtDepAt(isoStr, now) {
 }
 
 /**
- * Obtient le nouveau numéro de ligne (mappage ancien → nouveau).
+ * Obtient le nouveau numéro de ligne.
  */
 function getNewLineNumber(l) {
     return lineMapping[l] || l;
@@ -348,15 +310,12 @@ function sortLinesByType(a, b) {
     return String(a).localeCompare(String(b), undefined, { numeric: true, sensitivity: 'base' });
 }
 
-// ============================================
-// FONCTIONS DE CONSTRUCTION DES POPUPS
-// ============================================
-
 /**
  * Construit le popup d'un bus.
  */
 function buildBusPopup(bus) {
-    return `<div style="width:260px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
+    return `
+    <div style="width:260px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
         <div style="position:relative;height:80px;background:linear-gradient(135deg,${bus.color}33 0%,#08090f 55%,${bus.color}22 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
             <div style="position:absolute;inset:0;background:linear-gradient(135deg,${bus.color}33 0%,transparent 55%,${bus.color}22 100%);pointer-events:none;"></div>
             <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,var(--glass-bg-heavy));pointer-events:none;"></div>
@@ -372,7 +331,7 @@ function buildBusPopup(bus) {
                 </div>
                 <span style="font-size:10px;padding:3px 8px;border-radius:20px;${bus.delayOk ? 'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);' : 'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">${bus.delayOk ? "À l'heure" : bus.delay}</span>
             </div>
-            <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${bus.dest}</div>
+            <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${bus.dest || 'Destination inconnue'}</div>
         </div>
         <div style="padding:10px 14px;">
             <div style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
@@ -404,7 +363,7 @@ function getVehicleType(bus) {
 }
 
 /**
- * Hash pour les bus (pour éviter les doublons).
+ * Hash pour les bus.
  */
 function busHash(b) {
     return `${b.lat},${b.lon},${b.bearing},${b.delay},${b.dest_code}`;
@@ -429,7 +388,8 @@ function buildParkingPopup(p, titre = 'Parking') {
     let dispoSection = '';
     if (dispo !== null && cap !== null) {
         const dispoInfo = getDispoColor(dispo, cap);
-        dispoSection = `<div style="display:flex;gap:8px;margin-top:10px;">
+        dispoSection = `
+        <div style="display:flex;gap:8px;margin-top:10px;">
             <div style="flex:1;text-align:center;background:rgba(255,255,255,0.04);border-radius:10px;padding:8px;border:1px solid var(--glass-border);">
                 <div style="font-size:18px;font-weight:700;color:${dispoInfo.textColor};">${dispo}</div>
                 <div style="font-size:10px;color:var(--text-muted);">libres</div>
@@ -441,7 +401,8 @@ function buildParkingPopup(p, titre = 'Parking') {
         </div>`;
     }
 
-    return `<div style="width:220px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
+    return `
+    <div style="width:220px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
         <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">🅿️ ${p.nom || titre}</div>
         <div style="font-size:11px;color:var(--text-secondary);">${p.horaires || 'Horaires non disponibles'}</div>
         ${dispoSection}
@@ -452,7 +413,8 @@ function buildParkingPopup(p, titre = 'Parking') {
  * Construit le popup d'une agence.
  */
 function buildAgencyPopup(a, adresse, facea) {
-    return `<div style="width:230px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
+    return `
+    <div style="width:230px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
         <div style="background:linear-gradient(135deg,rgba(226,0,26,0.2),rgba(226,0,26,0.05));padding:14px;border-bottom:1px solid var(--glass-border);">
             <div style="display:flex;align-items:center;gap:10px;">
                 <div style="width:36px;height:36px;background:var(--accent);border-radius:10px;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 4px 12px var(--accent-glow);">
@@ -466,7 +428,7 @@ function buildAgencyPopup(a, adresse, facea) {
         </div>
         <div style="padding:12px 14px;display:flex;flex-direction:column;gap:8px;font-size:12px;color:var(--text-secondary);">
             <div style="display:flex;align-items:flex-start;gap:8px;">
-                <span style="flex-shrink:0;">📍</span>
+                <span>📍</span>
                 <div>
                     <div style="color:var(--text-primary);">${adresse}</div>
                     <div style="font-size:11px;">${a.codepostal || ''}</div>
@@ -493,7 +455,8 @@ function buildVelovPopup(s) {
     const total = s.bike_stands || (bikes + stands) || 0;
     const dispoInfo = getVelovDispoColor(bikes, stands, total);
     const ms = s.main_stands?.availabilities || {};
-    return `<div style="width:210px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
+    return `
+    <div style="width:210px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);padding:14px;">
         <div style="font-size:13px;font-weight:600;color:var(--text-primary);margin-bottom:10px;display:flex;align-items:center;gap:6px;">
             <img src="assets/SVG_Icons/velo.svg" class="svg-ic" style="width:14px;height:14px;"> ${s.name}
         </div>
@@ -507,22 +470,21 @@ function buildVelovPopup(s) {
                 <div style="font-size:10px;color:var(--text-muted);">places</div>
             </div>
         </div>
-        ${(ms.electricalBikes > 0 || ms.mechanicalBikes > 0) ? `<div style="display:flex;gap:6px;margin-top:10px;">
+        ${(ms.electricalBikes > 0 || ms.mechanicalBikes > 0) ? `
+        <div style="display:flex;gap:6px;margin-top:10px;">
             ${ms.electricalBikes > 0 ? `<span style="font-size:10px;color:#00d2ff;background:rgba(0,210,255,0.1);border:1px solid rgba(0,210,255,0.2);border-radius:6px;padding:3px 8px;">⚡ ${ms.electricalBikes} élec</span>` : ''}
             ${ms.mechanicalBikes > 0 ? `<span style="font-size:10px;color:var(--text-secondary);background:rgba(255,255,255,0.05);border:1px solid var(--glass-border);border-radius:6px;padding:3px 8px;">🔧 ${ms.mechanicalBikes} méca</span>` : ''}
         </div>` : ''}
     </div>`;
 }
 
-// ============================================
-// NOTIFICATIONS ET SPINNER
-// ============================================
-
 /**
  * Affiche une notification.
  */
 function showNotification(message, type = 'info') {
     const container = document.getElementById('notification-container');
+    if (!container) return;
+
     const notification = document.createElement('div');
     notification.className = `notification ${type}`;
     notification.innerHTML = `
@@ -537,12 +499,14 @@ function showNotification(message, type = 'info') {
  * Affiche le spinner de chargement.
  */
 function showSpinner() {
-    document.getElementById('loading-spinner').style.display = 'flex';
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) spinner.style.display = 'flex';
 }
 
 /**
  * Masque le spinner de chargement.
  */
 function hideSpinner() {
-    document.getElementById('loading-spinner').style.display = 'none';
+    const spinner = document.getElementById('loading-spinner');
+    if (spinner) spinner.style.display = 'none';
 }
