@@ -282,7 +282,13 @@ async function updateBus() {
             });
 
             const busSnap = { ...bus, line, color, dest, delayOk, modeFile, lineRemapped, hasValidBearing, bearing };
-            marker.bindPopup(() => buildBusPopup(busSnap), { maxWidth: 270, className: 'tcl-popup' });
+                       // Exemple pour les bus :
+            marker.bindPopup(buildBusPopup(busSnap), {
+                maxWidth: 270,
+                className: '', // Désactive les styles par défaut de Leaflet
+                closeButton: true
+            });
+        
 
             if (!busLineFilter || lineRemapped === busLineFilter || line === busLineFilter) {
                 marker.addTo(busLayer);
