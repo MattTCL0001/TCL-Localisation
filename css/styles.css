@@ -266,54 +266,62 @@
  }
 
  /* Onglets du panneau (toujours visibles) */
- .panel-tabs {
-     display: flex;
-     gap: 2px;
-     padding: 0 16px;
-     overflow-x: auto;
-     scrollbar-width: none;
-     -ms-overflow-style: none;
-     border-bottom: 1px solid var(--glass-border);
- }
+/* ============================================ */
+/* ONGLETS DU PANNEAU (VISIBLES)                */
+/* ============================================ */
+.panel-tabs {
+    display: flex !important; /* Force l'affichage */
+    gap: 2px;
+    padding: 0 16px;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    border-bottom: 1px solid var(--glass-border);
+    background: var(--glass-bg-heavy);
+}
 
- .panel-tabs::-webkit-scrollbar {
-     display: none;
- }
+.panel-tabs::-webkit-scrollbar {
+    display: none;
+}
 
- .panel-tab {
-     display: flex;
-     align-items: center;
-     gap: 6px;
-     padding: 10px 12px;
-     border-radius: var(--radius-sm);
-     border: 1px solid transparent;
-     background: transparent;
-     color: var(--text-secondary);
-     font-size: 12px;
-     font-weight: 500;
-     cursor: pointer;
-     white-space: nowrap;
-     transition: all 0.2s;
-     flex-shrink: 0;
- }
+.panel-tab {
+    display: flex !important; /* Force l'affichage */
+    align-items: center;
+    gap: 6px;
+    padding: 10px 12px;
+    border-radius: var(--radius-sm);
+    border: 1px solid transparent;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+    flex-shrink: 0;
+}
 
- .panel-tab:hover {
-     background: rgba(255, 255, 255, 0.05);
-     color: var(--text-primary);
- }
+.panel-tab:hover {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-primary);
+}
 
- .panel-tab.active {
-     background: rgba(226, 0, 26, 0.1);
-     border-color: rgba(226, 0, 26, 0.2);
-     color: var(--accent);
- }
+.panel-tab.active {
+    background: rgba(226, 0, 26, 0.1);
+    border-color: rgba(226, 0, 26, 0.2);
+    color: var(--accent);
+}
 
- .panel-tab img.svg-ic {
-     width: 16px !important;
-     height: 16px !important;
-     margin: 0 !important;
- }
+.panel-tab img.svg-ic {
+    width: 16px !important;
+    height: 16px !important;
+    margin: 0 !important;
+}
 
+.panel-tab span {
+    font-size: 12px;
+    display: inline !important; /* Force l'affichage du texte */
+}
  .panel-content {
      flex: 1;
      overflow-y: auto;
