@@ -312,3 +312,12 @@ window.addEventListener('load', initPanelDrag);
 map.on('zoomend', () => {
     updateIconSizes();
 });
+
+/**
+ * Bascule l'affichage de la sidebar.
+ */
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    sidebar.classList.toggle('collapsed');
+    setTimeout(() => map.invalidateSize(), 300); // Rafraîchit la carte
+}
