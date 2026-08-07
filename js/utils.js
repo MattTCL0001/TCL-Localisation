@@ -313,32 +313,47 @@ function sortLinesByType(a, b) {
 /**
  * Construit le popup d'un bus.
  */
+/**
+ * Construit le popup d'un bus (version simplifiée).
+ */
 function buildBusPopup(bus) {
     return `
     <div style="width:260px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
-        <div style="position:relative;height:80px;background:linear-gradient(135deg,${bus.color}33 0%,#08090f 55%,${bus.color}22 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <!-- En-tête avec couleur de la ligne -->
+        <div style="position:relative;height:60px;background:linear-gradient(135deg,${bus.color}33 0%,#08090f 55%,${bus.color}22 100%);display:flex;align-items:center;justify-content:center;overflow:hidden;">
             <div style="position:absolute;inset:0;background:linear-gradient(135deg,${bus.color}33 0%,transparent 55%,${bus.color}22 100%);pointer-events:none;"></div>
-            <div style="position:absolute;bottom:0;left:0;right:0;height:48px;background:linear-gradient(transparent,var(--glass-bg-heavy));pointer-events:none;"></div>
-            <div onclick="filterLineFromPopup('${bus.line}')" title="Filtrer la ligne ${bus.line}" style="position:absolute;bottom:12px;left:12px;background:rgba(13,15,24,0.75);border:1px solid ${bus.color}66;border-radius:12px;padding:6px;cursor:pointer;backdrop-filter:blur(12px);box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)';this.style.borderColor='${bus.color}'" onmouseout="this.style.transform='scale(1)';this.style.borderColor='${bus.color}66'">
-                ${lineImgHtml(bus.line, '30px')}
+            <div style="position:absolute;bottom:0;left:0;right:0;height:40px;background:linear-gradient(transparent,var(--glass-bg-heavy));pointer-events:none;"></div>
+            <div onclick="filterLineFromPopup('${bus.line}')" title="Filtrer la ligne ${bus.line}" style="position:absolute;bottom:8px;left:8px;background:rgba(13,15,24,0.75);border:1px solid ${bus.color}66;border-radius:10px;padding:4px;cursor:pointer;backdrop-filter:blur(12px);box-shadow:0 4px 12px rgba(0,0,0,0.4);transition:all 0.2s ease;" onmouseover="this.style.transform='scale(1.05)';this.style.borderColor='${bus.color}'" onmouseout="this.style.transform='scale(1)';this.style.borderColor='${bus.color}66'">
+                ${lineImgHtml(bus.line, '24px')}
             </div>
         </div>
-        <div style="padding:12px 14px;border-bottom:1px solid var(--glass-border);">
+
+        <!-- Contenu principal -->
+        <div style="padding:12px 14px;">
+            <!-- Ligne et retard -->
             <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
                 <div style="display:flex;align-items:center;gap:8px;">
                     <div style="width:6px;height:6px;border-radius:50%;background:${bus.color};flex-shrink:0;"></div>
                     <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;">Ligne ${bus.line}</span>
                 </div>
-                <span style="font-size:10px;padding:3px 8px;border-radius:20px;${bus.delayOk ? 'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);' : 'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">${bus.delayOk ? "À l'heure" : bus.delay}</span>
+                <span style="font-size:10px;padding:3px 8px;border-radius:20px;${bus.delayOk ? 'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);' : 'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">
+                    ${bus.delayOk ? "À l'heure" : bus.delay}
+                </span>
             </div>
-            <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:4px;">${bus.dest || 'Destination inconnue'}</div>
-        </div>
-        <div style="padding:10px 14px;">
+
+            <!-- Terminus (aligné à gauche) -->
+            <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;text-align:left;">
+                ${bus.dest || 'Destination inconnue'}
+            </div>
+
+            <!-- Infos supplémentaires -->
             <div style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
-                <img src="assets/SVG_Icons/bus.svg" class="svg-ic" style="width:12px;height:12px;">${getVehicleType(bus)}
+                <img src="assets/SVG_Icons/bus.svg" class="svg-ic" style="width:12px;height:12px;">
+                ${getVehicleType(bus)}
             </div>
             <div style="font-size:10px;color:var(--text-muted);font-family:monospace;margin-top:4px;display:flex;align-items:center;gap:6px;">
-                <img src="assets/SVG_Icons/id.svg" class="svg-ic" style="width:11px;height:11px;">${bus.id}
+                <img src="assets/SVG_Icons/id.svg" class="svg-ic" style="width:11px;height:11px;">
+                ${bus.id}
             </div>
         </div>
     </div>`;
