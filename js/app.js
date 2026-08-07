@@ -226,3 +226,51 @@ function toggleSidebar() {
     sidebar.classList.toggle('collapsed');
     setTimeout(() => map.invalidateSize(), 300); // Rafraîchit la carte
 }
+/**
+ * Bascule l'affichage des détails d'un élément dans les listes (ex: trafic, accessibilité).
+ * @param {HTMLElement} element - L'élément cliqué.
+ */
+function toggleInfoItem(element) {
+    const item = element.closest('.info-item');
+    if (!item) return;
+
+    item.classList.toggle('expanded');
+
+    // Masque tous les autres éléments ouverts
+    document.querySelectorAll('.info-item.expanded').forEach(otherItem => {
+        if (otherItem !== item) {
+            otherItem.classList.remove('expanded');
+        }
+    });
+}
+
+/**
+ * Bascule l'onglet actif dans le panneau latéral.
+ * @param {string} tabName - Le nom de l'onglet à activer.
+ */
+function switchPanelTab(tabName) {
+    // Met à jour l'onglet actif
+    document.querySelectorAll('.panel-tab').forEach(tab => {
+        tab.classList.toggle('active', tab.dataset.tab === tabName);
+    });
+
+    // Met à jour le contenu actif
+    document.querySelectorAll('.panel-tab-pane').forEach(pane => {
+        pane.classList.toggle('active', pane.id === `panel-${tabName}`);
+    });
+
+    // Charge les données si nécessaire
+    if (tabName === 'velov' && !velovLoaded) {
+        velovLoaded = true;
+        updateVelov();
+    }
+}
+
+/**
+ * Filtre les stations Vélo'v (si tu as cette fonctionnalité).
+ */
+function filterVelovStations() {
+    const term = document.getElementById('velov-search').value.toLowerCase().trim();
+    // Logique de filtrage à implémenter si nécessaire
+    console.log("Filtre Vélo'v :", term);
+}
