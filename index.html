@@ -31,22 +31,27 @@
             </div>
         </header>
 
-        <!-- Contrôles des couches (à gauche) -->
+        <!-- Contrôles des couches (à gauche, avec titres) -->
         <div class="layer-control">
             <div class="layer-toggle active" data-layer="bus" onclick="toggleLayer('bus')" title="Bus">
                 <div class="layer-toggle-icon"><img src="assets/SVG_Icons/bus.svg" class="svg-ic"></div>
+                <span class="layer-toggle-text">Bus</span>
             </div>
             <div class="layer-toggle active" data-layer="stops" onclick="toggleLayer('stops')" title="Arrêts">
                 <div class="layer-toggle-icon"><img src="assets/SVG_Icons/arrêt.svg" class="svg-ic"></div>
+                <span class="layer-toggle-text">Arrêts</span>
             </div>
             <div class="layer-toggle active" data-layer="velov" onclick="toggleLayer('velov')" title="Vélo'v">
                 <div class="layer-toggle-icon"><img src="assets/SVG_Icons/velo.svg" class="svg-ic"></div>
+                <span class="layer-toggle-text">Vélo'v</span>
             </div>
             <div class="layer-toggle active" data-layer="parking" onclick="toggleLayer('parking')" title="Parkings">
                 <div class="layer-toggle-icon">🅿️</div>
+                <span class="layer-toggle-text">Parkings</span>
             </div>
             <div class="layer-toggle" onclick="toggleAllLayers()" title="Tout masquer/afficher">
                 <div class="layer-toggle-icon">🌍</div>
+                <span class="layer-toggle-text">Tout</span>
             </div>
         </div>
 
@@ -64,12 +69,43 @@
             </div>
         </div>
 
-        <!-- Panneau latéral (en bas) -->
+        <!-- Panneau latéral (en bas, avec onglets visibles) -->
         <div id="info-panel">
+            <!-- Titre du panneau (glissable) -->
             <div class="panel-header" id="panel-drag-handle">
                 <div class="panel-title">Informations</div>
                 <div class="panel-toggle" onclick="togglePanel()">❯</div>
             </div>
+
+            <!-- Onglets du panneau (visibles) -->
+            <div class="panel-tabs">
+                <button class="panel-tab active" data-tab="traffic" onclick="switchPanelTab('traffic')">
+                    <img src="assets/SVG_Icons/trafic.svg" class="svg-ic">
+                    <span>Trafic</span>
+                </button>
+                <button class="panel-tab" data-tab="accessibility" onclick="switchPanelTab('accessibility')">
+                    <img src="assets/SVG_Icons/PMR.svg" class="svg-ic">
+                    <span>PMR</span>
+                </button>
+                <button class="panel-tab" data-tab="stops" onclick="switchPanelTab('stops')">
+                    <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic">
+                    <span>Arrêts</span>
+                </button>
+                <button class="panel-tab" data-tab="lines" onclick="switchPanelTab('lines')">
+                    <img src="assets/SVG_Icons/lignes.svg" class="svg-ic">
+                    <span>Lignes</span>
+                </button>
+                <button class="panel-tab" data-tab="velov" onclick="switchPanelTab('velov')">
+                    <img src="assets/SVG_Icons/velo.svg" class="svg-ic">
+                    <span>Vélo'v</span>
+                </button>
+                <button class="panel-tab" data-tab="credits" onclick="switchPanelTab('credits')">
+                    <img src="assets/SVG_Icons/id.svg" class="svg-ic">
+                    <span>Infos</span>
+                </button>
+            </div>
+
+            <!-- Contenu des onglets -->
             <div class="panel-content">
                 <!-- Onglet Trafic -->
                 <div id="panel-traffic" class="panel-tab-pane active">
