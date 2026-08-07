@@ -38,10 +38,6 @@ const stopMapLayer = L.layerGroup().addTo(map);
 // ============================================
 // VARIABLES GLOBALES (ÉTAT DE L'INTERFACE)
 // ============================================
-// État du panneau latéral (glisser pour monter/descendre)
-let isDraggingPanel = false;
-let dragStartY = 0;
-let panelStartBottom = 0;
 
 // État des onglets du panneau
 let currentPanelTab = 'traffic';
@@ -126,100 +122,13 @@ function togglePanel() {
     panel.classList.toggle('visible');
     if (panel.classList.contains('visible')) {
         panel.style.bottom = '0';
-    } else {
+    } else {f
         panel.style.bottom = '-90%';
     }
     setTimeout(() => map.invalidateSize(), 300);
 }
 
-// ============================================
-// GESTION DU GLISSER-DÉPOSER POUR LE PANNEAU
-// ============================================
 
-/**
- * Initialise le glisser-déposer du panneau.
- */
-function initPanelDrag() {
-    const panel = document.getElementById('info-panel');
-    const dragHandle = document.getElementById('panel-drag-handle');
-
-    if (!panel || !dragHandle) return;
-
-    // Écouteurs pour le glisser (tactile)
-    dragHandle.addEventListener('touchstart', (e) => {
-        isDraggingPanel = true;
-        dragStartY = e.touches[0].clientY;
-        panelStartBottom = parseInt(window.getComputedStyle(panel).bottom) || 0;
-        e.preventDefault();
-    }, { passive: false });
-
-    dragHandle.addEventListener('touchmove', (e) => {
-        if (!isDraggingPanel) return;
-        const deltaY = dragStartY - e.touches[0].clientY; // Inversé pour un mouvement naturel
-        const newBottom = panelStartBottom + deltaY;
-
-        // Limite la position entre 0 (complètement visible) et -90% (complètement caché)
-        const minBottom = -window.innerHeight * 0.9;
-        const maxBottom = 0;
-        const clampedBottom = Math.max(minBottom, Math.min(newBottom, maxBottom));
-
-        panel.style.bottom = `${clampedBottom}px`;
-        e.preventDefault();
-    }, { passive: false });
-
-    dragHandle.addEventListener('touchend', () => {
-        isDraggingPanel = false;
-        const panel = document.getElementById('info-panel');
-        const bottom = parseInt(window.getComputedStyle(panel).bottom) || 0;
-
-        // Si le panneau est à mi-chemin ou plus caché, le cacher complètement
-        if (bottom < -window.innerHeight * 0.4) {
-            panel.style.bottom = `-90%`;
-            panel.classList.remove('visible');
-        } else {
-            // Sinon, le montrer complètement
-            panel.style.bottom = `0`;
-            panel.classList.add('visible');
-        }
-        setTimeout(() => map.invalidateSize(), 100);
-    });
-
-    // Écouteurs pour la souris (desktop)
-    dragHandle.addEventListener('mousedown', (e) => {
-        isDraggingPanel = true;
-        dragStartY = e.clientY;
-        panelStartBottom = parseInt(window.getComputedStyle(panel).bottom) || 0;
-        e.preventDefault();
-    });
-
-    window.addEventListener('mousemove', (e) => {
-        if (!isDraggingPanel) return;
-        const deltaY = dragStartY - e.clientY;
-        const newBottom = panelStartBottom + deltaY;
-
-        const minBottom = -window.innerHeight * 0.9;
-        const maxBottom = 0;
-        const clampedBottom = Math.max(minBottom, Math.min(newBottom, maxBottom));
-
-        panel.style.bottom = `${clampedBottom}px`;
-        e.preventDefault();
-    });
-
-    window.addEventListener('mouseup', () => {
-        isDraggingPanel = false;
-        const panel = document.getElementById('info-panel');
-        const bottom = parseInt(window.getComputedStyle(panel).bottom) || 0;
-
-        if (bottom < -window.innerHeight * 0.4) {
-            panel.style.bottom = `-90%`;
-            panel.classList.remove('visible');
-        } else {
-            panel.style.bottom = `0`;
-            panel.classList.add('visible');
-        }
-        setTimeout(() => map.invalidateSize(), 100);
-    });
-}
 
 // ============================================
 // GESTION DES ONGLETS DU PANNEAU
@@ -304,10 +213,6 @@ if (window.screen?.orientation) {
         setTimeout(() => map.invalidateSize(), 350);
     });
 }
-
-// Initialiser le glisser-déposer du panneau
-window.addEventListener('load', initPanelDrag);
-
 // Met à jour les icônes quand on zoome/dézoome
 map.on('zoomend', () => {
     updateIconSizes();
