@@ -29,10 +29,39 @@ const busMarkers = new Map();
 const velovMarkerMap = new Map();
 const parkingMarkerMap = new Map();
 const parcsRelaisMarkerMap = new Map();
+const stopMarkerMap = new Map(); // Suivi persistant des marqueurs d'arrêts (évite la fuite de marqueurs au déplacement de la carte)
 let currentLineFilter = null;
 let busLineFilter = null;
 let stopsOnMap = [];
-const layerVisibility = { bus: true, stops: true, velov: true, parking: true };
+
+// Préférences des couches actives, persistées dans le navigateur
+const DEFAULT_LAYER_VISIBILITY = { bus: true, stops: true, velov: true, parking: true };
+
+/**
+ * Charge les préférences de couches depuis le localStorage.
+ */
+function loadLayerVisibility() {
+    try {
+        const saved = localStorage.getItem('tcl_layerVisibility');
+        if (saved) return { ...DEFAULT_LAYER_VISIBILITY, ...JSON.parse(saved) };
+    } catch (e) {
+        console.warn('Préférences de couches illisibles:', e);
+    }
+    return { ...DEFAULT_LAYER_VISIBILITY };
+}
+
+/**
+ * Sauvegarde les préférences de couches dans le localStorage.
+ */
+function saveLayerVisibility() {
+    try {
+        localStorage.setItem('tcl_layerVisibility', JSON.stringify(layerVisibility));
+    } catch (e) {
+        console.warn('Impossible de sauvegarder les préférences de couches:', e);
+    }
+}
+
+const layerVisibility = loadLayerVisibility();
 
 // ============================================
 // FONCTIONS D'APPEL API
@@ -780,6 +809,7 @@ async function updateAccessibility() {
  */
 function renderStopsOnMap() {
     stopMapLayer.clearLayers();
+    stopMarkerMap.clear();
     stopsOnMap = [];
 
     // Regroupe les arrêts par nom (pour éviter les doublons)
@@ -818,30 +848,39 @@ function renderStopsOnMap() {
 }
 
 /**
- * Rend les arrêts visibles sur la carte (avec limitation).
+ * Rend les arrêts visibles sur la carte (avec réutilisation des marqueurs déjà affichés).
  */
 function renderVisibleStops() {
     if (!layerVisibility.stops) {
         stopMapLayer.clearLayers();
+        stopMarkerMap.clear();
         return;
     }
 
     const zoom = map.getZoom();
     if (zoom < 13) {
         stopMapLayer.clearLayers();
+        stopMarkerMap.clear();
         return;
     }
 
     const bounds = map.getBounds();
     // Filtre les arrêts visibles dans la vue ET limite à MAX_STOPS_ON_MAP
     const visible = stopsOnMap.filter(s => bounds.contains([s.lat, s.lon])).slice(0, MAX_STOPS_ON_MAP);
-    const seen = new Map();
+    const seen = new Set();
 
     visible.forEach(s => {
         const key = `${s.lat},${s.lon}`;
-        if (seen.has(key)) return;
+        seen.add(key);
 
         const isHighlighted = currentLineFilter && s.stops.some(st => stopServesLine(st.desserte, currentLineFilter));
+
+        if (stopMarkerMap.has(key)) {
+            // Marqueur déjà affiché : on met juste à jour son surlignage si le filtre de ligne a changé
+            const el = stopMarkerMap.get(key).getElement()?.querySelector('.stop-map-marker');
+            if (el) el.classList.toggle('highlighted', !!isHighlighted);
+            return;
+        }
 
         // Taille adaptative en fonction du zoom
         const iconSize = zoom < 15 ? 10 : 14;
@@ -860,8 +899,15 @@ function renderVisibleStops() {
             await openStopGroupPopup(s);
         });
 
-        seen.set(key, marker);
+        stopMarkerMap.set(key, marker);
     });
+
+    for (const [k, m] of stopMarkerMap) {
+        if (!seen.has(k)) {
+            stopMapLayer.removeLayer(m);
+            stopMarkerMap.delete(k);
+        }
+    }
 }
 
 // ============================================
@@ -1274,30 +1320,24 @@ function filterLines() {
  * Recherche une ligne dans les arrêts.
  */
 async function searchLineInStops(line) {
-    switchToTab('stops');
+    switchPanelTab('stops');
     document.getElementById('stop-search').value = '';
     await applyLineFilter(line);
     renderStopList('');
-    const panel = document.getElementById('info-panel');
-    if (panel.classList.contains('collapsed')) {
-        panel.classList.remove('collapsed');
-        setTimeout(() => map.invalidateSize(), 300);
-    }
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('collapsed')) toggleSidebar();
 }
 
 /**
  * Filtre une ligne depuis un popup.
  */
 async function filterLineFromPopup(line) {
-    switchToTab('stops');
+    switchPanelTab('stops');
     document.getElementById('stop-search').value = '';
     await applyLineFilter(getNewLineNumber(line));
     renderStopList('');
-    const panel = document.getElementById('info-panel');
-    if (panel.classList.contains('collapsed')) {
-        panel.classList.remove('collapsed');
-        setTimeout(() => map.invalidateSize(), 300);
-    }
+    const sidebar = document.getElementById('sidebar');
+    if (sidebar.classList.contains('collapsed')) toggleSidebar();
 }
 
 /**
