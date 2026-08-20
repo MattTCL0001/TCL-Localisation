@@ -313,9 +313,6 @@ function sortLinesByType(a, b) {
 /**
  * Construit le popup d'un bus.
  */
-/**
- * Construit le popup d'un bus (version simplifiée).
- */
 function buildBusPopup(bus) {
     return `
     <div style="width:260px;background:var(--glass-bg-heavy);border-radius:16px;overflow:hidden;font-family:inherit;border:1px solid var(--glass-border-highlight);">
@@ -329,30 +326,25 @@ function buildBusPopup(bus) {
         </div>
 
         <!-- Contenu principal -->
-        <div style="padding:12px 14px;">
-            <!-- Ligne et retard -->
-            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-                <div style="display:flex;align-items:center;gap:8px;">
-                    <div style="width:6px;height:6px;border-radius:50%;background:${bus.color};flex-shrink:0;"></div>
-                    <span style="font-size:11px;font-weight:600;color:var(--text-secondary);text-transform:uppercase;">Ligne ${bus.line}</span>
+        <div class="popup-body">
+            <div class="popup-header">
+                <div class="popup-line-info">
+                    <div class="popup-line-dot" style="background:${bus.color};"></div>
+                    <span class="popup-line-label">Ligne ${bus.line}</span>
                 </div>
-                <span style="font-size:10px;padding:3px 8px;border-radius:20px;${bus.delayOk ? 'background:rgba(77,255,136,0.1);color:#4dff88;border:1px solid rgba(77,255,136,0.2);' : 'background:rgba(255,77,77,0.1);color:#ff4d4d;border:1px solid rgba(255,77,77,0.2);'}">
+                <span class="popup-status-badge ${bus.delayOk ? 'on-time' : 'late'}">
                     ${bus.delayOk ? "À l'heure" : bus.delay}
                 </span>
             </div>
 
-            <!-- Terminus (aligné à gauche) -->
-            <div style="font-size:14px;font-weight:600;color:var(--text-primary);margin-bottom:8px;text-align:left;">
-                ${bus.dest || 'Destination inconnue'}
-            </div>
+            <div class="popup-terminus">${bus.dest || 'Destination inconnue'}</div>
 
-            <!-- Infos supplémentaires -->
-            <div style="font-size:11px;color:var(--text-secondary);display:flex;align-items:center;gap:6px;">
-                <img src="assets/SVG_Icons/bus.svg" class="svg-ic" style="width:12px;height:12px;">
+            <div class="popup-meta">
+                <img src="assets/SVG_Icons/bus.svg" class="svg-ic popup-meta-icon size-12">
                 ${getVehicleType(bus)}
             </div>
-            <div style="font-size:10px;color:var(--text-muted);font-family:monospace;margin-top:4px;display:flex;align-items:center;gap:6px;">
-                <img src="assets/SVG_Icons/id.svg" class="svg-ic" style="width:11px;height:11px;">
+            <div class="popup-meta mono">
+                <img src="assets/SVG_Icons/id.svg" class="svg-ic popup-meta-icon size-11">
                 ${bus.id}
             </div>
         </div>
