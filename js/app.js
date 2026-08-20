@@ -113,45 +113,6 @@ function toggleAllLayers() {
     toggleLayer('velov');
     toggleLayer('parking');
 }
-
-/**
- * Bascule l'affichage du panneau latéral.
- */
-function togglePanel() {
-    const panel = document.getElementById('info-panel');
-    panel.classList.toggle('visible');
-    if (panel.classList.contains('visible')) {
-        panel.style.bottom = '0';
-    } else {f
-        panel.style.bottom = '-90%';
-    }
-    setTimeout(() => map.invalidateSize(), 300);
-}
-
-
-
-// ============================================
-// GESTION DES ONGLETS DU PANNEAU
-// ============================================
-
-/**
- * Change d'onglet dans le panneau latéral.
- */
-function switchPanelTab(name) {
-    currentPanelTab = name;
-    document.querySelectorAll('.panel-tab').forEach(b => {
-        b.classList.toggle('active', b.dataset.tab === name);
-    });
-    document.querySelectorAll('.panel-tab-pane').forEach(p => {
-        p.classList.remove('active');
-    });
-    document.getElementById(`panel-${name}`).classList.add('active');
-    if (name === 'velov' && !velovLoaded) {
-        velovLoaded = true;
-        updateVelov();
-    }
-}
-
 // ============================================
 // INITIALISATION
 // ============================================
@@ -249,17 +210,14 @@ function toggleInfoItem(element) {
  * @param {string} tabName - Le nom de l'onglet à activer.
  */
 function switchPanelTab(tabName) {
-    // Met à jour l'onglet actif
+    currentPanelTab = tabName; // ré-ajouté, perdu dans le doublon
+
     document.querySelectorAll('.panel-tab').forEach(tab => {
         tab.classList.toggle('active', tab.dataset.tab === tabName);
     });
-
-    // Met à jour le contenu actif
     document.querySelectorAll('.panel-tab-pane').forEach(pane => {
         pane.classList.toggle('active', pane.id === `panel-${tabName}`);
     });
-
-    // Charge les données si nécessaire
     if (tabName === 'velov' && !velovLoaded) {
         velovLoaded = true;
         updateVelov();
