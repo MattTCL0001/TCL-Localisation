@@ -708,3 +708,36 @@
 .popup-meta-icon { vertical-align: middle !important; margin-right:0 !important; }
 .popup-meta-icon.size-12 { width:12px !important; height:12px !important; }
 .popup-meta-icon.size-11 { width:11px !important; height:11px !important; }
+/* Le wrapper Leaflet devient invisible — seule la carte custom à l'intérieur compte */
+.leaflet-popup-content-wrapper {
+    background: transparent !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    max-width: none !important;
+    padding: 0 !important;
+}
+
+.leaflet-popup-content {
+    margin: 0 !important;
+    width: auto !important;
+}
+
+/* La petite pointe en bas du popup, recolorée pour matcher le thème sombre au lieu du blanc par défaut */
+.leaflet-popup-tip {
+    background: var(--glass-bg-heavy) !important;
+    box-shadow: none !important;
+}
+
+/* Bouton fermer repositionné au-dessus de la carte custom (plus de padding pour le caler) */
+.leaflet-popup-close-button {
+    top: 4px !important;
+    right: 4px !important;
+    z-index: 10;
+    background: rgba(13, 15, 24, 0.6) !important;
+    border-radius: 50% !important;
+    width: 22px !important;
+    height: 22px !important;
+    line-height: 22px !important;
+    text-align: center !important;
+}
