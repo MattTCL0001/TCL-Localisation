@@ -1,4 +1,6 @@
-// config.js - Configuration globale pour toute l'application
+// ============================================
+// CONFIGURATION GLOBALE
+// ============================================
 window.CONFIG = {
     API_BASE_URL: window.location.hostname.includes('hf.space') ? '' : 'https://matttcl-tcl-localisation.hf.space/',
     API_FETCH_TIMEOUT: 15000,
@@ -7,14 +9,26 @@ window.CONFIG = {
     MAX_PARKINGS_ON_MAP: 100
 };
 
-// Variables globales partagées entre tous les fichiers
+// ============================================
+// VARIABLES GLOBALES PARTAGÉES
+// ============================================
 window.allStops = [];
 window.stopsMapping = {};
 window.allLines = [];
+window.allVelovStations = [];
+window.allParkings = [];
+window.allParcsRelais = [];
+window.currentStopMarker = null;
+window.currentVelovMarker = null;
+window.parkingsLoaded = false;
+window.velovLoaded = false;
+window.parcsRelaisLoaded = false;
 window.busMarkers = new Map();
 window.velovMarkerMap = new Map();
 window.parkingMarkerMap = new Map();
+window.parcsRelaisMarkerMap = new Map();
 window.stopMarkerMap = new Map();
-window.layerVisibility = { bus: true, stops: true, velov: true, parking: true };
 window.currentLineFilter = null;
 window.busLineFilter = null;
+window.stopsOnMap = [];
+window.layerVisibility = { bus: true, stops: true, velov: true, parking: true };
