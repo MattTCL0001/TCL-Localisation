@@ -1,156 +1,184 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="theme-color" content="#1a1a2e">
-    <title>TCL Localisation | Lyon 🚍🚲🚗</title>
-    
-    <!-- Leaflet CSS (sans integrity pour éviter les erreurs) -->
+    <title>TCL Localisation</title>
+    <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+    <meta charset="utf-8" />
+    <meta name="color-scheme" content="dark">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="theme-color" content="#0d0f18">
+
+    <!-- Leaflet (carte) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    
-    <!-- Leaflet MarkerCluster CSS -->
+    <!-- Leaflet MarkerCluster -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
-    
-    <!-- Leaflet MarkerCluster Default CSS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-          
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Custom CSS -->
+    <!-- Styles personnalisés -->
     <link rel="stylesheet" href="css/styles.css">
+    <style>
+        /* Fix pour éviter le FOUC (Flash of Unstyled Content) */
+        body { background: #0d0f18; }
+        .leaflet-container { background: #0d0f18 !important; }
+    </style>
 </head>
 <body>
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="glass-overlay">
-        <div class="loader">
-            <div class="loader-circle"></div>
-            <div class="loader-circle"></div>
-            <div class="loader-circle"></div>
-        </div>
-        <p>Chargement de la carte...</p>
+    <!-- Spinner de chargement -->
+    <div id="loading-spinner" class="loading-spinner">
+        <div class="spinner"></div>
+        <p>Chargement des données...</p>
     </div>
 
-    <!-- App Container -->
-    <div id="app-container">
-        <div id="map"></div>
-
-        <!-- Controls Panel (Glass) -->
-        <div id="controls" class="glass-panel">
-            <div class="control-header">
-                <span class="logo">🚍 TCL Lyon</span>
-                <button id="toggleControls" class="icon-btn" title="Réduire">
-                    <i class="fas fa-chevron-down"></i>
-                </button>
+    <div class="app-container">
+        <!-- En-tête -->
+        <header class="app-header">
+            <div class="logo-badge">
+                <img src="assets/logo.svg" onerror="this.src='assets/SVG_Icons/lignes.svg'; this.classList.add('svg-ic');">
+                <div id="system-status-dot" class="system-status-dot" title="Initialisation..."></div>
             </div>
-            
-            <div class="control-body">
-                <div class="tabs">
-                    <button class="tab-btn active" data-tab="transport">
-                        <i class="fas fa-bus"></i> Transport
+        </header>
+
+        <!-- Contrôles des couches (à gauche) -->
+        <div class="layer-control">
+            <div class="layer-toggle active" data-layer="bus" onclick="toggleLayer('bus')" title="Bus">
+                <div class="layer-toggle-icon"><img src="assets/SVG_Icons/bus.svg" class="svg-ic"></div>
+                <span class="layer-toggle-text">Bus</span>
+            </div>
+            <div class="layer-toggle active" data-layer="stops" onclick="toggleLayer('stops')" title="Arrêts">
+                <div class="layer-toggle-icon"><img src="assets/SVG_Icons/arrêt.svg" class="svg-ic"></div>
+                <span class="layer-toggle-text">Arrêts</span>
+            </div>
+            <div class="layer-toggle active" data-layer="velov" onclick="toggleLayer('velov')" title="Vélo'v">
+                <div class="layer-toggle-icon"><img src="assets/SVG_Icons/velo.svg" class="svg-ic"></div>
+                <span class="layer-toggle-text">Vélo'v</span>
+            </div>
+            <div class="layer-toggle active" data-layer="parking" onclick="toggleLayer('parking')" title="Parkings">
+                <div class="layer-toggle-icon">🅿️</div>
+                <span class="layer-toggle-text">Parkings</span>
+            </div>
+            <div class="layer-toggle" onclick="toggleAllLayers()" title="Tout masquer/afficher">
+                <div class="layer-toggle-icon">🌍</div>
+                <span class="layer-toggle-text">Tout</span>
+            </div>
+        </div>
+
+        <!-- SIDEBAR (à droite) -->
+        <div id="sidebar" class="sidebar collapsed">
+            <div class="sidebar-toggle" onclick="toggleSidebar()">
+                <span class="sidebar-toggle-icon">▶</span>
+            </div>
+            <div class="sidebar-content">
+                <!-- Onglets -->
+                <div class="panel-tabs">
+                    <button class="panel-tab active" data-tab="traffic" onclick="switchPanelTab('traffic')">
+                        <img src="assets/SVG_Icons/trafic.svg" class="svg-ic">
                     </button>
-                    <button class="tab-btn" data-tab="info">
-                        <i class="fas fa-info-circle"></i> Infos
+                    <button class="panel-tab" data-tab="accessibility" onclick="switchPanelTab('accessibility')">
+                        <img src="assets/SVG_Icons/PMR.svg" class="svg-ic">
+                    </button>
+                    <button class="panel-tab" data-tab="stops" onclick="switchPanelTab('stops')">
+                        <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic">
+                    </button>
+                    <button class="panel-tab" data-tab="lines" onclick="switchPanelTab('lines')">
+                        <img src="assets/SVG_Icons/lignes.svg" class="svg-ic">
+                    </button>
+                    <button class="panel-tab" data-tab="velov" onclick="switchPanelTab('velov')">
+                        <img src="assets/SVG_Icons/velo.svg" class="svg-ic">
+                    </button>
+                    <button class="panel-tab" data-tab="credits" onclick="switchPanelTab('credits')">
+                        <img src="assets/SVG_Icons/id.svg" class="svg-ic">
                     </button>
                 </div>
 
-                <div class="tab-content" id="transport-tab">
-                    <div class="toggle-group">
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleBus" checked>
-                            <span class="slider"></span>
-                            <span class="toggle-label"><i class="fas fa-bus"></i> Bus</span>
-                        </label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleVelov" checked>
-                            <span class="slider"></span>
-                            <span class="toggle-label"><i class="fas fa-bicycle"></i> Vélov</span>
-                        </label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="toggleParkings" checked>
-                            <span class="slider"></span>
-                            <span class="toggle-label"><i class="fas fa-parking"></i> Parkings</span>
-                        </label>
+                <!-- Contenu des onglets -->
+                <div class="panel-content">
+                    <!-- Onglet Trafic -->
+                    <div id="panel-traffic" class="panel-tab-pane active">
+                        <div class="tab-header">Perturbations en cours</div>
+                        <div id="traffic-list" class="info-list"></div>
                     </div>
-                    
-                    <div class="stats-container" id="transport-stats">
-                        <div class="stat-card">
-                            <i class="fas fa-bus"></i>
-                            <span id="bus-count">0</span>
-                            <small>Bus actifs</small>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-bicycle"></i>
-                            <span id="velov-count">0</span>
-                            <small>Vélov dispo</small>
-                        </div>
-                        <div class="stat-card">
-                            <i class="fas fa-parking"></i>
-                            <span id="parking-count">0</span>
-                            <small>Places dispo</small>
-                        </div>
+                    <!-- Onglet Accessibilité -->
+                    <div id="panel-accessibility" class="panel-tab-pane">
+                        <div class="tab-header">Alertes accessibilité</div>
+                        <div id="accessibility-list" class="info-list"></div>
                     </div>
-                </div>
-
-                <div class="tab-content hidden" id="info-tab">
-                    <div class="info-section">
-                        <h3><i class="fas fa-exclamation-triangle"></i> Alertes Trafic</h3>
-                        <div id="traffic-alerts" class="alerts-container">
-                            <div class="alert-card warning">
-                                <i class="fas fa-exclamation-circle"></i>
-                                <div class="alert-content">
-                                    <strong>Attention</strong>
-                                    <p>Travaux sur la ligne D2 jusqu'au 30/08</p>
-                                </div>
-                            </div>
-                            <div class="alert-card info">
-                                <i class="fas fa-info-circle"></i>
-                                <div class="alert-content">
-                                    <strong>Info</strong>
-                                    <p>Nouvelle station Vélov Place Bellecour</p>
-                                </div>
-                            </div>
+                    <!-- Onglet Arrêts -->
+                    <div id="panel-stops" class="panel-tab-pane">
+                        <div class="search-bar">
+                            <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
+                            <input type="text" id="stop-search" placeholder="Rechercher un arrêt..." oninput="filterStops()">
+                        </div>
+                        <div class="tab-header">
+                            <span>Arrêts</span>
+                            <span id="search-stats">0/0</span>
+                        </div>
+                        <div id="stops-list" class="info-list"></div>
+                    </div>
+                    <!-- Onglet Lignes -->
+                    <div id="panel-lines" class="panel-tab-pane">
+                        <div class="filter-bar">
+                            <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="assets/SVG_Icons/metro.svg" class="svg-ic"> Métro</label>
+                            <label><input type="checkbox" id="filter-tram" checked onchange="filterLines()"> <img src="assets/SVG_Icons/tramway.svg" class="svg-ic"> Tram</label>
+                            <label><input type="checkbox" id="filter-tb" checked onchange="filterLines()"> <img src="assets/SVG_Icons/trolleybus.svg" class="svg-ic"> TramBus</label>
+                            <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="assets/SVG_Icons/funicular.svg" class="svg-ic"> Funiculaire</label>
+                            <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navigone.svg" class="svg-ic"> Navigône</label>
+                            <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="assets/SVG_Icons/chrono.svg" class="svg-ic"> Chrono</label>
+                            <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="assets/SVG_Icons/bus.svg" class="svg-ic"> Bus</label>
+                            <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navette.svg" class="svg-ic"> Navette</label>
+                            <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="assets/SVG_Icons/pleine_lune.svg" class="svg-ic"> Pleine Lune</label>
+                            <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="assets/SVG_Icons/JD.svg" class="svg-ic"> Junior Direct</label>
+                        </div>
+                        <div class="tab-header">Lignes disponibles</div>
+                        <div id="lines-list" class="info-list"></div>
+                    </div>
+                    <!-- Onglet Vélo'v -->
+                    <div id="panel-velov" class="panel-tab-pane">
+                        <div class="search-bar">
+                            <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
+                            <input type="text" id="velov-search" placeholder="Rechercher une station..." oninput="filterVelovStations()">
+                        </div>
+                        <div class="tab-header">
+                            <span>Stations Vélo'v</span>
+                            <span id="velov-stats">0/0</span>
+                        </div>
+                        <div id="velov-list" class="info-list"></div>
+                    </div>
+                    <!-- Onglet Crédits -->
+                    <div id="panel-credits" class="panel-tab-pane">
+                        <div class="tab-header">À propos</div>
+                        <div class="credits-content">
+                            <p>Application de localisation en temps réel des transports TCL.</p>
+                            <p>Données : <a href="https://data.grandlyon.com" target="_blank">Grand Lyon</a> | <a href="https://www.tcl.fr" target="_blank">TCL</a></p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Floating Buttons -->
-        <button id="locate-me" class="floating-btn glass-panel" title="Me localiser">
-            <i class="fas fa-crosshairs"></i>
-        </button>
-        <button id="reset-view" class="floating-btn glass-panel" title="Réinitialiser">
-            <i class="fas fa-sync"></i>
-        </button>
-
-        <!-- Legend -->
-        <div id="legend" class="glass-panel legend-panel">
-            <h4><i class="fas fa-map"></i> Légende</h4>
-            <div class="legend-item">
-                <div class="legend-icon bus"></div>
-                <span>Bus</span>
+        <!-- Carte -->
+        <div class="map-container">
+            <div id="map"></div>
+            <!-- Bannières de filtre -->
+            <div id="bus-filter-banner" class="filter-banner">
+                <span id="bus-filter-label"></span>
+                <button class="filter-clear-btn" onclick="clearAllFilters()">× Retirer</button>
             </div>
-            <div class="legend-item">
-                <div class="legend-icon velov"></div>
-                <span>Vélov</span>
-            </div>
-            <div class="legend-item">
-                <div class="legend-icon parking"></div>
-                <span>Parking</span>
+            <div id="stop-filter-banner" class="filter-banner">
+                <span id="stop-filter-label"></span>
+                <button class="filter-clear-btn" onclick="clearAllFilters()">× Retirer</button>
             </div>
         </div>
     </div>
+
+    <!-- Notifications -->
+    <div id="notification-container" class="notification-container"></div>
 
     <!-- Leaflet JS (MUST be loaded BEFORE MarkerCluster) -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    
-    <!-- Leaflet MarkerCluster (depends on Leaflet) -->
+    <!-- Leaflet MarkerCluster -->
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-    
     <!-- Custom scripts -->
-    <script src="config.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/api.js"></script>
     <script src="js/app.js"></script>
