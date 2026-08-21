@@ -32,3 +32,4 @@ window.currentLineFilter = null;
 window.busLineFilter = null;
 window.stopsOnMap = [];
 window.layerVisibility = { bus: true, stops: true, velov: true, parking: true };
+window.map = null;
