@@ -34,7 +34,9 @@ class Utils {
         const R = 6371;
         const dLat = (lat2 - lat1) * Math.PI / 180;
         const dLon = (lon2 - lon1) * Math.PI / 180;
-        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+        const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + 
+                  Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+                  Math.sin(dLon / 2) * Math.sin(dLon / 2);
         const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
         return R * c;
     }
@@ -42,7 +44,7 @@ class Utils {
     static getColorFromValue(value) {
         if (value === null || value === undefined) return '#999999';
         const hue = 120 - (value * 120);
-        return `hsl(${hue}, 100%, 50%)`;
+        return 'hsl(' + hue + ', 100%, 50%)';
     }
 
     static iconCache = new Map();
@@ -74,26 +76,48 @@ class Utils {
 
     static filterFeaturesByBounds(features, bounds) {
         if (!bounds || !features) return features;
-        const [sw, ne] = [bounds.getSouthWest(), bounds.getNorthEast()];
+        const sw = bounds.getSouthWest();
+        const ne = bounds.getNorthEast();
         return features.filter(feature => {
             if (!feature.geometry || !feature.geometry.coordinates) return false;
-            const [lng, lat] = feature.geometry.coordinates;
+            const lng = feature.geometry.coordinates[0];
+            const lat = feature.geometry.coordinates[1];
             return lat >= sw.lat && lat <= ne.lat && lng >= sw.lng && lng <= ne.lng;
         });
     }
 
     static timeAgo(date) {
         if (!date) return 'N/A';
-        const now = new Date(); const then = new Date(date); const diff = Math.floor((now - then) / 1000);
-        const intervals = { année: 31536000, mois: 2592000, semaine: 604800, jour: 86400, heure: 3600, minute: 60, seconde: 1 };
-        for (const [unit, seconds] of Object.entries(intervals)) {
-            const interval = Math.floor(diff / seconds);
-            if (interval >= 1) return interval === 1 ? `il y a 1 ${unit}` : `il y a ${interval} ${unit}s`;
+        const now = new Date(); 
+        const then = new Date(date); 
+        const diff = Math.floor((now - then) / 1000);
+        const intervals = { 
+            'année': 31536000, 
+            'mois': 2592000, 
+            'semaine': 604800, 
+            'jour': 86400, 
+            'heure': 3600, 
+            'minute': 60, 
+            'seconde': 1 
+        };
+        for (const unit in intervals) {
+            const interval = Math.floor(diff / intervals[unit]);
+            if (interval >= 1) {
+                return interval === 1 ? 'il y a 1 ' + unit : 'il y a ' + interval + ' ' + unit + 's';
+            }
         }
-        return 'à l'instant';
+        return `à l'instant`;
     }
 
-    static capitalize(str) { if (!str) return ''; return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); }
-    static sanitizeString(str) { if (!str) return ''; return str.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/\"/g, '&quot;').replace(/'/g, '&#39;'); }
-    static isMobile() { return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent); }
+    static capitalize(str) { 
+        if (!str) return ''; 
+        return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase(); 
+    }
+    static sanitizeString(str) { 
+        if (!str) return ''; 
+        return str.replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/'/g, '&#39;'); 
+    }
+    static isMobile() { 
+        return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent); 
+    }
 }

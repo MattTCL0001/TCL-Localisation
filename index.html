@@ -5,15 +5,24 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1a1a2e">
     <title>TCL Localisation | Lyon 🚍🚲🚗</title>
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" integrity="sha512-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY5KdXhcp+IPWG8n2h2qY9CSsmfB1dZJD0gB1PGoPzF5Q==" crossorigin="" />
-    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" integrity="sha512-+2KF42Jg20iB4J6Q6F5o5h52ZWr3R4Q5Lf2J8s5J3L5J4C5J4B5L5Q5J4C5J4" crossorigin="" />
+    
+    <!-- Leaflet CSS (sans integrity pour éviter les erreurs) -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    
+    <!-- Leaflet MarkerCluster CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
+    
+    <!-- Leaflet MarkerCluster Default CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
+          
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
     <link rel="stylesheet" href="css/styles.css">
-    <link rel="preload" href="js/app.js" as="script">
-    <link rel="preload" href="js/api.js" as="script">
-    <link rel="preload" href="css/styles.css" as="style">
 </head>
 <body>
+    <!-- Loading Overlay -->
     <div id="loading-overlay" class="glass-overlay">
         <div class="loader">
             <div class="loader-circle"></div>
@@ -22,18 +31,30 @@
         </div>
         <p>Chargement de la carte...</p>
     </div>
+
+    <!-- App Container -->
     <div id="app-container">
         <div id="map"></div>
+
+        <!-- Controls Panel (Glass) -->
         <div id="controls" class="glass-panel">
             <div class="control-header">
                 <span class="logo">🚍 TCL Lyon</span>
-                <button id="toggleControls" class="icon-btn" title="Réduire"><i class="fas fa-chevron-down"></i></button>
+                <button id="toggleControls" class="icon-btn" title="Réduire">
+                    <i class="fas fa-chevron-down"></i>
+                </button>
             </div>
+            
             <div class="control-body">
                 <div class="tabs">
-                    <button class="tab-btn active" data-tab="transport"><i class="fas fa-bus"></i> Transport</button>
-                    <button class="tab-btn" data-tab="info"><i class="fas fa-info-circle"></i> Infos</button>
+                    <button class="tab-btn active" data-tab="transport">
+                        <i class="fas fa-bus"></i> Transport
+                    </button>
+                    <button class="tab-btn" data-tab="info">
+                        <i class="fas fa-info-circle"></i> Infos
+                    </button>
                 </div>
+
                 <div class="tab-content" id="transport-tab">
                     <div class="toggle-group">
                         <label class="toggle-switch">
@@ -52,6 +73,7 @@
                             <span class="toggle-label"><i class="fas fa-parking"></i> Parkings</span>
                         </label>
                     </div>
+                    
                     <div class="stats-container" id="transport-stats">
                         <div class="stat-card">
                             <i class="fas fa-bus"></i>
@@ -70,6 +92,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="tab-content hidden" id="info-tab">
                     <div class="info-section">
                         <h3><i class="fas fa-exclamation-triangle"></i> Alertes Trafic</h3>
@@ -93,20 +116,43 @@
                 </div>
             </div>
         </div>
-        <button id="locate-me" class="floating-btn glass-panel" title="Me localiser"><i class="fas fa-crosshairs"></i></button>
-        <button id="reset-view" class="floating-btn glass-panel" title="Réinitialiser"><i class="fas fa-sync"></i></button>
+
+        <!-- Floating Buttons -->
+        <button id="locate-me" class="floating-btn glass-panel" title="Me localiser">
+            <i class="fas fa-crosshairs"></i>
+        </button>
+        <button id="reset-view" class="floating-btn glass-panel" title="Réinitialiser">
+            <i class="fas fa-sync"></i>
+        </button>
+
+        <!-- Legend -->
         <div id="legend" class="glass-panel legend-panel">
             <h4><i class="fas fa-map"></i> Légende</h4>
-            <div class="legend-item"><div class="legend-icon bus"></div><span>Bus</span></div>
-            <div class="legend-item"><div class="legend-icon velov"></div><span>Vélov</span></div>
-            <div class="legend-item"><div class="legend-icon parking"></div><span>Parking</span></div>
+            <div class="legend-item">
+                <div class="legend-icon bus"></div>
+                <span>Bus</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon velov"></div>
+                <span>Vélov</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-icon parking"></div>
+                <span>Parking</span>
+            </div>
         </div>
     </div>
-    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" integrity="sha512-nxSpiDau5Nz4mRaG3aj6K8HJ3aX6V8Q8pBdNnQm4E5KtK3uK4C5J4B5L5Q5J4C5J4" crossorigin="" defer></script>
-    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js" defer></script>
-    <script src="config.js" defer></script>
-    <script src="js/utils.js" defer></script>
-    <script src="js/api.js" defer></script>
-    <script src="js/app.js" defer></script>
+
+    <!-- Leaflet JS (MUST be loaded BEFORE MarkerCluster) -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    
+    <!-- Leaflet MarkerCluster (depends on Leaflet) -->
+    <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
+    
+    <!-- Custom scripts -->
+    <script src="config.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
