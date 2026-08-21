@@ -263,3 +263,19 @@ function filterLineFromPopup(line) {
     applyBusLineFilter();
     renderVisibleStops();
 }
+// ===== FONCTIONS MANQUANTES =====
+
+window.checkSystemStatus = async function() {
+    const statusDot = document.getElementById('system-status-dot');
+    if (!statusDot) return;
+    try {
+        const res = await fetch(window.CONFIG.API_BASE_URL + 'api/status', {
+            headers: { 'Accept': 'application/json' }
+        });
+        statusDot.className = res.ok ? 'system-status-dot online' : 'system-status-dot warning';
+        statusDot.title = res.ok ? 'Système opérationnel' : 'Problème de connexion';
+    } catch (e) {
+        statusDot.className = 'system-status-dot offline';
+        statusDot.title = 'Hors ligne - Mode dégradé';
+    }
+};
