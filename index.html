@@ -10,15 +10,11 @@
 
     <!-- Leaflet (carte) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-    <!-- Leaflet MarkerCluster -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet.markercluster@1.4.1/dist/MarkerCluster.Default.css" />
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Styles personnalisés -->
     <link rel="stylesheet" href="css/styles.css">
     <style>
-        /* Fix pour éviter le FOUC (Flash of Unstyled Content) */
         body { background: #0d0f18; }
         .leaflet-container { background: #0d0f18 !important; }
     </style>
@@ -39,112 +35,98 @@
             </div>
         </header>
 
-        <!-- Contrôles des couches (à gauche) -->
+        <!-- Contrôles des couches -->
         <div class="layer-control">
-            <div class="layer-toggle active" data-layer="bus" onclick="toggleLayer('bus')" title="Bus">
+            <div class="layer-toggle active" data-layer="bus" onclick="window.toggleLayer('bus')" title="Bus">
                 <div class="layer-toggle-icon"><img src="assets/SVG_Icons/bus.svg" class="svg-ic"></div>
                 <span class="layer-toggle-text">Bus</span>
             </div>
-            <div class="layer-toggle active" data-layer="stops" onclick="toggleLayer('stops')" title="Arrêts">
+            <div class="layer-toggle active" data-layer="stops" onclick="window.toggleLayer('stops')" title="Arrêts">
                 <div class="layer-toggle-icon"><img src="assets/SVG_Icons/arrêt.svg" class="svg-ic"></div>
                 <span class="layer-toggle-text">Arrêts</span>
             </div>
-            <div class="layer-toggle active" data-layer="velov" onclick="toggleLayer('velov')" title="Vélo'v">
+            <div class="layer-toggle active" data-layer="velov" onclick="window.toggleLayer('velov')" title="Vélo'v">
                 <div class="layer-toggle-icon"><img src="assets/SVG_Icons/velo.svg" class="svg-ic"></div>
                 <span class="layer-toggle-text">Vélo'v</span>
             </div>
-            <div class="layer-toggle active" data-layer="parking" onclick="toggleLayer('parking')" title="Parkings">
+            <div class="layer-toggle active" data-layer="parking" onclick="window.toggleLayer('parking')" title="Parkings">
                 <div class="layer-toggle-icon">🅿️</div>
                 <span class="layer-toggle-text">Parkings</span>
             </div>
-            <div class="layer-toggle" onclick="toggleAllLayers()" title="Tout masquer/afficher">
+            <div class="layer-toggle" onclick="window.toggleAllLayers()" title="Tout masquer/afficher">
                 <div class="layer-toggle-icon">🌍</div>
                 <span class="layer-toggle-text">Tout</span>
             </div>
         </div>
 
-        <!-- SIDEBAR (à droite) -->
+        <!-- SIDEBAR -->
         <div id="sidebar" class="sidebar collapsed">
-            <div class="sidebar-toggle" onclick="toggleSidebar()">
+            <div class="sidebar-toggle" onclick="window.toggleSidebar()">
                 <span class="sidebar-toggle-icon">▶</span>
             </div>
             <div class="sidebar-content">
-                <!-- Onglets -->
                 <div class="panel-tabs">
-                    <button class="panel-tab active" data-tab="traffic" onclick="switchPanelTab('traffic')">
+                    <button class="panel-tab active" data-tab="traffic" onclick="window.switchPanelTab('traffic')">
                         <img src="assets/SVG_Icons/trafic.svg" class="svg-ic">
                     </button>
-                    <button class="panel-tab" data-tab="accessibility" onclick="switchPanelTab('accessibility')">
+                    <button class="panel-tab" data-tab="accessibility" onclick="window.switchPanelTab('accessibility')">
                         <img src="assets/SVG_Icons/PMR.svg" class="svg-ic">
                     </button>
-                    <button class="panel-tab" data-tab="stops" onclick="switchPanelTab('stops')">
+                    <button class="panel-tab" data-tab="stops" onclick="window.switchPanelTab('stops')">
                         <img src="assets/SVG_Icons/arrêt.svg" class="svg-ic">
                     </button>
-                    <button class="panel-tab" data-tab="lines" onclick="switchPanelTab('lines')">
+                    <button class="panel-tab" data-tab="lines" onclick="window.switchPanelTab('lines')">
                         <img src="assets/SVG_Icons/lignes.svg" class="svg-ic">
                     </button>
-                    <button class="panel-tab" data-tab="velov" onclick="switchPanelTab('velov')">
+                    <button class="panel-tab" data-tab="velov" onclick="window.switchPanelTab('velov')">
                         <img src="assets/SVG_Icons/velo.svg" class="svg-ic">
                     </button>
-                    <button class="panel-tab" data-tab="credits" onclick="switchPanelTab('credits')">
+                    <button class="panel-tab" data-tab="credits" onclick="window.switchPanelTab('credits')">
                         <img src="assets/SVG_Icons/id.svg" class="svg-ic">
                     </button>
                 </div>
 
-                <!-- Contenu des onglets -->
                 <div class="panel-content">
-                    <!-- Onglet Trafic -->
                     <div id="panel-traffic" class="panel-tab-pane active">
                         <div class="tab-header">Perturbations en cours</div>
                         <div id="traffic-list" class="info-list"></div>
                     </div>
-                    <!-- Onglet Accessibilité -->
                     <div id="panel-accessibility" class="panel-tab-pane">
                         <div class="tab-header">Alertes accessibilité</div>
                         <div id="accessibility-list" class="info-list"></div>
                     </div>
-                    <!-- Onglet Arrêts -->
                     <div id="panel-stops" class="panel-tab-pane">
                         <div class="search-bar">
                             <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
-                            <input type="text" id="stop-search" placeholder="Rechercher un arrêt..." oninput="filterStops()">
+                            <input type="text" id="stop-search" placeholder="Rechercher un arrêt..." oninput="window.filterStops()">
                         </div>
-                        <div class="tab-header">
-                            <span>Arrêts</span>
-                            <span id="search-stats">0/0</span>
-                        </div>
+                        <div class="tab-header"><span>Arrêts</span><span id="search-stats">0/0</span></div>
                         <div id="stops-list" class="info-list"></div>
                     </div>
-                    <!-- Onglet Lignes -->
                     <div id="panel-lines" class="panel-tab-pane">
                         <div class="filter-bar">
-                            <label><input type="checkbox" id="filter-metro" checked onchange="filterLines()"> <img src="assets/SVG_Icons/metro.svg" class="svg-ic"> Métro</label>
-                            <label><input type="checkbox" id="filter-tram" checked onchange="filterLines()"> <img src="assets/SVG_Icons/tramway.svg" class="svg-ic"> Tram</label>
-                            <label><input type="checkbox" id="filter-tb" checked onchange="filterLines()"> <img src="assets/SVG_Icons/trolleybus.svg" class="svg-ic"> TramBus</label>
-                            <label><input type="checkbox" id="filter-funicular" checked onchange="filterLines()"> <img src="assets/SVG_Icons/funicular.svg" class="svg-ic"> Funiculaire</label>
-                            <label><input type="checkbox" id="filter-navgone" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navigone.svg" class="svg-ic"> Navigône</label>
-                            <label><input type="checkbox" id="filter-chrono" checked onchange="filterLines()"> <img src="assets/SVG_Icons/chrono.svg" class="svg-ic"> Chrono</label>
-                            <label><input type="checkbox" id="filter-bus" checked onchange="filterLines()"> <img src="assets/SVG_Icons/bus.svg" class="svg-ic"> Bus</label>
-                            <label><input type="checkbox" id="filter-navette" checked onchange="filterLines()"> <img src="assets/SVG_Icons/navette.svg" class="svg-ic"> Navette</label>
-                            <label><input type="checkbox" id="filter-pl" checked onchange="filterLines()"> <img src="assets/SVG_Icons/pleine_lune.svg" class="svg-ic"> Pleine Lune</label>
-                            <label><input type="checkbox" id="filter-jd" checked onchange="filterLines()"> <img src="assets/SVG_Icons/JD.svg" class="svg-ic"> Junior Direct</label>
+                            <label><input type="checkbox" id="filter-metro" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/metro.svg" class="svg-ic"> Métro</label>
+                            <label><input type="checkbox" id="filter-tram" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/tramway.svg" class="svg-ic"> Tram</label>
+                            <label><input type="checkbox" id="filter-tb" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/trolleybus.svg" class="svg-ic"> TramBus</label>
+                            <label><input type="checkbox" id="filter-funicular" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/funicular.svg" class="svg-ic"> Funiculaire</label>
+                            <label><input type="checkbox" id="filter-navgone" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/navigone.svg" class="svg-ic"> Navigône</label>
+                            <label><input type="checkbox" id="filter-chrono" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/chrono.svg" class="svg-ic"> Chrono</label>
+                            <label><input type="checkbox" id="filter-bus" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/bus.svg" class="svg-ic"> Bus</label>
+                            <label><input type="checkbox" id="filter-navette" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/navette.svg" class="svg-ic"> Navette</label>
+                            <label><input type="checkbox" id="filter-pl" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/pleine_lune.svg" class="svg-ic"> Pleine Lune</label>
+                            <label><input type="checkbox" id="filter-jd" checked onchange="window.filterLines()"> <img src="assets/SVG_Icons/JD.svg" class="svg-ic"> Junior Direct</label>
                         </div>
                         <div class="tab-header">Lignes disponibles</div>
                         <div id="lines-list" class="info-list"></div>
                     </div>
-                    <!-- Onglet Vélo'v -->
                     <div id="panel-velov" class="panel-tab-pane">
                         <div class="search-bar">
                             <img src="assets/SVG_Icons/loupe.svg" class="svg-ic">
-                            <input type="text" id="velov-search" placeholder="Rechercher une station..." oninput="filterVelovStations()">
+                            <input type="text" id="velov-search" placeholder="Rechercher une station..." oninput="window.filterVelovStations()">
                         </div>
-                        <div class="tab-header">
-                            <span>Stations Vélo'v</span>
-                            <span id="velov-stats">0/0</span>
-                        </div>
+                        <div class="tab-header"><span>Stations Vélo'v</span><span id="velov-stats">0/0</span></div>
                         <div id="velov-list" class="info-list"></div>
                     </div>
-                    <!-- Onglet Crédits -->
                     <div id="panel-credits" class="panel-tab-pane">
                         <div class="tab-header">À propos</div>
                         <div class="credits-content">
@@ -159,14 +141,13 @@
         <!-- Carte -->
         <div class="map-container">
             <div id="map"></div>
-            <!-- Bannières de filtre -->
             <div id="bus-filter-banner" class="filter-banner">
                 <span id="bus-filter-label"></span>
-                <button class="filter-clear-btn" onclick="clearAllFilters()">× Retirer</button>
+                <button class="filter-clear-btn" onclick="window.clearAllFilters()">× Retirer</button>
             </div>
             <div id="stop-filter-banner" class="filter-banner">
                 <span id="stop-filter-label"></span>
-                <button class="filter-clear-btn" onclick="clearAllFilters()">× Retirer</button>
+                <button class="filter-clear-btn" onclick="window.clearAllFilters()">× Retirer</button>
             </div>
         </div>
     </div>
@@ -174,14 +155,12 @@
     <!-- Notifications -->
     <div id="notification-container" class="notification-container"></div>
 
-    <!-- Leaflet JS (MUST be loaded BEFORE MarkerCluster) -->
+    <!-- Scripts dans le BON ORDRE -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-    <!-- Leaflet MarkerCluster -->
     <script src="https://unpkg.com/leaflet.markercluster@1.4.1/dist/leaflet.markercluster.js"></script>
-    <!-- Custom scripts -->
     <script src="config.js"></script>
-<script src="js/utils.js"></script>
-<script src="js/api.js"></script>
-<script src="js/app.js"></script>
+    <script src="js/utils.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
