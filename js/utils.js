@@ -112,4 +112,154 @@ function getLineType(line) {
     return 'bus';
 }
 
-// ... (garde toutes tes autres fonctions utilitaires)
+// ===== FONCTIONS MANQUANTES AJOUTÉES =====
+
+/**
+ * Vérifie le statut du système (appelé périodiquement)
+ */
+async function checkSystemStatus() {
+    try {
+        const statusDot = document.getElementById('system-status-dot');
+        if (!statusDot) return;
+        
+        // Simuler un check (à remplacer par un vrai appel API si disponible)
+        const response = await fetch(CONFIG.API_BASE_URL + 'api/status', {
+            headers: { 'Accept': 'application/json' }
+        });
+        
+        if (response.ok) {
+            const data = await response.json();
+            statusDot.className = 'system-status-dot online';
+            statusDot.title = 'Système opérationnel';
+        } else {
+            statusDot.className = 'system-status-dot warning';
+            statusDot.title = 'Problème de connexion';
+        }
+    } catch (e) {
+        const statusDot = document.getElementById('system-status-dot');
+        if (statusDot) {
+            statusDot.className = 'system-status-dot offline';
+            statusDot.title = 'Hors ligne - Mode dégradé';
+        }
+        console.warn('System status check failed:', e.message);
+    }
+}
+
+/**
+ * Met à jour les données de trafic
+ */
+async function updateTraffic() {
+    try {
+        const data = await apiFetch('api/traffic');
+        if (data.is_loading) {
+            setTimeout(updateTraffic, 10000);
+            return;
+        }
+        renderTrafficList(data);
+        console.log("✅ Trafic mis à jour");
+    } catch (e) {
+        console.error("❌ Erreur updateTraffic:", e);
+        setTimeout(updateTraffic, 10000);
+    }
+}
+
+/**
+ * Met à jour les alertes d'accessibilité
+ */
+async function updateAccessibility() {
+    try {
+        const data = await apiFetch('api/accessibility');
+        if (data.is_loading) {
+            setTimeout(updateAccessibility, 10000);
+            return;
+        }
+        renderAccessibilityList(data);
+        console.log("✅ Accessibilité mise à jour");
+    } catch (e) {
+        console.error("❌ Erreur updateAccessibility:", e);
+        setTimeout(updateAccessibility, 10000);
+    }
+}
+
+/**
+ * Affiche la liste du trafic
+ */
+function renderTrafficList(data) {
+    const container = document.getElementById('traffic-list');
+    if (!container) return;
+    
+    if (!data || !data.alerts || data.alerts.length === 0) {
+        container.innerHTML = '<div class="info-empty">Aucune perturbation en cours</div>';
+        return;
+    }
+    
+    container.innerHTML = data.alerts.map(alert => `
+        <div class="info-item" onclick="toggleInfoItem(this)">
+            <div class="info-item-header">
+                <span class="info-item-icon">⚠️</span>
+                <span class="info-item-title">${alert.line || 'Général'}</span>
+                <span class="info-item-badge">${alert.severity || 'Info'}</span>
+            </div>
+            <div class="info-item-body">
+                <p>${alert.message || 'Détails non disponibles'}</p>
+                <p class="mono">${alert.start_time ? new Date(alert.start_time).toLocaleString('fr-FR') : ''}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Affiche la liste d'accessibilité
+ */
+function renderAccessibilityList(data) {
+    const container = document.getElementById('accessibility-list');
+    if (!container) return;
+    
+    if (!data || !data.alerts || data.alerts.length === 0) {
+        container.innerHTML = '<div class="info-empty">Aucune alerte accessibilité</div>';
+        return;
+    }
+    
+    container.innerHTML = data.alerts.map(alert => `
+        <div class="info-item" onclick="toggleInfoItem(this)">
+            <div class="info-item-header">
+                <span class="info-item-icon">♿</span>
+                <span class="info-item-title">${alert.stop || 'Arrêt inconnu'}</span>
+                <span class="info-item-badge">PMR</span>
+            </div>
+            <div class="info-item-body">
+                <p>${alert.message || 'Détails non disponibles'}</p>
+            </div>
+        </div>
+    `).join('');
+}
+
+/**
+ * Efface tous les filtres
+ */
+function clearAllFilters() {
+    currentLineFilter = null;
+    busLineFilter = null;
+    document.getElementById('bus-filter-banner').style.display = 'none';
+    document.getElementById('stop-filter-banner').style.display = 'none';
+    updateVisibleVelov();
+    updateVisibleParkings();
+    updateVisibleParkAndRideLots();
+    renderVisibleStops();
+    applyBusLineFilter();
+}
+
+/**
+ * Filtre par ligne depuis un popup
+ */
+function filterLineFromPopup(line) {
+    busLineFilter = getNewLineNumber(line);
+    currentLineFilter = busLineFilter;
+    const label = document.getElementById('bus-filter-label');
+    if (label) {
+        label.textContent = `Ligne ${line} seulement`;
+        document.getElementById('bus-filter-banner').style.display = 'flex';
+    }
+    applyBusLineFilter();
+    renderVisibleStops();
+}
