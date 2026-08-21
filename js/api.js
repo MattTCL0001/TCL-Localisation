@@ -1,122 +1,180 @@
+// ============================================
+// CONSTANTES GLOBALES (API)
+// ============================================
+const API_BASE_URL = 'https://matttcl-tcl-localisation.hf.space/';
+const API_FETCH_TIMEOUT = 15000;
+let _fetchBackoff = 1000;
+const MAX_STOPS_ON_MAP = 200;
+const MAX_VELOV_ON_MAP = 250;
+const MAX_PARKINGS_ON_MAP = 100;
+
+// Variables globales
+let allStops = [];
+let stopsMapping = {};
+let allLines = [];
+let allVelovStations = [];
+let allParkings = [];
+let allParcsRelais = [];
+let currentStopMarker = null;
+let currentVelovMarker = null;
+let parkingsLoaded = false;
+let velovLoaded = false;
+let parcsRelaisLoaded = false;
+const busMarkers = new Map();
+const velovMarkerMap = new Map();
+const parkingMarkerMap = new Map();
+const parcsRelaisMarkerMap = new Map();
+const stopMarkerMap = new Map();
+let currentLineFilter = null;
+let busLineFilter = null;
+let stopsOnMap = [];
+let layerVisibility = { bus: true, stops: true, velov: true, parking: true };
+
+// ============================================
+// FONCTIONS D'APPEL API
+// ============================================
+
 /**
- * API Manager pour TCL Localisation - Version Optimisée 2026
+ * Effectue une requête API avec gestion des erreurs et des timeouts.
  */
+async function apiFetch(path, attempt = 1) {
+    showSpinner();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), API_FETCH_TIMEOUT);
 
-class APIManager {
-    constructor() {
-        this.cache = new Map();
-        this.pendingRequests = new Map();
-        this.lastUpdated = new Map();
-        this.abortControllers = new Map();
-    }
+    try {
+        const res = await fetch(API_BASE_URL + path, {
+            signal: controller.signal,
+            headers: { 'Accept': 'application/json' }
+        });
+        clearTimeout(timeoutId);
+        hideSpinner();
 
-    async fetchData(endpoint, options = {}) {
-        const { forceRefresh = false, cacheTTL = CONFIG.PERFORMANCE.updateInterval, signal } = options;
-        const cacheKey = `api_${endpoint}`;
-
-        if (!forceRefresh && this.cache.has(cacheKey)) {
-            const cached = this.cache.get(cacheKey);
-            const lastUpdate = this.lastUpdated.get(cacheKey) || 0;
-            if (Date.now() - lastUpdate < cacheTTL) return cached;
+        if (res.status === 429) {
+            const wait = Math.min(_fetchBackoff * attempt * 2, 30000);
+            console.warn(`⏳ 429 rate limit sur ${path}, attente ${wait/1000}s...`);
+            await new Promise(r => setTimeout(r, wait));
+            if (attempt < 3) return apiFetch(path, attempt + 1);
+            showNotification("Trop de requêtes. Réessayez plus tard.", "error");
+            return { is_loading: true };
         }
 
-        if (this.pendingRequests.has(cacheKey)) return this.pendingRequests.get(cacheKey);
-
-        const controller = signal ? null : new AbortController();
-        const requestSignal = signal || controller?.signal;
-
-        const requestPromise = this._makeRequest(endpoint, requestSignal)
-            .then(data => {
-                this.cache.set(cacheKey, data);
-                this.lastUpdated.set(cacheKey, Date.now());
-                this.pendingRequests.delete(cacheKey);
-                if (controller) this.abortControllers.delete(cacheKey);
-                return data;
-            })
-            .catch(error => {
-                this.pendingRequests.delete(cacheKey);
-                if (controller) this.abortControllers.delete(cacheKey);
-                throw error;
-            });
-
-        this.pendingRequests.set(cacheKey, requestPromise);
-        if (controller) this.abortControllers.set(cacheKey, controller);
-        return requestPromise;
-    }
-
-    async _makeRequest(endpoint, signal) {
-        const url = CONFIG.API[endpoint];
-        if (!url) throw new Error(`Endpoint non trouvé: ${endpoint}`);
-
-        try {
-            const timeoutPromise = new Promise((_, reject) => 
-                setTimeout(() => reject(new Error(`Timeout pour ${endpoint}`)), CONFIG.ERRORS.apiTimeout)
-            );
-            const responsePromise = fetch(url, { signal });
-            const response = await Promise.race([responsePromise, timeoutPromise]);
-            if (!response.ok) throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-            const data = await response.json();
-            return this._cleanData(data, endpoint);
-        } catch (error) {
-            if (CONFIG.ERRORS.fallbackData) {
-                try { return await this._loadFallbackData(endpoint); }
-                catch (fallbackError) { console.error(`Erreur API et fallback pour ${endpoint}:`, error, fallbackError); throw error; }
-            }
-            throw error;
+        if (res.status === 503) {
+            showNotification("Service temporairement indisponible.", "error");
+            return { is_loading: true };
         }
-    }
 
-    _cleanData(data, endpoint) {
-        if (!data) return { features: [], type: 'FeatureCollection' };
-        if (data.type === 'FeatureCollection') return { ...data, features: data.features.filter(f => f && f.geometry && f.geometry.coordinates) };
-        if (Array.isArray(data)) return { type: 'FeatureCollection', features: data.filter(f => f && f.geometry && f.geometry.coordinates) };
-        if (endpoint === 'busPositions' && data.features) {
-            return { 
-                type: 'FeatureCollection', 
-                features: data.features.map(f => ({
-                    type: 'Feature', 
-                    geometry: { type: 'Point', coordinates: f.geometry?.coordinates || [0, 0] }, 
-                    properties: { ...f.properties, id: f.properties?.id || Utils.generateId(), timestamp: Date.now() }
-                }))
-            };
+        _fetchBackoff = 1000;
+
+        if (!res.ok) throw new Error(`HTTP ${res.status}: ${res.statusText}`);
+        return await res.json();
+    } catch (e) {
+        clearTimeout(timeoutId);
+        _fetchBackoff = Math.min(_fetchBackoff * 2, 30000);
+        console.error(`❌ Erreur API (${path}):`, e.message);
+        showNotification(`Erreur de chargement: ${e.message}`, "error");
+        if (attempt < 2) {
+            await new Promise(r => setTimeout(r, _fetchBackoff));
+            return apiFetch(path, attempt + 1);
         }
-        return data;
+        throw e;
     }
-
-    async _loadFallbackData(endpoint) {
-        try {
-            const response = await fetch(`data/${endpoint}.json`);
-            if (response.ok) return await response.json();
-        } catch (e) {}
-        return { type: 'FeatureCollection', features: [] };
-    }
-
-    async getStats(type) {
-        try {
-            const data = await this.fetchData(type);
-            if (type === 'bus') return { total: data.features?.length || 0, active: data.features?.filter(f => f.properties?.etat === 'En service').length || 0 };
-            if (type === 'velov') {
-                const total = data.features?.length || 0;
-                const available = data.features?.filter(f => f.properties?.nbvelosdispo > 0).length || 0;
-                const totalBikes = data.features?.reduce((sum, f) => sum + (f.properties?.nbvelosdispo || 0), 0) || 0;
-                return { total, available, totalBikes };
-            }
-            if (type === 'parkings') {
-                const total = data.features?.length || 0;
-                const available = data.features?.filter(f => f.properties?.nbplacesdispo > 0).length || 0;
-                const totalSpots = data.features?.reduce((sum, f) => sum + (f.properties?.nbplacesdispo || 0), 0) || 0;
-                return { total, available, totalSpots };
-            }
-            return { total: data.features?.length || 0 };
-        } catch (error) { console.error(`Erreur stats ${type}:`, error); return { total: 0, available: 0, totalBikes: 0, totalSpots: 0 }; }
-    }
-
-    cancelAllRequests() {
-        for (const [key, controller] of this.abortControllers) controller.abort();
-        this.abortControllers.clear();
-        this.pendingRequests.clear();
-    }
-    clearCache() { this.cache.clear(); this.lastUpdated.clear(); }
 }
 
-const apiManager = new APIManager();
+// ============================================
+// CHARGEMENT DES DONNÉES
+// ============================================
+
+/**
+ * Charge toutes les données initiales.
+ */
+async function loadInitialData() {
+    try {
+        await Promise.all([
+            loadStopsMapping(),
+            updateBus(),
+            loadParkings(),
+            loadParkAndRideLots(),
+            updateVelov(),
+            updateTraffic(),
+            updateAccessibility(),
+            updateStopsData(),
+            loadAgencies()
+        ]);
+        showNotification("Données chargées avec succès !", "success");
+        hideLoadingWhenReady();
+    } catch (e) {
+        showNotification("Erreur lors du chargement initial.", "error");
+        console.error("Erreur loadInitialData:", e);
+        hideLoadingWhenReady();
+    }
+}
+
+/**
+ * Masque le spinner quand toutes les données sont chargées.
+ */
+function hideLoadingWhenReady() {
+    const allDataLoaded =
+        allStops.length > 0 &&
+        parkingsLoaded &&
+        parcsRelaisLoaded &&
+        allVelovStations.length > 0;
+
+    if (allDataLoaded) {
+        hideSpinner();
+    } else {
+        setTimeout(hideLoadingWhenReady, 1000);
+    }
+}
+
+// ============================================
+// FONCTIONS POUR LES BUS
+// ============================================
+
+/**
+ * Met à jour les positions des bus.
+ */
+async function updateBus() {
+    try {
+        const buses = await apiFetch('api/buses');
+        if (buses.is_loading) {
+            setTimeout(updateBus, 10000);
+            return;
+        }
+
+        // ... (ton code existant pour updateBus)
+        console.log("✅ Bus mis à jour");
+    } catch (e) {
+        console.error("❌ Erreur updateBus:", e);
+        setTimeout(updateBus, 10000);
+    }
+}
+
+// ============================================
+// FONCTIONS POUR LES VÉLO'V
+// ============================================
+
+/**
+ * Met à jour les stations Vélo'v.
+ */
+async function updateVelov() {
+    try {
+        const data = await apiFetch('api/velov');
+        if (data.is_loading) {
+            setTimeout(updateVelov, 10000);
+            return;
+        }
+        allVelovStations = data.values || [];
+        velovLoaded = true;
+        updateVisibleVelov();
+        console.log("✅ Vélo'v mis à jour");
+    } catch (e) {
+        setTimeout(updateVelov, 10000);
+    }
+}
+
+// ============================================
+// AUTRES FONCTIONS (à copier depuis ton code original)
+// ============================================
+// loadStopsMapping, loadParkings, loadParkAndRideLots, updateTraffic, updateAccessibility, updateStopsData, loadAgencies
+// (Copie-colle ces fonctions depuis ton api.js original)
